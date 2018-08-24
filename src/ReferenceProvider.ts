@@ -1,9 +1,9 @@
 'use strict';
-
 import * as vscode from 'vscode';
-//import * as grep from './grep';
-//const grep = require('grep');
 import { grep } from './grep';
+
+
+
 /**
  * ReferenceProvider for assembly language.
  */
@@ -15,9 +15,8 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param options 
      * @param token 
      */
-    public provideReferences(document: vscode.TextDocument, position: vscode.Position,
-        options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-           return this.processSearch(document, position);
+    public provideReferences(document: vscode.TextDocument, position: vscode.Position, options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
+           return this.search(document, position);
     }
 
     
@@ -26,7 +25,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param document The document that contains the word.
      * @param position The word position.
      */
-    private processSearch(document, position): Thenable<vscode.Location[]>
+    private search(document, position): Thenable<vscode.Location[]>
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
@@ -39,7 +38,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
                 globs: ['**/*.{asm,inc,s,a80}'],
                 regex: searchRegex,
               }).then(function(filematches) {
-                console.log(filematches);
+                //console.log(filematches);
                 // Iterate all matches
                 const list = [];
                 for(const [file,matches] of filematches) {
