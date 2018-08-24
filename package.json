@@ -1,0 +1,66 @@
+{
+    "name": "asm-references",
+    "displayName": "ASM References",
+    "version": "0.1.0",
+    "publisher": "maziac",
+    "description": "A language server that enables the use of references in asssembler files.",
+    "author": {
+        "name": "Thomas Busse"
+    },
+    "license": "MIT",
+    "keywords": [
+        "assembler",
+        "references"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xxx"
+    },
+    "engines": {
+        "vscode": "^1.13.0"
+    },
+    "icon": "assets/icon.png",
+    "categories": [
+        "Programming Languages"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "languages": [
+            {
+                "id": "asm-files",
+                "extensions": [
+                    ".a80",
+                    ".asm",
+                    ".inc",
+                    ".s"
+                ],
+                "aliases": [
+                    "Assembler file"
+                ]
+            }
+        ],
+        "configuration": {
+            "properties": {}
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "fast-glob": "^2.2.2",
+        "p-queue": "^2.4.2"
+    }
+}
