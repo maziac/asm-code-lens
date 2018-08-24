@@ -35,10 +35,10 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('\\b' + searchWord + '\\b');
 
-            const cwd = '/Volumes/Macintosh\ HD\ 2/Projects/zesarux/asm/starwarrior';
+            const dir = vscode.workspace.rootPath;
             this.grep({
                 //cwd: __dirname,
-                cwd: cwd,
+                cwd: dir,
                 globs: ['**/*.{asm,inc,s,a80}'],
                 //globs: ['**/*.{asm,list}'],
                 //globs: ['**/starwarrior.list'],
@@ -55,7 +55,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
                         const colEnd = match.end;                       
                         const startPos = new vscode.Position(lineNr, colStart);
                         const endPos = new vscode.Position(lineNr, colEnd);
-                        const loc = new vscode.Location(vscode.Uri.file(cwd + '/' + file), new vscode.Range(startPos, endPos));
+                        const loc = new vscode.Location(vscode.Uri.file(dir + '/' + file), new vscode.Range(startPos, endPos));
     
                         list.push(loc);                       
                     }
