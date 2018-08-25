@@ -26,12 +26,12 @@ export function read(stream, onData) {
  * search for.
  * @param opts opts.cwd = directory, 
  * opts.globs = the glob pattern, if undefined uses asse,bler defaults,
- * opts.regex = the regular expressionto search for, 
+ * opts.regex = the regular expression to search for, 
  * opts.singleResult = true/false, if true only a single result is 
  * returned (faster).
- * @returns A Map with filenames and matches.
+ * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(opts): Promise<Map<string,any>> {
+export async function grep(opts): Promise<Array<vscode.Location>> {
     const cwd = opts.cwd;
     const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
     const regex = opts.regex;
@@ -39,7 +39,7 @@ export async function grep(opts): Promise<Map<string,any>> {
     
     const readQueue = new PQueue();
     const fileStream = fastGlob.stream(globs, {cwd: cwd} );
-    const matches = new Map();
+    const allMatches = new Map();
     let leave = false;
     
     await read(fileStream, async fileName => {
@@ -52,7 +52,7 @@ export async function grep(opts): Promise<Map<string,any>> {
         
             const filePath = path.join(cwd, fileName);
             const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
-            let fileMatches = matches.get(fileName);
+            let fileMatches = allMatches.get(fileName);
             let lastIndex = 0;
     
             await read(readStream, data => {
@@ -73,7 +73,7 @@ export async function grep(opts): Promise<Map<string,any>> {
         
                     if (!fileMatches) {
                         fileMatches = [];
-                        matches.set(fileName, fileMatches);
+                        allMatches.set(fileName, fileMatches);
                     }
         
                     fileMatches.push({
@@ -95,8 +95,24 @@ export async function grep(opts): Promise<Map<string,any>> {
             });
         });
     });
-    
-    return matches;
+
+    // Convert matches to vscode locations
+    const locations: Array<vscode.Location> = [];
+    for(const [file,matches] of allMatches) {
+        // Iterate all matches inside file
+        for(const match of matches) {
+            const lineNr = match.line;
+            const colStart = match.start;
+            const colEnd = match.end;
+            const startPos = new vscode.Position(lineNr, colStart);
+            const endPos = new vscode.Position(lineNr, colEnd);
+            const loc = new vscode.Location(vscode.Uri.file(path.join(cwd, file)), new vscode.Range(startPos, endPos));
+            // store
+            locations.push(loc);                       
+        }
+    }
+ 
+    return locations;
 }
 
 
@@ -121,15 +137,13 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array
         // Found: get start and end
         const start = match.index;
         const end = match.index + match[0].length;
-        const matchedText = match[1];
 
         // Store found result
         matches.push({
             line,  // line number (starts at 0)
             start,  // start column
             end,    // end column
-            lineContents,   // The line text.
-            matchedText   // The matched text
+            lineContents
         });
     }
     return matches;
