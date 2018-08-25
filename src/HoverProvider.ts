@@ -40,24 +40,18 @@ export class HoverProvider implements vscode.HoverProvider {
                 globs: ['**/*.{asm,inc,s,a80}'],
                 regex: searchRegex,
                 singleResult: true
-              }).then(function(filematches) {
-                //console.log(filematches);
-                // Get match 
-                const iter = filematches.entries();
-                const entry = iter.next().value;
-                const filename = entry[0];
-                const matches = entry[1];
-                const result = matches[0];
-                const lineNr = result.line;
-                const text = result.lineContents;
-
+              }).then(locations => {
+                // There should be only one location.
                 // Now read the comment lines above the found word.
-                const filePath = path.join(dir, filename);
+                const loc = locations[0];
+                const lineNr = loc.range.start.line;
+                const filePath = loc.uri.fsPath;
                 const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
                 read(readStream, data => {
                     const lines = data.split('\n');
-                    // Now find all comments abofe the found line
+                    // Now find all comments above the found line
                     const hoverTexts = new Array<string>();
+                    const text = lines[lineNr];
                     hoverTexts.unshift(text);
                     let startLine = lineNr-1;
                     while(startLine >= 0) {

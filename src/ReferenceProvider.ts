@@ -33,28 +33,12 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
 
             const dir = vscode.workspace.rootPath;
             grep({
-                //cwd: __dirname,
                 cwd: dir,
                 regex: searchRegex,
-            }).then(function(filematches) {
-                //console.log(filematches);
-                // Iterate all matches
-                const list = [];
-                for(const [file,matches] of filematches) {
-                    // Iterate all matches inside file
-                    for(const match of matches) {
-                        const lineNr = match.line;
-                        const colStart = match.start;
-                        const colEnd = match.end;
-                        const startPos = new vscode.Position(lineNr, colStart);
-                        const endPos = new vscode.Position(lineNr, colEnd);
-                        const loc = new vscode.Location(vscode.Uri.file(dir + '/' + file), new vscode.Range(startPos, endPos));
-    
-                        list.push(loc);                       
-                    }
-                }
-                return resolve(list);
-              });
+            })
+            .then(locations => {
+                return resolve(locations);
+            });
         });
     }
 
