@@ -33,10 +33,9 @@ export class HoverProvider implements vscode.HoverProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('\\b' + searchWord + ':');
 
-            const dir = vscode.workspace.rootPath;
             grep({
                 //cwd: __dirname,
-                cwd: dir,
+                cwd: vscode.workspace.rootPath,
                 globs: ['**/*.{asm,inc,s,a80}'],
                 regex: searchRegex,
                 singleResult: true

@@ -7,19 +7,21 @@ import { CodeLensProvider } from './CodeLensProvider';
 
 export function activate(context: vscode.ExtensionContext) {
     //const ASM_LANGUAGE: vscode.DocumentFilter = { pattern: '**/*.{asm,s,a80,inc}' };
-    const asmFiles = "asm-files";
+    //const asmFiles = "asm-files";
+    const asmFiles: vscode.DocumentSelector = { language: "asm-files", scheme: "file" };
     context.subscriptions.push(
         //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())
-        vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider()),
-
-        vscode.languages.registerHoverProvider(asmFiles, new HoverProvider()),
-
-        vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider()),
-        
-        vscode.commands.registerCommand('extension.asmcodelens.getrefrences', args => {
-         })
-    
+        vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider())
     );
+
+    context.subscriptions.push(
+        vscode.languages.registerHoverProvider(asmFiles, new HoverProvider()),
+    );
+
+    context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider()),
+    );
+
 }
 
 // this method is called when your extension is deactivated

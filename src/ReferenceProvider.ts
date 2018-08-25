@@ -31,9 +31,8 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('\\b' + searchWord + '\\b');
 
-            const dir = vscode.workspace.rootPath;
             grep({
-                cwd: dir,
+                cwd: vscode.workspace.rootPath,
                 regex: searchRegex,
             })
             .then(locations => {
