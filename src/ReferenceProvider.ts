@@ -25,7 +25,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param document The document that contains the word.
      * @param position The word position.
      */
-    private search(document, position): Thenable<vscode.Location[]>
+    public search(document, position): Thenable<vscode.Location[]>
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
@@ -35,9 +35,8 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             grep({
                 //cwd: __dirname,
                 cwd: dir,
-                globs: ['**/*.{asm,inc,s,a80}'],
                 regex: searchRegex,
-              }).then(function(filematches) {
+            }).then(function(filematches) {
                 //console.log(filematches);
                 // Iterate all matches
                 const list = [];
@@ -45,8 +44,8 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
                     // Iterate all matches inside file
                     for(const match of matches) {
                         const lineNr = match.line;
-                        const colStart = match.start;                       
-                        const colEnd = match.end;                       
+                        const colStart = match.start;
+                        const colEnd = match.end;
                         const startPos = new vscode.Position(lineNr, colStart);
                         const endPos = new vscode.Position(lineNr, colEnd);
                         const loc = new vscode.Location(vscode.Uri.file(dir + '/' + file), new vscode.Range(startPos, endPos));

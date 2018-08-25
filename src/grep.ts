@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as PQueue from 'p-queue';
@@ -20,10 +21,11 @@ export function read(stream, onData) {
 
 
 /**
- * Searches according to opts.
+ * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
- * @param opts opts.cwd = directory, opts.globs = the glob pattern,
+ * @param opts opts.cwd = directory, 
+ * opts.globs = the glob pattern, if undefined uses asse,bler defaults,
  * opts.regex = the regular expressionto search for, 
  * opts.singleResult = true/false, if true only a single result is 
  * returned (faster).
@@ -31,7 +33,7 @@ export function read(stream, onData) {
  */
 export async function grep(opts): Promise<Map<string,any>> {
     const cwd = opts.cwd;
-    const globs = opts.globs;
+    const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
     const regex = opts.regex;
     const singleResult = opts.singleResult;
     
@@ -79,7 +81,7 @@ export async function grep(opts): Promise<Map<string,any>> {
                         line,
                         start,
                         end,
-                        lineContents,
+                        lineContents
                     });
 
                     // Check if only one result is wanted
@@ -97,3 +99,38 @@ export async function grep(opts): Promise<Map<string,any>> {
     return matches;
 }
 
+
+
+
+/**
+ * Searches a vscode.TextDocument for a regular expression and
+ * returns the found line numbers.
+ * @param doc The TextDocument.
+ * @returns An array that contains: line number, start column, end column, and the text of the line.
+ */
+export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array<any> {
+    const matches = new Array<any>();
+    const len = doc.lineCount;
+    for (let line=0; line<len; line++) {
+        const textLine = doc.lineAt(line);
+        const lineContents = textLine.text;
+        const match = regex.exec(lineContents);
+        if(!match) 
+            continue;
+
+        // Found: get start and end
+        const start = match.index;
+        const end = match.index + match[0].length;
+        const matchedText = match[1];
+
+        // Store found result
+        matches.push({
+            line,  // line number (starts at 0)
+            start,  // start column
+            end,    // end column
+            lineContents,   // The line text.
+            matchedText   // The matched text
+        });
+    }
+    return matches;
+}
