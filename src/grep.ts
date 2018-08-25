@@ -9,7 +9,7 @@ import * as fastGlob from 'fast-glob';
  * @param stream 
  * @param onData 
  */
-function read(stream, onData) {
+export function read(stream, onData) {
     return new Promise((resolve, reject) => {
         const promises = [];
         stream.on('data', data => promises.push(onData(data)));
@@ -48,8 +48,8 @@ export async function grep(opts): Promise<Map<string,any>> {
             if(leave)
                 return;
         
-            let filePath = path.join(cwd, fileName);
-            let readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+            const filePath = path.join(cwd, fileName);
+            const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
             let fileMatches = matches.get(fileName);
             let lastIndex = 0;
     

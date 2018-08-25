@@ -1,6 +1,8 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep } from './grep';
+import { grep, read } from './grep';
+import * as fs from 'fs';
+import * as path from 'path';
 
 
 
@@ -29,7 +31,7 @@ export class HoverProvider implements vscode.HoverProvider {
     {
         return new Promise<vscode.Hover>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
-            const searchRegex = new RegExp('\\b' + searchWord + '\\b');
+            const searchRegex = new RegExp('\\b' + searchWord + ':');
 
             const dir = vscode.workspace.rootPath;
             grep({
@@ -43,12 +45,37 @@ export class HoverProvider implements vscode.HoverProvider {
                 // Get match 
                 const iter = filematches.entries();
                 const entry = iter.next().value;
-                const match = entry[1];
-                const result = match[0];
+                const filename = entry[0];
+                const matches = entry[1];
+                const result = matches[0];
+                const lineNr = result.line;
                 const text = result.lineContents;
-                const hover = new vscode.Hover(text);
-                return resolve(hover);
-              });
+
+                // Now read the comment lines above the found word.
+                const filePath = path.join(dir, filename);
+                const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+                read(readStream, data => {
+                    const lines = data.split('\n');
+                    // Now find all comments abofe the found line
+                    const hoverTexts = new Array<string>();
+                    hoverTexts.unshift(text);
+                    let startLine = lineNr-1;
+                    while(startLine >= 0) {
+                        // Check if line starts with ";"
+                        const line = lines[startLine];
+                        const match = /^\s*;/.exec(line);
+                        if(!match)
+                            break;
+                        // Add text
+                        hoverTexts.unshift(line);    
+                        // Next
+                        startLine --;
+                    }
+                    // return
+                    const hover = new vscode.Hover(hoverTexts);
+                    return resolve(hover);
+                });
+            });
         });
     }
 
