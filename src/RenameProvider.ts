@@ -33,16 +33,14 @@ export class RenameProvider implements vscode.RenameProvider {
         return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
             const searchRegex = new RegExp('\\b' + oldName + '\\b');
 
-            grep({
-                cwd: vscode.workspace.rootPath,
-                regex: searchRegex,
-            })
+            grep({ regex: searchRegex })
             .then(locations => {
                 // Change to WorkSpaceEdits.
                 const wsEdit = new vscode.WorkspaceEdit();
                 for(const loc of locations) {
                     wsEdit.replace(loc.uri, loc.range, newName);
                 }
+                
                 return resolve(wsEdit);
             });
         });

@@ -33,13 +33,8 @@ export class HoverProvider implements vscode.HoverProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('\\b' + searchWord + ':');
 
-            grep({
-                //cwd: __dirname,
-                cwd: vscode.workspace.rootPath,
-                globs: ['**/*.{asm,inc,s,a80}'],
-                regex: searchRegex,
-                singleResult: true
-              }).then(locations => {
+            grep({ regex: searchRegex, singleResult: true })
+            .then(locations => {
                 // There should be only one location.
                 // Now read the comment lines above the found word.
                 const loc = locations[0];

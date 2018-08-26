@@ -24,103 +24,108 @@ export function read(stream, onData) {
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
- * @param opts opts.cwd = directory, 
- * opts.globs = the glob pattern, if undefined uses asse,bler defaults,
- * opts.regex = the regular expression to search for, 
+ * @param opts opts.regex = the regular expression to search for, 
  * opts.singleResult = true/false, if true only a single result is 
  * returned (faster).
  * @returns An array of the vscode locations of the found expressions.
  */
 export async function grep(opts): Promise<Array<vscode.Location>> {
-    const cwd = opts.cwd;
-    const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
+    //const cwd = opts.cwd;
+    //const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
     const regex = opts.regex;
     const singleResult = opts.singleResult;
     
     const readQueue = new PQueue();
-    const fileStream = fastGlob.stream(globs, {cwd: cwd} );
+    //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
     let leave = false;
     
-    await read(fileStream, async fileName => {
-        if(leave)
-            return;
+    await vscode.workspace.findFiles('**/*.{asm,inc,s,a80}', null)
+    .then(async uris => {
+        for(const uri of uris) {
         
-        await readQueue.add(async () => {
             if(leave)
                 return;
-        
-            const filePath = path.join(cwd, fileName);
 
-            // Check if file is opened in editor
-            const docs = vscode.workspace.textDocuments;
-            let foundDoc = undefined;
-            for(const doc of docs) {
-                if(doc.isDirty) {   // Only check dirty documents, other are on disk
-                    if(doc.fileName == filePath) {
-                        foundDoc = doc;
-                        break;
-                    }
-                }
-            }
-
-            // Check if file on disk is checked or in vscode
-            if(foundDoc) {
-                // Check file in vscode
-                const fileMatches = grepTextDocument(foundDoc, regex);
-                // Add filename to matches
-                for(const match of fileMatches) {
-                    match.fileName = fileName;
-                }
-                // Store
-                allMatches.set(fileName, fileMatches);
-            }
-            else {
-                // Check file on disk
-                const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
-                let fileMatches = allMatches.get(fileName);
-                let lastIndex = 0;
+            // get fileName
+            const fileName = uri.fsPath;
         
-                await read(readStream, data => {
-                    if(leave)
+            await readQueue.add(async () => {
+                if(leave)
                     return;
-
-                    const lines = data.split('\n');
-                    const len = lines.length;
-                    for (let index = 0; index < len; index++) {
-                        const lineContents = lines[index];
-                        const line = lastIndex + index;
-                        const match = regex.exec(lineContents);
-                        if(!match) 
-                            continue;
-                
-                        const start = match.index;
-                        const end = match.index + match[0].length;
             
-                        if (!fileMatches) {
-                            fileMatches = [];
-                            allMatches.set(fileName, fileMatches);
-                        }
-            
-                        fileMatches.push({
-                            filePath,
-                            line,
-                            start,
-                            end,
-                            lineContents
-                        });
+                const filePath = fileName; //path.join(cwd, fileName);
 
-                        // Check if only one result is wanted
-                        if(singleResult) {
-                            leave = true;
+                // Check if file is opened in editor
+                const docs = vscode.workspace.textDocuments;
+                let foundDoc = undefined;
+                for(const doc of docs) {
+                    if(doc.isDirty) {   // Only check dirty documents, other are on disk
+                        if(doc.fileName == filePath) {
+                            foundDoc = doc;
                             break;
                         }
                     }
-        
-                    lastIndex += len;
-                });
-            }
-        });
+                }
+
+                // Check if file on disk is checked or in vscode
+                if(foundDoc) {
+                    // Check file in vscode
+                    const fileMatches = grepTextDocument(foundDoc, regex);
+                    // Add filename to matches
+                    for(const match of fileMatches) {
+                        match.fileName = fileName;
+                    }
+                    // Store
+                    allMatches.set(fileName, fileMatches);
+                }
+                else {
+                    // Check file on disk
+                    const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+                    let fileMatches = allMatches.get(fileName);
+                    let lastIndex = 0;
+            
+                    await read(readStream, data => {
+                        if(leave)
+                        return;
+
+                        const lines = data.split('\n');
+                        const len = lines.length;
+                        for (let index = 0; index < len; index++) {
+                            const lineContents = lines[index];
+                            const line = lastIndex + index;
+                            const match = regex.exec(lineContents);
+                            if(!match) 
+                                continue;
+                    
+                            const start = match.index;
+                            const end = match.index + match[0].length;
+                
+                            if (!fileMatches) {
+                                fileMatches = [];
+                                allMatches.set(fileName, fileMatches);
+                            }
+                
+                            fileMatches.push({
+                                filePath,
+                                line,
+                                start,
+                                end,
+                                lineContents
+                            });
+
+                            // Check if only one result is wanted
+                            if(singleResult) {
+                                leave = true;
+                                break;
+                            }
+                        }
+            
+                        lastIndex += len;
+                    });
+                }
+            });
+        }
     });
 
     // Convert matches to vscode locations
@@ -133,7 +138,7 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
             const colEnd = match.end;
             const startPos = new vscode.Position(lineNr, colStart);
             const endPos = new vscode.Position(lineNr, colEnd);
-            const loc = new vscode.Location(vscode.Uri.file(path.join(cwd, file)), new vscode.Range(startPos, endPos));
+            const loc = new vscode.Location(vscode.Uri.file(file), new vscode.Range(startPos, endPos));
             // store
             locations.push(loc);                       
         }
