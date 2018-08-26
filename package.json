@@ -1,16 +1,17 @@
 {
-    "name": "asm-references",
-    "displayName": "ASM References",
-    "version": "0.1.0",
+    "name": "asm-code-lens",
+    "displayName": "ASM Code Lens",
+    "version": "1.0.0",
     "publisher": "maziac",
-    "description": "A language server that enables the use of references in asssembler files.",
+    "description": "A language server that enables code lens, references, hover information and symbol renaming in asssembler files.",
     "author": {
         "name": "Thomas Busse"
     },
     "license": "MIT",
     "keywords": [
         "assembler",
-        "references"
+        "references",
+        "code lens"
     ],
     "repository": {
         "type": "git",
@@ -28,20 +29,6 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "languages": [
-            {
-                "id": "asm-files",
-                "extensions": [
-                    ".a80",
-                    ".asm",
-                    ".inc",
-                    ".s"
-                ],
-                "aliases": [
-                    "Assembler file"
-                ]
-            }
-        ],
         "configuration": {
             "properties": {}
         }
