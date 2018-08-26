@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep } from './grep';
+import { grep, read } from './grep';
+import * as fs from 'fs';
 
 
 
@@ -36,14 +37,63 @@ export class RenameProvider implements vscode.RenameProvider {
             grep({ regex: searchRegex })
             .then(locations => {
                 // Change to WorkSpaceEdits.
+                // Note: WorkSpaceEdits seem to work only on opened documents.
+                // The problem is: there is no way to find out the opened documents.
+                // The only available information are the dirty docs. I.e. those are opened.
+                // And only those are changed with WorkSpaceEdits.
+                // The other, undirty opened docs and unopened docs, are changed on disk.
+                // For the undirty opened docs this will result in a reload at the same position.
+                // Not nice, but working.
                 const wsEdit = new vscode.WorkspaceEdit();
+                const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
                 for(const loc of locations) {
-                    wsEdit.replace(loc.uri, loc.range, newName);
+                    // Check if doc is not open  
+                    let foundDoc = undefined;
+                    for(const doc of docs) {
+                        if(doc.uri.fsPath == loc.uri.fsPath) {
+                            foundDoc = doc;
+                            break;
+                        }
+                    }
+                    if(foundDoc) {
+                        // use workspace edit because file is opened in editor
+                        wsEdit.replace(loc.uri, loc.range, newName);
+                    }
+                    else {
+                        // Change file on disk
+                        this.renameInFile(loc.uri.fsPath, oldName, newName);
+                     }
                 }
                 
                 return resolve(wsEdit);
             });
         });
+    }
+
+
+    /**
+     * Replaces all occurences of 'regex' in a file on disk with the 'newName'.
+     * @param filePath The absolute file path.
+     * @param regex The regex to change. Should be global otherwise only the first name is changed.
+     * @param newName The new name.
+     */
+    protected async renameInFile(filePath: string, oldName: string, newName: string) {
+        const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+        let text = '';
+        const regex = new RegExp('\\b' + oldName + '\\b', 'gm');
+
+        // Read an exchange
+        await read(readStream, data => {
+            text += data;
+        });
+        readStream.destroy();
+        const replacedText = text.replace(regex, newName);
+
+        // Now write file
+        const writeStream = fs.createWriteStream(filePath, { encoding: 'utf-8' });
+        writeStream.write(replacedText, () => {
+            writeStream.close();
+        })
     }
 
 }

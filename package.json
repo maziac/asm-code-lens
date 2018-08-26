@@ -15,7 +15,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/xxx"
+        "url": "https://github.com/maziac/asm-code-lens"
     },
     "engines": {
         "vscode": "^1.13.0"

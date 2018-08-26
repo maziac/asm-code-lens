@@ -42,6 +42,8 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
     
     await vscode.workspace.findFiles('**/*.{asm,inc,s,a80}', null)
     .then(async uris => {
+        const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+ 
         for(const uri of uris) {
         
             if(leave)
@@ -54,10 +56,9 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
                 if(leave)
                     return;
             
-                const filePath = fileName; //path.join(cwd, fileName);
+                const filePath = fileName;
 
                 // Check if file is opened in editor
-                const docs = vscode.workspace.textDocuments;
                 let foundDoc = undefined;
                 for(const doc of docs) {
                     if(doc.isDirty) {   // Only check dirty documents, other are on disk
@@ -87,7 +88,7 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
             
                     await read(readStream, data => {
                         if(leave)
-                        return;
+                            return;
 
                         const lines = data.split('\n');
                         const len = lines.length;

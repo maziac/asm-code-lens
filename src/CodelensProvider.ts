@@ -81,16 +81,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             const searchWord = codeLens.symbol;
             const searchRegex = new RegExp('^[^;]*\\b' + searchWord + '(?![\\w:])');
 
-            let line = '; '+searchWord;
-            const m1 = searchRegex.exec(line);
-
-            line = 'afa '+searchWord;
-            const m2 = searchRegex.exec(line);
-
-            line = '  ; '+searchWord;
-            const m3 = searchRegex.exec(line);
-
-
             const doc = codeLens.document;
             const pos = codeLens.range.start;
             grep({ regex: searchRegex })
