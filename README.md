@@ -10,6 +10,15 @@ It provides support for:
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
 
 
+## Installation
+
+Install through Visual Studio Code Marketplace.
+The extension is called "ASM Code Lens".
+
+It supports the following assembler file extensions:
+.asm, .s, .inc, .a80.
+
+
 ## Known Issues
 
 - [CodeLens lifetime #57227](https://github.com/Microsoft/vscode/issues/57227): Updates of the CodeLens is not working optimal. At the moment it is necessary to reload or save the file to update the CodeLens info.

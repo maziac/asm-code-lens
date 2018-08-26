@@ -1,9 +1,9 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "maziac",
-    "description": "A language server that enables code lens, references, hover information and symbol renaming in asssembler files.",
+    "description": "A language server that enables code lens, references, hover information and symbol renaming in assembler files.",
     "author": {
         "name": "Thomas Busse"
     },
