@@ -37,7 +37,11 @@ export class RenameProvider implements vscode.RenameProvider {
             grep({ regex: searchRegex })
             .then(locations => {
                 // Change to WorkSpaceEdits.
-                // Note: WorkSpaceEdits seem to work only on opened documents.
+                // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.
+                // However the problem is that the a file which is not yet opene would be
+                // opened by the WorkSpaceEdit and stay there unsaved.
+                // Therefore I try beforehand to find out which documents are already opened and
+                // handle the unopened files differently.
                 // The problem is: there is no way to find out the opened documents.
                 // The only available information are the dirty docs. I.e. those are opened.
                 // And only those are changed with WorkSpaceEdits.
