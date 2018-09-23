@@ -7,7 +7,7 @@ import { grep } from './grep';
 /**
  * ReferenceProvider for assembly language.
  */
-export class ReferenceProvider implements vscode.ReferenceProvider {
+export class ReferenceProvider implements vscode.ReferenceProvider { 
     /**
      * Called from vscode if the used selects "Find all references".
      * @param document The current document.
