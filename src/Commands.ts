@@ -22,35 +22,8 @@ export class Commands {
         .then(labelLocations => {
             // locations is a GrepLocation array that contains all found labels.
             // Convert this to an array of labels.
-            //const labels = labelLocations.map(loc => loc.fileMatch.match[1]);
-            this.findLabels(labelLocations).then(unreferencedLabels => {
-                for(const label of unreferencedLabels) {
-                    // No reference
-                    console.log("Label=", label);
-                }
-                
-            });
-
-            /*
-            for(const labelLoc of labelLocations) {
-                const match = labelLoc.fileMatch.match;
-                const label = match[1];
-                assert(label);
-
-                // Now search for at least one usage of this label
-                //const refRegex = new RegExp('^[^;]*\\b' + label + '(?![\\w:])');
-                const refRegex = new RegExp('^[^;]*\\b' + label + '');
-                grep({ regex: refRegex, singleResult: true })
-                .then(refLocations => {
-                    if(refLocations.length == 1) {
-                        // No reference
-                        console.log("Label=", label);
-                    }
-                });
-            }
-            */
+            this.findLabels(labelLocations);
         });
-
     }
 
 
@@ -62,13 +35,12 @@ export class Commands {
      * @param opts opts.regex = the regular expression to search for, 
      * opts.singleResult = true/false, if true only a single result is 
      * returned (faster).
-     * @returns An array of the vscode locations of the found expressions.
      */
-    protected static async findLabels(locLabels): Promise<Array<string>> {
-   //     const readQueue = new PQueue();
-        //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
-        const allUnref = new Array<string>();
-        
+    protected static async findLabels(locLabels) {
+        output.appendLine("Unreferenced labels:");
+        output.show(true);
+        let count = 0;
+
         await vscode.workspace.findFiles('**/*.{asm,inc,s,a80}', null)
         .then(async uris => {
             try {
@@ -105,6 +77,7 @@ export class Commands {
                             const fileMatches = grepTextDocument(foundDoc, regex);
                             if(fileMatches.length > 0) {
                                 leave = true;
+                                count ++;
                             }
                         }
                         else {
@@ -112,6 +85,7 @@ export class Commands {
                             const result = grepit(regex, filePath);
                             if(result.length > 0) {
                                 leave = true;
+                                count ++;
                             }
                         }
                         if(leave)
@@ -120,8 +94,8 @@ export class Commands {
                     // Check if found
                     if(!leave) {
                         // Not found
-                        allUnref.push(label);
-                        console.log("fffLabel=", label);
+                        output.appendLine(label + ", " + firstFileName + ":" + (locLabel.fileMatch.line+1));
+    
                     }
                 }
             }
@@ -129,7 +103,12 @@ export class Commands {
                 console.log("Error: ", e);
             }
         });   
-        return allUnref;
+        
+        // Check if any label is unreferenced
+        if(count == 0) 
+            output.appendLine("None.");
     }
 
 }
+
+let output = vscode.window.createOutputChannel("ASM Code Lens");
