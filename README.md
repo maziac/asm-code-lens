@@ -8,6 +8,7 @@ It provides support for:
 - Hovering: When hovering over  symbol it shows the comments for the symbol.
 - Rename symbols.
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
+- Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
 
 
 ## Installation
