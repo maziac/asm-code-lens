@@ -10,6 +10,17 @@ import * as path from 'path';
  * HoverProvider for assembly language.
  */
 export class HoverProvider implements vscode.HoverProvider {
+
+    /**
+     * If hover provider was registered this
+     */
+    public static deregister() {
+        if(hoverProviderDisposable) {
+            hoverProviderDisposable.dispose();
+            hoverProviderDisposable = undefined;
+        }
+    }
+
     /**
      * Called from vscode if the used selects "Find all references".
      * @param document The current document.
@@ -18,7 +29,11 @@ export class HoverProvider implements vscode.HoverProvider {
      * @param token 
      */
     public provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Hover> {
-           return this.search(document, position);
+        let settings = vscode.workspace.getConfiguration('asm-code-lens');
+        if(settings.enableHoverProvider)
+            return this.search(document, position);
+        else
+            return undefined; // new vscode.Hover;
     }
 
     
@@ -26,6 +41,7 @@ export class HoverProvider implements vscode.HoverProvider {
      * Does a search for a word. I.e. finds all references of the word.
      * @param document The document that contains the word.
      * @param position The word position.
+     * @return A promise with a vscode.Hover object.
      */
     private search(document, position): Thenable<vscode.Hover>
     {

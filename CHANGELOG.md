@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0
+- HoverProvider can be enabled/disabled in the settings.
+
 ## 1.0.1
 - Readme updated.
 

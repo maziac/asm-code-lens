@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information and symbol renaming in assembler files.",
     "author": {
@@ -30,7 +30,15 @@
     "main": "./out/src/extension",
     "contributes": {
         "configuration": {
-            "properties": {}
+            "type": "object",
+            "title": "asm-code-lens configuration",
+            "properties": {
+                "asm-code-lens.enableHoverProvider": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disabe the hover provider."
+                }
+            }
         }
     },
     "scripts": {
