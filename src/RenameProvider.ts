@@ -32,13 +32,13 @@ export class RenameProvider implements vscode.RenameProvider {
      */
     public rename(oldName: string, newName: string): Thenable<vscode.WorkspaceEdit> {
         return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
-            const searchRegex = new RegExp('\\b' + oldName + '\\b');
+            const searchRegex = new RegExp('\\b' + oldName + '\\b', 'g');
 
             grep({ regex: searchRegex })
             .then(locations => {
                 // Change to WorkSpaceEdits.
                 // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.
-                // However the problem is that the a file which is not yet opene would be
+                // However the problem is that the a file which is not yet open would be
                 // opened by the WorkSpaceEdit and stay there unsaved.
                 // Therefore I try beforehand to find out which documents are already opened and
                 // handle the unopened files differently.
@@ -64,9 +64,10 @@ export class RenameProvider implements vscode.RenameProvider {
                         wsEdit.replace(loc.uri, loc.range, newName);
                     }
                     else {
-                        // Change file on disk
+                        // Change file on disk.
+                        // Note: this is called more than once. Although this is superfluous it does not harm.
                         this.renameInFile(loc.uri.fsPath, oldName, newName);
-                     }
+                    }
                 }
                 
                 return resolve(wsEdit);

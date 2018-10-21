@@ -79,7 +79,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         return new Promise<vscode.CodeLens>((resolve, reject) => {
             // search the references
             const searchWord = codeLens.symbol;
-            const searchRegex = new RegExp('^[^;]*\\b' + searchWord + '(?![\\w:])');
+            const searchRegex = new RegExp('^[^;"]*\\b' + searchWord + '(?![\\w:])');
 
             const doc = codeLens.document;
             const pos = codeLens.range.start;

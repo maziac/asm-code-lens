@@ -199,23 +199,29 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array
     for (let line=0; line<len; line++) {
         const textLine = doc.lineAt(line);
         const lineContents = textLine.text;
-        const match = regex.exec(lineContents);
-        if(!match) 
-            continue;
 
-        // Found: get start and end
-        const start = match.index;
-        const end = match.index + match[0].length;
+        let match = regex.exec(lineContents);
+        while(match !== null) {
+             // Found: get start and end
+            const start = match.index;
+            const end = match.index + match[0].length;
 
-        // Store found result
-        matches.push({
-            filePath: undefined,
-            line,  // line number (starts at 0)
-            start,  // start column
-            end,    // end column
-            lineContents,
-            match
-        });
+            // Store found result
+            matches.push({
+                filePath: undefined,
+                line,  // line number (starts at 0)
+                start,  // start column
+                end,    // end column
+                lineContents,
+                match
+            });
+
+            // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+            if(regex.global)
+               match = regex.exec(lineContents)
+            else 
+                match = null;
+        }
     }
     return matches;
 }
