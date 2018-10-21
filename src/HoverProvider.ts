@@ -12,16 +12,6 @@ import * as path from 'path';
 export class HoverProvider implements vscode.HoverProvider {
 
     /**
-     * If hover provider was registered this
-     */
-    public static deregister() {
-        if(hoverProviderDisposable) {
-            hoverProviderDisposable.dispose();
-            hoverProviderDisposable = undefined;
-        }
-    }
-
-    /**
      * Called from vscode if the used selects "Find all references".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.

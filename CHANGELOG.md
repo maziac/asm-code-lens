@@ -2,6 +2,7 @@
 
 ## 1.1.0
 - HoverProvider can be enabled/disabled in the settings.
+- DefinitionProvider added.
 
 ## 1.0.1
 - Readme updated.

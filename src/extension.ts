@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { ReferenceProvider } from './ReferenceProvider';
+import { DefinitionProvider } from './DefinitionProvider';
 import { HoverProvider } from './HoverProvider';
 import { CodeLensProvider } from './CodeLensProvider';
 import { RenameProvider } from './RenameProvider';
@@ -14,6 +15,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())
         vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider())
+    );
+
+    context.subscriptions.push(
+        vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider())
     );
 
     context.subscriptions.push(
