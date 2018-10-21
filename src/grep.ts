@@ -1,9 +1,44 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as path from 'path';
+//import * as path from 'path';
 import * as PQueue from 'p-queue';
-import * as fastGlob from 'fast-glob';
+//import * as fastGlob from 'fast-glob';
 
+
+export interface FileMatch {
+    /// The file path of the match:
+    filePath: string,
+    /// The line number:
+    line: number,
+    /// The column:
+    start: number,
+    /// The end column:
+    end: number,
+    /// The contents of the found line:
+    lineContents: string,
+    /// The corresponding match object.
+    match: RegExpExecArray
+}
+
+/**
+ * This extends the vscode location object by 
+ * the match object.
+ * Used in 'findLabelsWithNoReference'.
+ */
+export class GrepLocation extends vscode.Location {
+    public fileMatch: FileMatch;
+
+    /**
+     * Creates a new location object.
+     * @param uri The resource identifier.
+     * @param rangeOrPosition The range or position. Positions will be converted to an empty range.
+     * @param fileMatch The complete file match object.
+     */
+    constructor(uri: vscode.Uri, rangeOrPosition: vscode.Range | vscode.Position, fileMatch: FileMatch) {
+        super(uri, rangeOrPosition);
+        this.fileMatch = fileMatch;
+    }
+}
 
 /**
  * Reads data from a stream.
@@ -29,7 +64,7 @@ export function read(stream, onData) {
  * returned (faster).
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(opts): Promise<Array<vscode.Location>> {
+export async function grep(opts): Promise<Array<GrepLocation>> {
     //const cwd = opts.cwd;
     //const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
     const regex = opts.regex;
@@ -75,7 +110,7 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
                     const fileMatches = grepTextDocument(foundDoc, regex);
                     // Add filename to matches
                     for(const match of fileMatches) {
-                        match.fileName = fileName;
+                        match.filePath = fileName;
                     }
                     // Store
                     allMatches.set(fileName, fileMatches);
@@ -112,25 +147,28 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
                                 line,
                                 start,
                                 end,
-                                lineContents
+                                lineContents,
+                                match
                             });
 
                             // Check if only one result is wanted
                             if(singleResult) {
                                 leave = true;
-                                break;
+                                return;
                             }
                         }
             
                         lastIndex += len;
                     });
                 }
+                if(leave)
+                    return;
             });
         }
     });
 
     // Convert matches to vscode locations
-    const locations: Array<vscode.Location> = [];
+    const locations: Array<GrepLocation> = [];
     for(const [file,matches] of allMatches) {
         // Iterate all matches inside file
         for(const match of matches) {
@@ -139,7 +177,7 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
             const colEnd = match.end;
             const startPos = new vscode.Position(lineNr, colStart);
             const endPos = new vscode.Position(lineNr, colEnd);
-            const loc = new vscode.Location(vscode.Uri.file(file), new vscode.Range(startPos, endPos));
+            const loc = new GrepLocation(vscode.Uri.file(file), new vscode.Range(startPos, endPos), match);
             // store
             locations.push(loc);                       
         }
@@ -149,16 +187,14 @@ export async function grep(opts): Promise<Array<vscode.Location>> {
 }
 
 
-
-
 /**
  * Searches a vscode.TextDocument for a regular expression and
  * returns the found line numbers.
  * @param doc The TextDocument.
  * @returns An array that contains: line number, start column, end column, and the text of the line.
  */
-export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array<any> {
-    const matches = new Array<any>();
+export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array<FileMatch> {
+    const matches = new Array<FileMatch>();
     const len = doc.lineCount;
     for (let line=0; line<len; line++) {
         const textLine = doc.lineAt(line);
@@ -173,11 +209,15 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array
 
         // Store found result
         matches.push({
+            filePath: undefined,
             line,  // line number (starts at 0)
             start,  // start column
             end,    // end column
-            lineContents
+            lineContents,
+            match
         });
     }
     return matches;
 }
+
+

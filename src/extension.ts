@@ -6,6 +6,7 @@ import { DefinitionProvider } from './DefinitionProvider';
 import { HoverProvider } from './HoverProvider';
 import { CodeLensProvider } from './CodeLensProvider';
 import { RenameProvider } from './RenameProvider';
+import { Commands } from './Commands';
 
 export function activate(context: vscode.ExtensionContext) {
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
@@ -33,6 +34,10 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerRenameProvider(asmFiles, new RenameProvider()),
     );
 
+    vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
+        Commands.findLabelsWithNoReference(); 
+    });
+   
 }
 
 // this method is called when your extension is deactivated

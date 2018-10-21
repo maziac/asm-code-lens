@@ -39,7 +39,13 @@
                     "description": "Enable/disabe the hover provider."
                 }
             }
-        }
+        },
+        "commands": [
+            {
+                "command": "asm-code-lens.find-labels-with-no-reference",
+                "title": "ASM Code Lens: Find labels with no reference "
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
@@ -56,6 +62,7 @@
     },
     "dependencies": {
         "fast-glob": "^2.2.2",
+        "grepit": "^1.0.0",
         "p-queue": "^2.4.2"
     }
 }

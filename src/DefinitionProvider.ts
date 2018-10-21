@@ -32,7 +32,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('\\b' + searchWord + ':');
 
-            grep({ regex: searchRegex, singleResult: true })
+            grep({ regex: searchRegex })
             .then(locations => {
                 // There should be only one location.
                 // Anyhow return the whole array.
