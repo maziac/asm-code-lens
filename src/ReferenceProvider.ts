@@ -9,7 +9,7 @@ import { grep } from './grep';
  */
 export class ReferenceProvider implements vscode.ReferenceProvider { 
     /**
-     * Called from vscode if the used selects "Find all references".
+     * Called from vscode if the user selects "Find all references".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
      * @param options 

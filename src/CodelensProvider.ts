@@ -71,7 +71,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     /**
      * Called by vscode if the codelens should be resolved (displayed).
      * The symbol (matchedText) is searched and the count of references is
-     * prexented with the text "n references".
+     * presented with the text "n references".
      * @param codeLens An AsmCodeLens object which also includes the symbol and the document.
      * @param token 
      */

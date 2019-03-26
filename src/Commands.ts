@@ -6,6 +6,11 @@ import { Location } from 'vscode';
 
 var grepit = require('grepit');
 
+
+/// Output to the vscode "OUTPUT" tab.
+let output = vscode.window.createOutputChannel("ASM Code Lens");
+
+
 /**
  * Static user command functions.
  * - findLabelsWithNoReference: Searches all labels and shows the ones that are not referenced.
@@ -116,4 +121,3 @@ export class Commands {
 
 }
 
-let output = vscode.window.createOutputChannel("ASM Code Lens");

@@ -6,6 +6,7 @@ import { grep } from './grep';
 
 /**
  * DefinitionProvider for assembly language.
+ * Called from vscode e.g. for "Goto definition".
  */
 export class DefinitionProvider implements vscode.DefinitionProvider { 
     /**

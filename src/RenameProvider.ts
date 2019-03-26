@@ -7,10 +7,11 @@ import * as fs from 'fs';
 
 /**
  * RenameProvider for assembly language.
+ * User selects "Rename symbol".
  */
 export class RenameProvider implements vscode.RenameProvider {
     /**
-     * Called from vscode if the used selects "Find all references".
+     * Called from vscode if the user selects "Rename symbol".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
      * @param options 
