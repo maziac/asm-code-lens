@@ -218,7 +218,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array
 
             // Note if "g" was specified multiple matches (e.g. for rename) can be found.
             if(regex.global)
-               match = regex.exec(lineContents)
+                match = regex.exec(lineContents)
             else 
                 match = null;
         }

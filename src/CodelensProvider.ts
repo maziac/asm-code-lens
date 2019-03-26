@@ -56,10 +56,31 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 const colEnd = match.end;
                 const lineContents = document.lineAt(lineNr).text;
                 const matchedText = lineContents.substr(colStart, colEnd-colStart-1);
+                const trimmedMatchedText = matchedText.trim();
                 const startPos = new vscode.Position(lineNr, colStart);
                 const endPos = new vscode.Position(lineNr, colEnd);
                 const range = new vscode.Range(startPos, endPos); 
-                const codeLense = new AsmCodeLens(document, range, matchedText);
+                const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
+                // Store
+                codeLenses.push(codeLense);
+            }
+
+            // Find all sjasmplus labels without ":" in the document
+            const searchRegex2 = /^\b\w+([^:\w]|$)/;
+            const matches2 = grepTextDocument(document, searchRegex2);
+            // Loop all matches and create code lenses
+            for(const match of matches2) {
+                // Create codeLens
+                const lineNr = match.line;
+                const colStart = match.start;
+                const colEnd = match.end;
+                const lineContents = document.lineAt(lineNr).text;
+                const matchedText = lineContents.substr(colStart, colEnd-colStart-1);
+                const trimmedMatchedText = matchedText.trim();
+                const startPos = new vscode.Position(lineNr, colStart);
+                const endPos = new vscode.Position(lineNr, colEnd);
+                const range = new vscode.Range(startPos, endPos); 
+                const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
                 // Store
                 codeLenses.push(codeLense);
             }
@@ -79,12 +100,24 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         return new Promise<vscode.CodeLens>((resolve, reject) => {
             // search the references
             const searchWord = codeLens.symbol;
-            const searchRegex = new RegExp('^[^;"]*\\b' + searchWord + '(?![\\w:])');
+            const searchRegex = new RegExp('^[^;"]*\\b' + searchWord + '\\b');
 
             const doc = codeLens.document;
             const pos = codeLens.range.start;
+            const line = pos.line;
             grep({ regex: searchRegex })
             .then(locations => {
+                // Remove the code lens itself
+                let k;
+                for(k=0; k<locations.length; k++) {
+                    const loc = locations[k];
+                    if(loc.fileMatch.line == line
+                        && doc.fileName == loc.fileMatch.filePath) {
+                        // Found -> Remove
+                        locations.splice(k, 1);
+                        break;
+                    }
+                }
                 // create title
                 const count = locations.length;
                 let title = count + ' reference';
