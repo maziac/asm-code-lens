@@ -27,7 +27,7 @@ export class RenameProvider implements vscode.RenameProvider {
 
     
     /**
-     * Searches for oldNamein all files and replaces it with newName.
+     * Searches for oldName in all files and replaces it with newName.
      * @param oldName The name to replace.
      * @param newName The new name.
      */

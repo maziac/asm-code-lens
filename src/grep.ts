@@ -26,17 +26,24 @@ export interface FileMatch {
  * Used in 'findLabelsWithNoReference'.
  */
 export class GrepLocation extends vscode.Location {
+    /// The match (e.g. line number, line contents etc.) that led to the location.
     public fileMatch: FileMatch;
+
+    /// The complete label on the line. (May miss the module name.)
+    public symbol: string;
+
 
     /**
      * Creates a new location object.
      * @param uri The resource identifier.
      * @param rangeOrPosition The range or position. Positions will be converted to an empty range.
      * @param fileMatch The complete file match object.
+     * @param symbol The label, i.e. part of the label (without module name).
      */
     constructor(uri: vscode.Uri, rangeOrPosition: vscode.Range | vscode.Position, fileMatch: FileMatch) {
         super(uri, rangeOrPosition);
         this.fileMatch = fileMatch;
+        this.symbol = getCompleteLabel(fileMatch.lineContents, fileMatch.start);
     }
 }
 
@@ -52,6 +59,27 @@ export function read(stream, onData) {
         stream.on('error', reject);
         stream.on('end', () => Promise.all(promises).then(resolve));
     });
+}
+
+
+/**
+ * Checks the list of 'docs' for a given 'filePath' and returns the corresponding 
+ * text document.
+ * @param filePath 
+ * @param docs The list of text documents. Obtained with vscode.workspace.textDocuments.filter(doc => doc.isDirty)
+ * @returns The vscode.TextDcoument or undefined if not found.
+ */
+export function getTextDocument(filePath: string, docs: Array<vscode.TextDocument>): vscode.TextDocument {
+    // Check if file is opened in editor
+    let foundDoc;
+    for(const doc of docs) {
+        //if(doc.isDirty)    // Only check dirty documents, other are on disk
+            if(doc.fileName == filePath) {
+                foundDoc = doc;
+                break;
+            }
+    }
+    return foundDoc;
 }
 
 
@@ -94,15 +122,7 @@ export async function grep(opts): Promise<Array<GrepLocation>> {
                 const filePath = fileName;
 
                 // Check if file is opened in editor
-                let foundDoc = undefined;
-                for(const doc of docs) {
-                    if(doc.isDirty) {   // Only check dirty documents, other are on disk
-                        if(doc.fileName == filePath) {
-                            foundDoc = doc;
-                            break;
-                        }
-                    }
-                }
+                let foundDoc = getTextDocument(filePath, docs);
 
                 // Check if file on disk is checked or in vscode
                 if(foundDoc) {
@@ -227,3 +247,210 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array
 }
 
 
+/**
+ * Concatenates a module and a label.
+ * @param module E.g. 'sound.effects'.
+ * @param label  E.g. 'explosion'
+ * @return E.g. sound.effects.explosion. If module is undefined or an emtpy string then label is returned unchanged.
+ */
+function concatenateModuleAndLabel(module: string, label: string): string {
+    if(!module)
+        return label;
+    if(module.length == 0)
+        return label;
+        
+    const mLabel = module + '.' + label;
+    return mLabel;
+}
+
+
+/**
+ * Returns the label and the module label (i.e. module name + label) for a given
+ * file and position.
+ * The file may be on disk or opened in the editor.
+ * 1. The original label is constructed from the document and position info.
+ * 2. The document is parsed from begin to position for 'MODULE' info.
+ * 3. The MODULE info is added to the orignal label (this is now the searchLabel).
+ * 4. Both are returned.
+ * @param fileName The filename of the document.
+ * @param pos The position that points to the label.
+ * @param documents All dirty vscode.TextDocuments.
+ * @returns { label, module.label }
+ */
+export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>): Promise<{label: string, moduleLabel: string}> {
+    const readQueue = new PQueue();
+
+    // Get fileName
+
+    let label: string;
+    let moduleLabel: string;
+    await readQueue.add(async () => {
+
+        // Get line/column
+        const row = pos.line;
+        const clmn = pos.character;
+
+        // Check if file is opened in editor
+        const filePath = fileName;
+        let foundDoc = getTextDocument(filePath, documents);
+
+        let lines: Array<string>;
+        // Different handling: open text document or file on disk
+        if(foundDoc) {
+            // Doc is opened in text editor (and dirty).
+            lines = foundDoc.getText().split('\n');
+        }
+        else {
+            // Doc is read from disk.
+            const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+    
+            await read(readStream, data => {
+                lines = data.split('\n');
+            });
+        }
+        
+        // 1. Get original label
+        const line = lines[row];
+        label = getCompleteLabel(line, clmn);
+
+        // 2. The document is parsed from begin to 'pos' for 'MODULE' info.
+        const module = getModule(lines, row);
+
+        // 3. The MODULE info is added to the orignal label
+        moduleLabel = concatenateModuleAndLabel(module, label);
+    });
+
+    // return
+    return {label, moduleLabel};
+}
+
+
+/**
+ * Reduces the number of found 'locations'. Is used to get rid of wrong references
+ * by checking the dot notation/module label.
+ * 1. Get the module-label (=searchLabel).
+ * 2. Get the module-labels for each found location and the corresponding file.
+ * 3. 'searchLabel' is compared with all labels.
+ * 4. If 'searchLabel' is not equal to the direct label and not equal to the 
+ *    concatenated label it is removed from 'locations'
+ * @param locations An array with found locations of grepped labels.
+ * @param document The document of the original label.
+ * @param position The position inside the document with the original label.
+ */
+export async function reduceLocations(locations: Array<vscode.Location>, document: vscode.TextDocument, position: vscode.Position) {
+    const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+
+    // 1. Get module label
+    let searchLabel;
+    await getLabelAndModuleLabel(document.fileName, position, docs)
+    .then(mLabel => {
+        searchLabel = mLabel.moduleLabel;
+    });
+
+    // 2. Get the module-labels for each found location and the corresponding file.
+    const readQueue = new PQueue();
+ 
+    let i = locations.length;
+    while(i--) {    // loop backwards
+        // get fileName
+        const loc = locations[i];
+        const fileName = loc.uri.fsPath;
+        const pos = loc.range.start;
+
+        // Check if same location as searchLabel.
+        if(pos.line == position.line
+            && fileName == document.fileName) {
+            // Remove also this location
+            locations.splice(i,1); 
+            continue;
+        }
+
+        await getLabelAndModuleLabel(fileName, pos, docs)
+        .then(mLabel => {
+            // 3. 'searchLabel' is compared with all labels.
+            if(searchLabel == mLabel.label
+                || searchLabel == mLabel.moduleLabel)
+                return;
+            // 4. If 'searchLabel' is not equal to the direct label and not equal to the 
+            //    concatenated label it is removed from 'locations'
+            locations.splice(i,1);  // delete
+        });
+    }
+}
+
+
+/**
+ * Searches 'lines' from beginning to 'len' and returns the (concatenated)
+ * module label.
+ * 'lines' are searched for 'MODULE' and 'ENDMODULE' to retrieve the module information.
+ * @param lines An array of strings containing the complete text.
+ * @param len The line number up to which it will be searched. (excluding)
+ * @returns A string like 'audio.samples'.
+ */
+export function getModule(lines: Array<string>, len: number): string {
+    const regexModule = new RegExp(/^\s+MODULE\s+([\w\._]+)/i);
+    const regexEndmodule = new RegExp(/^\s+ENDMODULE[\s$]/i);
+    const modules: Array<string> = [];
+    for (let row=0; row<len; row++) {
+        const lineContents = lines[row];
+        
+        // MODULE
+        const matchModule = regexModule.exec(lineContents);
+        if(matchModule) {
+            modules.push(matchModule[1]);
+            continue;
+        }
+
+        // ENDMODULE
+        const matchEndmodule = regexEndmodule.exec(lineContents);
+        if(matchEndmodule) {
+            modules.pop();
+            continue;
+        }
+    }
+
+    // Create module label
+    const mLabel = modules.join('.');
+
+    return mLabel;
+}
+
+
+/**
+ * Returns the complete label around the 'startIndex'.
+ * I.e. startIndex might point to the last part of the label then this
+ * function returns the complete label.
+ * @param lineContents The text of the line.
+ * @param startIndex The index into the label.
+ */
+function getCompleteLabel(lineContents: string, startIndex: number): string {
+    // Find end of label.
+    const len = lineContents.length;
+    let k;
+    for(k = startIndex; k<len; k++) {
+        const s = lineContents.charAt(k);
+        if(s == ' ' || s == '\t' || s == ';')
+            break;
+    }
+    // k points now after the label
+    
+    // Find start of label.
+    let i;
+    for(i = startIndex; i>=0; i--) {
+        const s = lineContents.charAt(i);
+        if(s == ' ' || s == '\t' || s == ';')
+            break;
+    }
+    // i points one before the start of the label
+    i++;
+
+    // Get complete string
+    const completeLabel = lineContents.substr(i, k-i);
+
+    return completeLabel;
+}
+
+
+function getLabelAtPosition(doc: vscode.TextDocument) {
+
+}

@@ -16,7 +16,9 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param token 
      */
     public provideReferences(document: vscode.TextDocument, position: vscode.Position, options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-           return this.search(document, position);
+            //const text = document.getText();
+            //const lines = text.split('\n');
+            return this.search(document, position);
     }
 
     
