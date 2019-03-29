@@ -187,6 +187,29 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
     return locations;
 }
 
+/**
+ * Greps for multiple regular expressions. E.g. used to search for labels
+ * terminated by a ':' and for labels that start on 1rst column.
+ * Simply calls 'grep' multiple times.
+ * @param regexs Array of regexes.
+ * @return An array with all regex search results.
+ */
+export async function grepMultiple(regexes: RegExp[]): Promise<GrepLocation[]> {
+    const allLocations: Array<GrepLocation> = [];
+    
+    // grep all regex
+    for(const regex of regexes) {
+        await grep(regex)
+        .then(locations => {
+            // Add found locations
+            allLocations.push(...locations);
+        });
+    }
+
+    // Return all
+    return allLocations;
+}
+
 
 /**
  * Searches a vscode.TextDocument for a regular expression and
@@ -194,8 +217,8 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
  * @param doc The TextDocument.
  * @returns An array that contains: line number, start column, end column, and the text of the line.
  */
-export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array<FileMatch> {
-    const matches = new Array<FileMatch>();
+export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileMatch[] {
+    const matches: FileMatch[] = [];
     const len = doc.lineCount;
     for (let line=0; line<len; line++) {
         const textLine = doc.lineAt(line);
@@ -225,6 +248,29 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): Array
         }
     }
     return matches;
+}
+
+
+/**
+ * Greps for multiple regexes in the text document.
+ * Simply calls grepTextDocument several times.
+ * @param doc The document to search.
+ * @param regexes An array of regular expressions.
+ * @return An array with all matches.
+ */
+export function grepTextDocumentMultiple(doc: vscode.TextDocument, regexes: RegExp[]): FileMatch[] {
+    const allMatches: FileMatch[] = [];
+    
+    // grep all regex
+    for(const regex of regexes) {
+        // grep doc
+        const fileMatches = grepTextDocument(doc, regex);
+        // Add found matches
+        allMatches.push(...fileMatches);
+    }
+
+    // Return all
+    return allMatches;
 }
 
 

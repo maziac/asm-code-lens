@@ -1,9 +1,10 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep, grepTextDocument, read, reduceLocations } from './grep';
+import { grep, grepTextDocumentMultiple, read, reduceLocations, FileMatch } from './grep';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ReferenceProvider } from './ReferenceProvider';
+import { CodeLensProvider } from './CodeLensProvider';
 
 
 /**
@@ -45,17 +46,23 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     
         return new Promise<vscode.CodeLens[]>((resolve, reject) => {
             // Find all "something:" (labels) in the document
-            const searchRegex = /^\s*\b\w+:/;
-            const matches = grepTextDocument(document, searchRegex);
+            const searchRegex = /^(\s*)\b\w+:/;
+            // Find all sjasmplus labels without ":" in the document
+            const searchRegex2 = /^\w+\b(?!:)/;
+            const matches = grepTextDocumentMultiple(document, [searchRegex, searchRegex2]);
             // Loop all matches and create code lenses
             const codeLenses = new Array<vscode.CodeLens>();
-            for(const match of matches) {
+            for(const fmatch of matches) {
                 // Create codeLens
-                const lineNr = match.line;
-                const colStart = match.start;
-                const colEnd = match.end;
+                const lineNr = fmatch.line;
+                const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
+                let colEnd = fmatch.end;
                 const lineContents = document.lineAt(lineNr).text;
-                const matchedText = lineContents.substr(colStart, colEnd-colStart-1);
+                let matchedText = lineContents.substr(colStart, colEnd-colStart);
+                if(matchedText.endsWith(':')) {
+                    colEnd --;
+                    matchedText = matchedText.substr(0, matchedText.length-1);
+                }
                 const trimmedMatchedText = matchedText.trim();
                 const startPos = new vscode.Position(lineNr, colStart);
                 const endPos = new vscode.Position(lineNr, colEnd);
@@ -65,25 +72,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 codeLenses.push(codeLense);
             }
 
-            // Find all sjasmplus labels without ":" in the document
-            const searchRegex2 = /^\w+([^:\w]|$)/;
-            const matches2 = grepTextDocument(document, searchRegex2);
-            // Loop all matches and create code lenses
-            for(const match of matches2) {
-                // Create codeLens
-                const lineNr = match.line;
-                const colStart = match.start;
-                const colEnd = match.end;
-                const lineContents = document.lineAt(lineNr).text;
-                const matchedText = lineContents.substr(colStart, colEnd-colStart-1);
-                const trimmedMatchedText = matchedText.trim();
-                const startPos = new vscode.Position(lineNr, colStart);
-                const endPos = new vscode.Position(lineNr, colEnd);
-                const range = new vscode.Range(startPos, endPos); 
-                const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
-                // Store
-                codeLenses.push(codeLense);
-            }
             return resolve(codeLenses);
         });
     }
