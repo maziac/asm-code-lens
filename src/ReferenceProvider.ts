@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep } from './grep';
+import { grep, reduceLocations } from './grep';
 
 
 
@@ -31,11 +31,14 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
-            const searchRegex = new RegExp('^[^;"]*\\b' + searchWord + '\\b');
+            const searchRegex = new RegExp('^([^;"]*)\\b' + searchWord + '\\b');
 
             grep({ regex: searchRegex })
             .then(locations => {
-                return resolve(locations);
+                reduceLocations(locations, document, position)
+                .then(() => {
+                    return resolve(locations);
+                });
             });
         });
     }

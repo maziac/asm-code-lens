@@ -100,7 +100,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         return new Promise<vscode.CodeLens>((resolve, reject) => {
             // search the references
             const searchWord = codeLens.symbol;
-            const searchRegex = new RegExp('^[^;"]*\\b' + searchWord + '\\b');
+            const searchRegex = new RegExp('^([^;"]*)\\b' + searchWord + '\\b');
 
             const doc = codeLens.document;
             const pos = codeLens.range.start;
@@ -118,6 +118,8 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                         break;
                     }
                 }
+                // Remove any locations because of module information (dot notation)
+                //reduceLocations(locations, document, position);
                 // create title
                 const count = locations.length;
                 let title = count + ' reference';

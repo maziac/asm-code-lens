@@ -3,6 +3,8 @@ import * as fs from 'fs';
 //import * as path from 'path';
 import * as PQueue from 'p-queue';
 //import * as fastGlob from 'fast-glob';
+import { CodeLensProvider } from './CodeLensProvider';
+import { runInDebugContext } from 'vm';
 
 
 export interface FileMatch {
@@ -154,9 +156,14 @@ export async function grep(opts): Promise<Array<GrepLocation>> {
                             if(!match) 
                                 continue;
                     
-                            const start = match.index;
-                            const end = match.index + match[0].length;
-                
+                            let start = match.index;
+                            if(match[1]) {
+                                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+                                const i = match[1].length;
+                                start += i;
+                            }
+                            let end = match[0].length;
+
                             if (!fileMatches) {
                                 fileMatches = [];
                                 allMatches.set(fileName, fileMatches);
@@ -278,47 +285,45 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * @returns { label, module.label }
  */
 export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>): Promise<{label: string, moduleLabel: string}> {
-    const readQueue = new PQueue();
+    //const readQueue = new PQueue();
 
     // Get fileName
 
     let label: string;
     let moduleLabel: string;
-    await readQueue.add(async () => {
 
-        // Get line/column
-        const row = pos.line;
-        const clmn = pos.character;
+    // Get line/column
+    const row = pos.line;
+    const clmn = pos.character;
 
-        // Check if file is opened in editor
-        const filePath = fileName;
-        let foundDoc = getTextDocument(filePath, documents);
+    // Check if file is opened in editor
+    const filePath = fileName;
+    let foundDoc = getTextDocument(filePath, documents);
 
-        let lines: Array<string>;
-        // Different handling: open text document or file on disk
-        if(foundDoc) {
-            // Doc is opened in text editor (and dirty).
-            lines = foundDoc.getText().split('\n');
-        }
-        else {
-            // Doc is read from disk.
-            const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+    let lines: Array<string>;
+    // Different handling: open text document or file on disk
+    if(foundDoc) {
+        // Doc is opened in text editor (and dirty).
+        lines = foundDoc.getText().split('\n');
+    }
+    else {
+        // Doc is read from disk.
+        const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+
+        await read(readStream, data => {
+            lines = data.split('\n');
+        });
+    }
     
-            await read(readStream, data => {
-                lines = data.split('\n');
-            });
-        }
-        
-        // 1. Get original label
-        const line = lines[row];
-        label = getCompleteLabel(line, clmn);
+    // 1. Get original label
+    const line = lines[row];
+    label = getCompleteLabel(line, clmn);
 
-        // 2. The document is parsed from begin to 'pos' for 'MODULE' info.
-        const module = getModule(lines, row);
+    // 2. The document is parsed from begin to 'pos' for 'MODULE' info.
+    const module = getModule(lines, row);
 
-        // 3. The MODULE info is added to the orignal label
-        moduleLabel = concatenateModuleAndLabel(module, label);
-    });
+    // 3. The MODULE info is added to the orignal label
+    moduleLabel = concatenateModuleAndLabel(module, label);
 
     // return
     return {label, moduleLabel};
@@ -344,12 +349,10 @@ export async function reduceLocations(locations: Array<vscode.Location>, documen
     let searchLabel;
     await getLabelAndModuleLabel(document.fileName, position, docs)
     .then(mLabel => {
-        searchLabel = mLabel.moduleLabel;
+        searchLabel = mLabel;
     });
 
     // 2. Get the module-labels for each found location and the corresponding file.
-    const readQueue = new PQueue();
- 
     let i = locations.length;
     while(i--) {    // loop backwards
         // get fileName
@@ -368,9 +371,11 @@ export async function reduceLocations(locations: Array<vscode.Location>, documen
         await getLabelAndModuleLabel(fileName, pos, docs)
         .then(mLabel => {
             // 3. 'searchLabel' is compared with all labels.
-            if(searchLabel == mLabel.label
-                || searchLabel == mLabel.moduleLabel)
-                return;
+            if(searchLabel.label == mLabel.label
+                || searchLabel.moduleLabel == mLabel.moduleLabel
+                || searchLabel.label == mLabel.moduleLabel
+                || searchLabel.moduleLabel == mLabel.label)
+                return; // Please note: the test is ambiguous. There might be situations were this is wrong.
             // 4. If 'searchLabel' is not equal to the direct label and not equal to the 
             //    concatenated label it is removed from 'locations'
             locations.splice(i,1);  // delete
@@ -429,7 +434,7 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     let k;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
-        if(s == ' ' || s == '\t' || s == ';')
+        if(s == ' ' || s == '\t' || s == ':' || s == ';')
             break;
     }
     // k points now after the label
