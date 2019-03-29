@@ -91,7 +91,8 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
  * search for.
  * @param opts opts.regex = the regular expression to search for, 
  * opts.singleResult = true/false, if true only a single result is 
- * returned (faster).
+ * returned (faster). 
+ * Note: 'singleResult' is most probably not required anymore.
  * @returns An array of the vscode locations of the found expressions.
  */
 export async function grep(opts): Promise<GrepLocation[]> {
