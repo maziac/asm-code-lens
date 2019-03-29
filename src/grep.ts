@@ -94,7 +94,7 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
  * returned (faster).
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(opts): Promise<Array<GrepLocation>> {
+export async function grep(opts): Promise<GrepLocation[]> {
     //const cwd = opts.cwd;
     //const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
     const regex = opts.regex;
@@ -342,7 +342,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  * @param document The document of the original label.
  * @param position The position inside the document with the original label.
  */
-export async function reduceLocations(locations: Array<vscode.Location>, document: vscode.TextDocument, position: vscode.Position) {
+export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
 
     // 1. Get module label
@@ -352,11 +352,14 @@ export async function reduceLocations(locations: Array<vscode.Location>, documen
         searchLabel = mLabel;
     });
 
+    // Copy locations
+    const redLocs = [...locations]
+
     // 2. Get the module-labels for each found location and the corresponding file.
-    let i = locations.length;
+    let i = redLocs.length;
     while(i--) {    // loop backwards
         // get fileName
-        const loc = locations[i];
+        const loc = redLocs[i];
         const fileName = loc.uri.fsPath;
         const pos = loc.range.start;
 
@@ -364,7 +367,7 @@ export async function reduceLocations(locations: Array<vscode.Location>, documen
         if(pos.line == position.line
             && fileName == document.fileName) {
             // Remove also this location
-            locations.splice(i,1); 
+            redLocs.splice(i,1); 
             continue;
         }
 
@@ -378,9 +381,12 @@ export async function reduceLocations(locations: Array<vscode.Location>, documen
                 return; // Please note: the test is ambiguous. There might be situations were this is wrong.
             // 4. If 'searchLabel' is not equal to the direct label and not equal to the 
             //    concatenated label it is removed from 'locations'
-            locations.splice(i,1);  // delete
+            redLocs.splice(i,1);  // delete
         });
     }
+
+    // Return
+    return redLocs;
 }
 
 
@@ -393,8 +399,8 @@ export async function reduceLocations(locations: Array<vscode.Location>, documen
  * @returns A string like 'audio.samples'.
  */
 export function getModule(lines: Array<string>, len: number): string {
-    const regexModule = new RegExp(/^\s+MODULE\s+([\w\._]+)/i);
-    const regexEndmodule = new RegExp(/^\s+ENDMODULE[\s$]/i);
+    const regexModule = new RegExp(/^\s+(MODULE)\s+([\w\._]+)/i);
+    const regexEndmodule = new RegExp(/^\s+(ENDMODULE)[\s$]/i);
     const modules: Array<string> = [];
     for (let row=0; row<len; row++) {
         const lineContents = lines[row];
@@ -402,7 +408,7 @@ export function getModule(lines: Array<string>, len: number): string {
         // MODULE
         const matchModule = regexModule.exec(lineContents);
         if(matchModule) {
-            modules.push(matchModule[1]);
+            modules.push(matchModule[2]);
             continue;
         }
 
@@ -434,7 +440,7 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     let k;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
-        if(s == ' ' || s == '\t' || s == ':' || s == ';')
+        if(s == ' ' || s == '\t' || s == ':' || s == ';' || s == ')')
             break;
     }
     // k points now after the label
@@ -443,7 +449,7 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     let i;
     for(i = startIndex; i>=0; i--) {
         const s = lineContents.charAt(i);
-        if(s == ' ' || s == '\t' || s == ';')
+        if(s == ' ' || s == '\t' || s == ';' || s == '(')
             break;
     }
     // i points one before the start of the label

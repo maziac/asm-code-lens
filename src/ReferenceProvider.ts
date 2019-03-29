@@ -33,11 +33,14 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('^([^;"]*)\\b' + searchWord + '\\b');
 
-            grep({ regex: searchRegex })
+            grep({regex: searchRegex})
             .then(locations => {
                 reduceLocations(locations, document, position)
-                .then(() => {
-                    return resolve(locations);
+                .then(reducedLocations => {
+                    // If reduced locations has removed too much (all) then fall back to the original array.
+                    // This can e.g. happen for STRUCTS.
+                    const locs = (reducedLocations.length > 0) ? reducedLocations : locations;
+                    return resolve(locs);
                 });
             });
         });
