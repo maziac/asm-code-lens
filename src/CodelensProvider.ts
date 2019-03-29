@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep, grepTextDocument, read } from './grep';
+import { grep, grepTextDocument, read, reduceLocations } from './grep';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ReferenceProvider } from './ReferenceProvider';
@@ -105,37 +105,29 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             const doc = codeLens.document;
             const pos = codeLens.range.start;
             const line = pos.line;
+
             grep({ regex: searchRegex })
             .then(locations => {
-                // Remove the code lens itself
-                let k;
-                for(k=0; k<locations.length; k++) {
-                    const loc = locations[k];
-                    if(loc.fileMatch.line == line
-                        && doc.fileName == loc.fileMatch.filePath) {
-                        // Found -> Remove
-                        locations.splice(k, 1);
-                        break;
-                    }
-                }
                 // Remove any locations because of module information (dot notation)
-                //reduceLocations(locations, document, position);
-                // create title
-                const count = locations.length;
-                let title = count + ' reference';
-                if(count != 1)
-                    title += 's';
-                // Add command to show the references (like in "find all references")
-                codeLens.command = {
-                    title: title,
-                    command: 'editor.action.showReferences',
-                    arguments: [
-                        doc.uri, // uri
-                        pos, // position
-                        locations //reference locations
-                    ]
-                };
-                return resolve(codeLens); 
+                reduceLocations(locations, doc, pos)
+                .then(reducedLocations => {
+                    // create title
+                    const count = reducedLocations.length;
+                    let title = count + ' reference';
+                    if(count != 1)
+                        title += 's';
+                    // Add command to show the references (like in "find all references")
+                    codeLens.command = {
+                        title: title,
+                        command: 'editor.action.showReferences',
+                        arguments: [
+                            doc.uri, // uri
+                            pos, // position
+                            reducedLocations //reference locations
+                        ]
+                    };
+                    return resolve(codeLens); 
+                });
             });
 
         });

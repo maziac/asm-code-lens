@@ -326,6 +326,10 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
     moduleLabel = concatenateModuleAndLabel(module, label);
 
     // return
+    if(line.trim().startsWith(label)) {
+        // It's the definition of a label, so moduleLabel is the only possible label.
+        label = moduleLabel;
+    }
     return {label, moduleLabel};
 }
 
@@ -353,10 +357,11 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
     });
 
     // Copy locations
-    const redLocs = [...locations]
+    let redLocs = [...locations]
 
     // 2. Get the module-labels for each found location and the corresponding file.
     let i = redLocs.length;
+    let removedSameLine = -1;
     while(i--) {    // loop backwards
         // get fileName
         const loc = redLocs[i];
@@ -368,6 +373,8 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
             && fileName == document.fileName) {
             // Remove also this location
             redLocs.splice(i,1); 
+            // Remember
+            removedSameLine = i;
             continue;
         }
 
@@ -385,7 +392,16 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
         });
     }
 
-    // Return
+    // Return.
+    // If reduced locations has removed too much (all) then fall back to the original array.
+    // This can e.g. happen for STRUCTS.
+    if(redLocs.length == 0) {
+        // Copy again.
+        redLocs = [...locations];
+        // But remove the searchLabel
+        if(removedSameLine >= 0)
+            redLocs.splice(removedSameLine,1)
+    }
     return redLocs;
 }
 

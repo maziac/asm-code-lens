@@ -37,10 +37,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             .then(locations => {
                 reduceLocations(locations, document, position)
                 .then(reducedLocations => {
-                    // If reduced locations has removed too much (all) then fall back to the original array.
-                    // This can e.g. happen for STRUCTS.
-                    const locs = (reducedLocations.length > 0) ? reducedLocations : locations;
-                    return resolve(locs);
+                    return resolve(reducedLocations);
                 });
             });
         });
