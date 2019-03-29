@@ -35,7 +35,7 @@ export class RenameProvider implements vscode.RenameProvider {
         return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
             const searchRegex = new RegExp('\\b' + oldName + '\\b', 'g');
 
-            grep({ regex: searchRegex })
+            grep(searchRegex)
             .then(locations => {
                 // Change to WorkSpaceEdits.
                 // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.

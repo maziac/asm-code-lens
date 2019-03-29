@@ -23,7 +23,7 @@ export class Commands {
     public static findLabelsWithNoReference() {
         // Label regex:
         const lblRegex = new RegExp('^[ \t]*\\b([a-z_]\\w*):[ \t]*(equ|macro)?', 'i');
-        grep({ regex: lblRegex })
+        grep(lblRegex)
         .then(labelLocations => {
             // locations is a GrepLocation array that contains all found labels.
             // Convert this to an array of labels.

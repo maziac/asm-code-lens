@@ -39,7 +39,7 @@ export class HoverProvider implements vscode.HoverProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('\\b' + searchWord + ':');   // Note: I should also search for labels without ":".
 
-            grep({ regex: searchRegex, singleResult: false })
+            grep(searchRegex)
             .then(locations => {
                 // Reduce the found locations.
                 // Please note that the label location itself is also removed.

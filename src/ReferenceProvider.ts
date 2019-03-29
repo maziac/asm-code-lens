@@ -33,7 +33,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = new RegExp('^([^;"]*)\\b' + searchWord + '\\b');
 
-            grep({regex: searchRegex})
+            grep(searchRegex)
             .then(locations => {
                 reduceLocations(locations, document, position)
                 .then(reducedLocations => {

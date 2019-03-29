@@ -106,7 +106,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             const pos = codeLens.range.start;
             const line = pos.line;
 
-            grep({ regex: searchRegex })
+            grep(searchRegex)
             .then(locations => {
                 // Remove any locations because of module information (dot notation)
                 reduceLocations(locations, doc, pos)

@@ -89,39 +89,23 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
- * @param opts opts.regex = the regular expression to search for, 
- * opts.singleResult = true/false, if true only a single result is 
- * returned (faster). 
- * Note: 'singleResult' is most probably not required anymore.
+ * @param regex The regular expression to search for, 
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(opts): Promise<GrepLocation[]> {
-    //const cwd = opts.cwd;
-    //const globs = opts.globs || ['**/*.{asm,inc,s,a80}'];
-    const regex = opts.regex;
-    const singleResult = opts.singleResult;
-    
+export async function grep(regex: RegExp): Promise<GrepLocation[]> {
     const readQueue = new PQueue();
     //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
-    let leave = false;
-    
+   
     await vscode.workspace.findFiles('**/*.{asm,inc,s,a80}', null)
     .then(async uris => {
         const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
  
         for(const uri of uris) {
-        
-            if(leave)
-                return;
-
             // get fileName
             const fileName = uri.fsPath;
         
             await readQueue.add(async () => {
-                if(leave)
-                    return;
-            
                 const filePath = fileName;
 
                 // Check if file is opened in editor
@@ -145,9 +129,6 @@ export async function grep(opts): Promise<GrepLocation[]> {
                     let lastIndex = 0;
             
                     await read(readStream, data => {
-                        if(leave)
-                            return;
-
                         const lines = data.split('\n');
                         const len = lines.length;
                         for (let index = 0; index < len; index++) {
@@ -178,19 +159,11 @@ export async function grep(opts): Promise<GrepLocation[]> {
                                 lineContents,
                                 match
                             });
-
-                            // Check if only one result is wanted
-                            if(singleResult) {
-                                leave = true;
-                                return;
-                            }
                         }
             
                         lastIndex += len;
                     });
                 }
-                if(leave)
-                    return;
             });
         }
     });
