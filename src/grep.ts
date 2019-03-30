@@ -366,7 +366,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  * @param document The document of the original label.
  * @param position The position inside the document with the original label.
  */
-export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position): Promise<GrepLocation[]> {
+export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position, removeOwnLocation = true): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
 
     // 1. Get module label
@@ -389,7 +389,8 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
         const pos = loc.range.start;
 
         // Check if same location as searchLabel.
-        if(pos.line == position.line
+        if(removeOwnLocation
+            && pos.line == position.line
             && fileName == document.fileName) {
             // Remove also this location
             redLocs.splice(i,1); 

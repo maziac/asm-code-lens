@@ -1,8 +1,9 @@
 # Changelog
 
 ## 1.2.0
-
-
+- Better support fo sjasmplus dot label notation.
+- Support for sjasmplus macros.
+- Recognizes sjasmplus MODULE keyword in assembly files.
 
 
 ## 1.1.0

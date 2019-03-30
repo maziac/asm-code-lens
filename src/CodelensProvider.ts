@@ -50,6 +50,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             // Find all sjasmplus labels without ":" in the document
             const searchRegex2 = /^\w+\b(?!:)/;
             const matches = grepTextDocumentMultiple(document, [searchRegex, searchRegex2]);
+            //const matches = grepTextDocumentMultiple(document, [searchRegex2]);
             // Loop all matches and create code lenses
             const codeLenses = new Array<vscode.CodeLens>();
             for(const fmatch of matches) {
