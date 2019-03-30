@@ -33,7 +33,8 @@ export class RenameProvider implements vscode.RenameProvider {
     public rename(document: vscode.TextDocument, position: vscode.Position, newName: string): Thenable<vscode.WorkspaceEdit> {
         return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
             const oldName = document.getText(document.getWordRangeAtPosition(position));
-            const searchRegex = new RegExp('(.*?)\\b' + oldName + '\\b', 'g');
+           // const searchRegex = new RegExp('(.*?)\\b' + oldName + '\\b', 'g');
+            const searchRegex = new RegExp('^([^"]*)\\b' + oldName + '\\b');
 
             grep(searchRegex)
             .then(locations => {

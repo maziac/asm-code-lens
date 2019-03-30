@@ -492,6 +492,7 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     let k;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
+        // Allow [a-z0-9]
         const match = /\w/.exec(s);
         if(!match)
             break;
@@ -500,8 +501,9 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     
     // Find start of label.
     let i;
-    for(i = startIndex; i>=0; i--) {
+    for(i = startIndex-1; i>=0; i--) {
         const s = lineContents.charAt(i);
+        // Allow [a-z0-9.]
         const match = /[\w\.]/.exec(s);
         if(!match)
             break;
