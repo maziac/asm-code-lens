@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep, read } from './grep';
+import { grep, read, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
 
 
@@ -20,8 +20,7 @@ export class RenameProvider implements vscode.RenameProvider {
     public provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Thenable<vscode.WorkspaceEdit> {
 
         return new Promise<vscode.WorkspaceEdit>((resolve,reject) => {
-            const oldName = document.getText(document.getWordRangeAtPosition(position));
-            return resolve(this.rename(oldName, newName));
+            return resolve(this.rename(document, position, newName));
         });
     }
 
@@ -31,73 +30,106 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param oldName The name to replace.
      * @param newName The new name.
      */
-    public rename(oldName: string, newName: string): Thenable<vscode.WorkspaceEdit> {
+    public rename(document: vscode.TextDocument, position: vscode.Position, newName: string): Thenable<vscode.WorkspaceEdit> {
         return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
-            const searchRegex = new RegExp('\\b' + oldName + '\\b', 'g');
+            const oldName = document.getText(document.getWordRangeAtPosition(position));
+            const searchRegex = new RegExp('(.*?)\\b' + oldName + '\\b', 'g');
 
             grep(searchRegex)
             .then(locations => {
-                // Change to WorkSpaceEdits.
-                // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.
-                // However the problem is that the a file which is not yet open would be
-                // opened by the WorkSpaceEdit and stay there unsaved.
-                // Therefore I try beforehand to find out which documents are already opened and
-                // handle the unopened files differently.
-                // The problem is: there is no way to find out the opened documents.
-                // The only available information are the dirty docs. I.e. those are opened.
-                // And only those are changed with WorkSpaceEdits.
-                // The other, undirty opened docs and unopened docs, are changed on disk.
-                // For the undirty opened docs this will result in a reload at the same position.
-                // Not nice, but working.
-                const wsEdit = new vscode.WorkspaceEdit();
-                const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
-                for(const loc of locations) {
-                    // Check if doc is not open  
-                    let foundDoc = undefined;
-                    for(const doc of docs) {
-                        if(doc.uri.fsPath == loc.uri.fsPath) {
-                            foundDoc = doc;
-                            break;
+                reduceLocations(locations, document, position, false)
+                .then(reducedLocations => {
+                    // Change to WorkSpaceEdits.
+                    // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.
+                    // However the problem is that the file which is not yet open would be
+                    // opened by the WorkSpaceEdit and stay there unsaved.
+                    // Therefore I try beforehand to find out which documents are already opened and
+                    // handle the unopened files differently.
+                    // The problem is: there is no way to find out the opened documents.
+                    // The only available information are the dirty docs. I.e. those are opened.
+                    // And only those are changed with WorkSpaceEdits.
+                    // The other, undirty opened docs and unopened docs, are changed on disk.
+                    // For the undirty opened docs this will result in a reload at the same position.
+                    // Not nice, but working.
+                    const wsEdit = new vscode.WorkspaceEdit();
+                    const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+                    const fileMap = new Map<string, Array<vscode.Range>>()
+                    for(const loc of reducedLocations) {
+                        // Check if doc is not open  
+                        const fsPath = loc.uri.fsPath;
+                        const foundDoc = getTextDocument(fsPath, docs);
+                        if(foundDoc) {
+                            // use workspace edit because file is opened in editor
+                            wsEdit.replace(loc.uri, loc.range, newName);
+                        }
+                        else {
+                            // Remember the change for the files on disk:
+                            // It may happen that the same file is changed several times.
+                            // Therefore the data is collected first.
+                            // Check if location array already exists.
+                            let locs = fileMap.get(fsPath);
+                            if(!locs) {
+                                // If not, create it.
+                                locs = new Array<any>();
+                                fileMap.set(fsPath, locs);
+                            }
+                            // Add location
+                            locs.push(loc.range);
                         }
                     }
-                    if(foundDoc) {
-                        // use workspace edit because file is opened in editor
-                        wsEdit.replace(loc.uri, loc.range, newName);
+                    
+                    // Change files on disk.
+                    for(const [fsPath, changes] of fileMap) {
+                        this.renameInFile(fsPath, changes, newName);
                     }
-                    else {
-                        // Change file on disk.
-                        // Note: this is called more than once. Although this is superfluous it does not harm.
-                        this.renameInFile(loc.uri.fsPath, oldName, newName);
-                    }
-                }
-                
-                return resolve(wsEdit);
+
+                    return resolve(wsEdit);
+                });
             });
         });
     }
 
 
     /**
-     * Replaces all occurences of 'regex' in a file on disk with the 'newName'.
+     * Replaces one occurence in the file on disk with the 'newName'.
      * @param filePath The absolute file path.
-     * @param regex The regex to change. Should be global otherwise only the first name is changed.
+     * @param changes The changes: an array with locations.
      * @param newName The new name.
      */
-    protected async renameInFile(filePath: string, oldName: string, newName: string) {
+    protected async renameInFile(filePath: string, changes: Array<vscode.Range>, newName: string) {
         const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
-        let text = '';
-        const regex = new RegExp('\\b' + oldName + '\\b', 'gm');
 
-        // Read an exchange
+        // Read and exchange
+        let text = '';
         await read(readStream, data => {
             text += data;
         });
-        readStream.destroy();
-        const replacedText = text.replace(regex, newName);
+        
+        // Get lines
+        const lines = text.split('\n');
+
+        // Process all changes
+        const regex = new RegExp('\\s*INCLUDE\\s+', 'i');
+        for(const range of changes) {
+            const row = range.start.line;
+            const clmn = range.start.character;
+            const clmnEnd = range.end.character;
+            const line = lines[row];
+            
+            // Skip include lines
+            const match = regex.exec(line);
+            if(match)
+                continue;
+
+            // Replace
+            const replacedLine = line.substr(0, clmn) + newName + line.substr(clmnEnd);
+            lines[row] = replacedLine;
+        }
 
         // Now write file
+        const replacedText = lines.join('\n');
         const writeStream = fs.createWriteStream(filePath, { encoding: 'utf-8' });
-        writeStream.write(replacedText, () => {
+        await writeStream.write(replacedText, () => {
             writeStream.close();
         })
     }

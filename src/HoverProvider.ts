@@ -37,13 +37,13 @@ export class HoverProvider implements vscode.HoverProvider {
         return new Promise<vscode.Hover>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             // Find all "something:" (labels) in the document
-            const searchRegex = new RegExp('^(\\s*)[\\w\\._]*\\b' + searchWord + ':');
+            const searchNormal = new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + ':');
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^()[\\w\\._]*\\b' + searchWord + '\\b(?![:\._])');
+            const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\._])');
             // Find all sjasmplus MODULEs in the document
             const searchsJasmModule = new RegExp('^(\\s+MODULE\\s)' + searchWord + '\\b');
 
-            grepMultiple([searchRegex, searchSjasmLabel, searchsJasmModule])
+            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule])
 //            grepMultiple([searchsJasmModule])
             .then(locations => {
                 // Reduce the found locations.

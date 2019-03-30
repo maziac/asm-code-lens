@@ -16,8 +16,6 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param token 
      */
     public provideReferences(document: vscode.TextDocument, position: vscode.Position, options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-            //const text = document.getText();
-            //const lines = text.split('\n');
             return this.search(document, position);
     }
 
@@ -27,7 +25,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param document The document that contains the word.
      * @param position The word position.
      */
-    public search(document, position): Thenable<vscode.Location[]>
+    public search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Location[]>
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));

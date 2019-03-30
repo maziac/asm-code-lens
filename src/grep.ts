@@ -132,33 +132,44 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                         const lines = data.split('\n');
                         const len = lines.length;
                         for (let index = 0; index < len; index++) {
-                            const lineContents = lines[index];
+                            const lineContents = stripComment(lines[index]);
                             const line = lastIndex + index;
-                            const match = regex.exec(lineContents);
-                            if(!match) 
-                                continue;
-                    
-                            let start = match.index;
-                            if(match[1]) {
-                                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                                const i = match[1].length;
-                                start += i;
-                            }
-                            let end = match[0].length;
+                            regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
+                            const lineMatches: Array<FileMatch> = [];
+                            do {
+                                const match = regex.exec(lineContents);
+                                if(!match) 
+                                    break;
+                            
+                                // Found: get start and end
+                                let start = match.index;
+                                if(match[1]) {
+                                    // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+                                    const i = match[1].length;
+                                    start += i;
+                                }
+                                const end = match.index + match[0].length;
 
-                            if (!fileMatches) {
-                                fileMatches = [];
-                                allMatches.set(fileName, fileMatches);
-                            }
-                
-                            fileMatches.push({
-                                filePath,
-                                line,
-                                start,
-                                end,
-                                lineContents,
-                                match
-                            });
+                                // MAke sure that the map entry exists.
+                                if (!fileMatches) {
+                                    fileMatches = [];
+                                    allMatches.set(fileName, fileMatches);
+                                }
+                    
+                                // Reverse order (useful if names should be replaced later on)
+                                lineMatches.unshift({
+                                    filePath,
+                                    line,
+                                    start,
+                                    end,
+                                    lineContents,
+                                    match
+                                });
+                            } while(regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+
+                            // Put in global array.
+                            if(fileMatches)
+                                fileMatches.push(...lineMatches);
                         }
             
                         lastIndex += len;
@@ -222,13 +233,23 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
     const len = doc.lineCount;
     for (let line=0; line<len; line++) {
         const textLine = doc.lineAt(line);
-        const lineContents = textLine.text;
+        const lineContents = stripComment(textLine.text);
 
-        let match = regex.exec(lineContents);
-        while(match !== null) {
-             // Found: get start and end
-            const start = match.index;
+        regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
+        do {
+            const match = regex.exec(lineContents);
+            if(!match)
+                break;
+            
+            // Found: get start and end
+            let start = match.index;
+            if(match[1]) {
+                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+                const i = match[1].length;
+                start += i;
+            }
             const end = match.index + match[0].length;
+
 
             // Store found result
             matches.push({
@@ -239,13 +260,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
                 lineContents,
                 match
             });
-
-            // Note if "g" was specified multiple matches (e.g. for rename) can be found.
-            if(regex.global)
-                match = regex.exec(lineContents)
-            else 
-                match = null;
-        }
+        } while(regex.global);  // Note if "g" was specified multiple matches (e.g. for rename) can be found.
     }
     return matches;
 }
@@ -436,7 +451,7 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
  * @returns A string like 'audio.samples'.
  */
 export function getModule(lines: Array<string>, len: number): string {
-    const regexModule = new RegExp(/^\s+(MODULE)\s+([\w\._]+)/i);
+    const regexModule = new RegExp(/^\s+(MODULE)\s+([\w\.]+)/i);
     const regexEndmodule = new RegExp(/^\s+(ENDMODULE)[\s$]/i);
     const modules: Array<string> = [];
     for (let row=0; row<len; row++) {
@@ -477,7 +492,8 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     let k;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
-        if(s == ' ' || s == '\t' || s == ':' || s == ';' || s == ')')
+        const match = /\w/.exec(s);
+        if(!match)
             break;
     }
     // k points now after the label
@@ -486,7 +502,8 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     let i;
     for(i = startIndex; i>=0; i--) {
         const s = lineContents.charAt(i);
-        if(s == ' ' || s == '\t' || s == ';' || s == '(')
+        const match = /[\w\.]/.exec(s);
+        if(!match)
             break;
     }
     // i points one before the start of the label
@@ -499,6 +516,15 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
 }
 
 
-function getLabelAtPosition(doc: vscode.TextDocument) {
-
+/**
+ * Strips the comment (;) from the text and returns it.
+ * @param text Text with comment.
+ * @returns string before the first ";"
+ */
+function stripComment(text: string) {
+    const i = text.indexOf(';');
+    if(i >= 0)
+        return text.substr(0, i);   // strip comment
+    // No comment
+    return text;    
 }
