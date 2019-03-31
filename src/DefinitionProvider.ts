@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
+import { resolve } from 'path';
 
 
 
@@ -17,17 +18,50 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @param token 
      */
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-           return this.search(document, position);
+        // Check for 'include "..."'
+        const lineContents = document.lineAt(position.line).text;
+        const match = /\s*INCLUDE\s+"(.*)"/i.exec(lineContents);
+        if(match) {
+            // INCLUDE found
+            return this.getInclude(match[1]);
+        }
+        else {
+            // Normal definition
+            return this.search(document, position);
+        }
     }
 
     
     /**
+     * Searches the files that math the 'relPath' path.
+     * @param relPath E.g. 'util/zxspectrum.inc'
+     * @returns A promise to an array with locations. Normally there is only one entry to the array.
+     * Points to the first line of the file.
+     */
+    protected getInclude(relPath: string): Thenable<vscode.Location[]> {
+        return new Promise<vscode.Location[]>((resolve, reject) => {
+            vscode.workspace.findFiles('**/'+relPath, null)
+            .then(uris => {
+                const locations: vscode.Location[] = [];
+                const pos = new vscode.Position(0, 0);
+                const range = new vscode.Range(pos, pos);
+                for(const uri of uris) {
+                    const loc = new vscode.Location(uri, range);
+                    locations.push(loc);
+                }    
+                resolve(locations);             
+            });
+        });
+    }
+
+
+    /**
      * Does a search for a word. I.e. finds all references of the word.
      * @param document The document that contains the word.
      * @param position The word position.
-     * @return A promise to an array with locations. Normally there is only one entry to the array.
+     * @returns A promise to an array with locations. Normally there is only one entry to the array.
      */
-    public search(document, position): Thenable<vscode.Location[]>
+    protected search(document, position): Thenable<vscode.Location[]>
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
@@ -49,7 +83,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
                 .then(reducedLocations => {
                     // There should be only one location.
                     // Anyhow return the whole array.
-                    return resolve(reducedLocations);
+                    resolve(reducedLocations);
                 });
             });
         });

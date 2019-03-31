@@ -4,6 +4,7 @@
 - Better support fo sjasmplus dot label notation.
 - Support for sjasmplus macros.
 - Recognizes sjasmplus MODULE keyword in assembly files.
+- 'Go to definition' also for INCLUDE files.
 
 
 ## 1.1.0

@@ -25,7 +25,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param document The document that contains the word.
      * @param position The word position.
      */
-    public search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Location[]>
+    protected search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Location[]>
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));

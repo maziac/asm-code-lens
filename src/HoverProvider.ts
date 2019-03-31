@@ -32,7 +32,7 @@ export class HoverProvider implements vscode.HoverProvider {
      * @param position The word position.
      * @return A promise with a vscode.Hover object.
      */
-    private search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Hover>
+    protected search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Hover>
     {
         return new Promise<vscode.Hover>((resolve, reject) => {
             // Check for local label
