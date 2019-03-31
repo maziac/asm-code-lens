@@ -5,6 +5,7 @@ import * as PQueue from 'p-queue';
 //import * as fastGlob from 'fast-glob';
 import { CodeLensProvider } from './CodeLensProvider';
 import { runInDebugContext } from 'vm';
+import { FileMatch } from './grep';
 
 
 export interface FileMatch {
@@ -150,7 +151,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                                 }
                                 const end = match.index + match[0].length;
 
-                                // MAke sure that the map entry exists.
+                                // Make sure that the map entry exists.
                                 if (!fileMatches) {
                                     fileMatches = [];
                                     allMatches.set(fileName, fileMatches);
@@ -361,7 +362,9 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
     moduleLabel = concatenateModuleAndLabel(module, label);
 
     // return
-    if(line.trim().startsWith(label)) {
+    const preString = line.substr(0, clmn);
+    const match = /\S/.exec(preString); // Check that no character is preceding the label.
+    if(!match) {
         // It's the definition of a label, so moduleLabel is the only possible label.
         label = moduleLabel;
     }
