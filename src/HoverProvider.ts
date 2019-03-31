@@ -42,8 +42,10 @@ export class HoverProvider implements vscode.HoverProvider {
             const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\._])');
             // Find all sjasmplus MODULEs in the document
             const searchsJasmModule = new RegExp('^(\\s+MODULE\\s)' + searchWord + '\\b');
+            // Find all sjasmplus MACROs in the document
+            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s)' + searchWord + '\\b');
 
-            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule])
+            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
 //            grepMultiple([searchsJasmModule])
             .then(locations => {
                 // Reduce the found locations.
