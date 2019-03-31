@@ -46,7 +46,8 @@ export class GrepLocation extends vscode.Location {
     constructor(uri: vscode.Uri, rangeOrPosition: vscode.Range | vscode.Position, fileMatch: FileMatch) {
         super(uri, rangeOrPosition);
         this.fileMatch = fileMatch;
-        this.symbol = getCompleteLabel(fileMatch.lineContents, fileMatch.start);
+        const {label} = getCompleteLabel(fileMatch.lineContents, fileMatch.start);
+        this.symbol = label;
     }
 }
 
@@ -312,8 +313,9 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * file and position.
  * The file may be on disk or opened in the editor.
  * 1. The original label is constructed from the document and position info.
- * 2. The document is parsed from begin to position for 'MODULE' info.
- * 3. The MODULE info is added to the orignal label (this is now the searchLabel).
+ * 2. If local label: The document is parsed from position to begin for a non-local label.
+ * 3. The document is parsed from begin to position for 'MODULE' info.
+ * 4. The MODULE info is added to the orignal label (this is now the searchLabel).
  * 4. Both are returned.
  * @param fileName The filename of the document.
  * @param pos The position that points to the label.
@@ -321,13 +323,6 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * @returns { label, module.label }
  */
 export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>): Promise<{label: string, moduleLabel: string}> {
-    //const readQueue = new PQueue();
-
-    // Get fileName
-
-    let label: string;
-    let moduleLabel: string;
-
     // Get line/column
     const row = pos.line;
     const clmn = pos.character;
@@ -353,16 +348,22 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
     
     // 1. Get original label
     const line = lines[row];
-    label = getCompleteLabel(line, clmn);
+    let {label, preString} = getCompleteLabel(line, clmn);
 
-    // 2. The document is parsed from begin to 'pos' for 'MODULE' info.
+    // 2. If local label: The document is parsed from position to begin for a non-local label.
+    if(label.startsWith('.')) {
+        // Local label, e.g. ".loop"
+        const nonLocalLabel = getNonLocalLabel(lines, row);
+        label = nonLocalLabel + label;
+    }
+
+    // 3. The document is parsed from begin to 'pos' for 'MODULE' info.
     const module = getModule(lines, row);
 
-    // 3. The MODULE info is added to the orignal label
-    moduleLabel = concatenateModuleAndLabel(module, label);
+    // 4. The MODULE info is added to the orignal label
+    const moduleLabel = concatenateModuleAndLabel(module, label);
 
     // return
-    const preString = line.substr(0, clmn);
     const match = /\S/.exec(preString); // Check that no character is preceding the label.
     if(!match) {
         // It's the definition of a label, so moduleLabel is the only possible label.
@@ -446,6 +447,41 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
 
 
 /**
+ * Searches 'lines' from 'index' to 0 and returns the 
+ * first non local label.
+ * @param lines An array of strings containing the complete text.
+ * @param index The starting line (the line where the label was found.
+ * @returns A string like 'check_collision'. undefined if nothing found.
+ */
+export function getNonLocalLabel(lines: Array<string>, index: number): string {
+    // Find all "something:" (labels)
+    const regex = /^\s*\b(\w+):/;
+    // Find all sjasmplus labels without ":"
+    const regex2 = /^(\w+)\b(?!:)/;
+
+    // Loop
+    let match;
+    for(; index>=0; index--) {
+        const line = lines[index];
+        match = regex.exec(line);
+        if(match)
+            break;
+        match = regex2.exec(line);
+        if(match)
+            break;
+    }
+
+    // Out of bounds check
+    if(!match)
+        return undefined;
+    
+    // Return
+    const label = match[1];
+    return label;
+}
+
+
+/**
  * Searches 'lines' from beginning to 'len' and returns the (concatenated)
  * module label.
  * 'lines' are searched for 'MODULE' and 'ENDMODULE' to retrieve the module information.
@@ -488,8 +524,10 @@ export function getModule(lines: Array<string>, len: number): string {
  * function returns the complete label.
  * @param lineContents The text of the line.
  * @param startIndex The index into the label.
+ * @returns {label, preString} The found label and the part of the string that 
+ * is found before 'label'.
  */
-function getCompleteLabel(lineContents: string, startIndex: number): string {
+function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
     // Find end of label.
     const len = lineContents.length;
     let k;
@@ -515,9 +553,10 @@ function getCompleteLabel(lineContents: string, startIndex: number): string {
     i++;
 
     // Get complete string
-    const completeLabel = lineContents.substr(i, k-i);
+    const label = lineContents.substr(i, k-i);
+    const preString = lineContents.substr(0, i);
 
-    return completeLabel;
+    return {label, preString};
 }
 
 
