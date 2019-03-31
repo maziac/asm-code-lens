@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep } from './grep';
+import { grepMultiple, reduceLocations } from './grep';
 
 
 
@@ -31,13 +31,26 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
-            const searchRegex = new RegExp('\\b' + searchWord + ':');
+            // Find all "something:" (labels) in the document
+            const searchNormal = new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + ':');
+            // Find all sjasmplus labels without ":" in the document
+            const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\._])');
+            // Find all sjasmplus MODULEs in the document
+            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s)' + searchWord + '\\b');
+            // Find all sjasmplus MACROs in the document
+            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s)' + searchWord + '\\b');
 
-            grep(searchRegex)
+            // Find all sjasmplus STRUCTs in the document
+            const searchsJasmStruct = new RegExp('^(\\s+STRUCT\\s)' + searchWord + '\\b');
+
+            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchsJasmStruct])
             .then(locations => {
-                // There should be only one location.
-                // Anyhow return the whole array.
-                return resolve(locations);
+                reduceLocations(locations, document, position)
+                .then(reducedLocations => {
+                    // There should be only one location.
+                    // Anyhow return the whole array.
+                    return resolve(reducedLocations);
+                });
             });
         });
 
