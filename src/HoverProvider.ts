@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grepMultiple, read, reduceLocations, getLabelAndModuleLabel } from './grep';
+import { grepMultiple, read, reduceLocations, getCompleteLabel } from './grep';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -32,9 +32,16 @@ export class HoverProvider implements vscode.HoverProvider {
      * @param position The word position.
      * @return A promise with a vscode.Hover object.
      */
-    private search(document, position): Thenable<vscode.Hover>
+    private search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Hover>
     {
         return new Promise<vscode.Hover>((resolve, reject) => {
+            // Check for local label
+            const lineContents = document.lineAt(position.line).text;
+            const {label} = getCompleteLabel(lineContents, position.character);
+            if(label.startsWith('.'))
+                return undefined;
+                
+            // It is a non local label
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             // Find all "something:" (labels) in the document
             const searchNormal = new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + ':');
@@ -98,9 +105,11 @@ export class HoverProvider implements vscode.HoverProvider {
                             // End of processing.
                             // Check if 0 entries
                             if(hoverTexts.length == 0)
-                                hoverTexts.push('...');
-                            else
-                                hoverTexts.splice(0,1); // Remove first ('------')
+                            return resolve(undefined);  // Nothing found
+                            
+                            // Remove first ('============');
+                            hoverTexts.splice(0,1);
+
                             // return
                             const hover = new vscode.Hover(hoverTexts);
                             return resolve(hover);

@@ -527,7 +527,7 @@ export function getModule(lines: Array<string>, len: number): string {
  * @returns {label, preString} The found label and the part of the string that 
  * is found before 'label'.
  */
-function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
+export function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
     // Find end of label.
     const len = lineContents.length;
     let k;
