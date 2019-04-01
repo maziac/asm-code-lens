@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grepMultiple, reduceLocations, getCompleteLabel, getLastLabelPart } from './grep';
+import { grepMultiple, reduceLocations, getCompleteLabel, getLastLabelPart, getModule } from './grep';
 
 
 
@@ -44,7 +44,19 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
     protected propose(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.CompletionList>
     {
         return new Promise<vscode.CompletionList>((resolve, reject) => {
-            const text = document.getText(document.getWordRangeAtPosition(position));
+            // Get all lines
+            const lines = document.getText().split('\n');
+            // Get the module at the line of the searched word.
+            const row = position.line;
+            const moduleLabel = getModule(lines, row);
+
+            // Get the range of the whole input label.
+            // Otherwise vscode takes only the part after the last dot.
+            const lineContents = lines[row];
+            const {label, preString} = getCompleteLabel(lineContents, position.character);
+            const start = preString.length;
+            const end = start + label.length;
+            const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, start+end));
 
             // Search
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
@@ -67,9 +79,23 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
                     const proposals: vscode.CompletionItem[] = [];
                     for(const loc of reducedLocations) {
                         const text = loc.moduleLabel;
-                        console.log('Proposal:', text);
+                        //console.log('Proposal:', text);
                         const item = new vscode.CompletionItem(text);
-                        item.insertText = getLastLabelPart(text);
+                        item.filterText = text;
+                        item.range = range;
+                        
+                        // Maybe make the label local to current module.
+                        if(text.startsWith(moduleLabel+'.')) {
+                            // Change insert text
+                            const k = moduleLabel.length + 1;
+                            let part = text.substr(k);
+                            item.insertText = part;
+                            // change shown text
+                            item.label = '['+text.substr(0,k)+'] '+part;
+                            // Preselect this item
+                            item.preselect = true;
+                        }
+                        
                         proposals.push(item);
                     }
                     
