@@ -19,10 +19,11 @@ export class HoverProvider implements vscode.HoverProvider {
      */
     public provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Hover> {
         let settings = vscode.workspace.getConfiguration('asm-code-lens');
-        if(settings.enableHoverProvider)
+        if(settings.enableHoverProvider == undefined
+            || settings.enableHoverProvider)
             return this.search(document, position);
         else
-            return undefined; // new vscode.Hover;
+            return undefined;
     }
 
     
@@ -56,14 +57,10 @@ export class HoverProvider implements vscode.HoverProvider {
 //            grepMultiple([searchsJasmModule])
             .then(locations => {
                 // Reduce the found locations.
-                // Please note that the label location itself is also removed.
-                // I.e. you cannot hover a label definition.
-                // Anyhow doesn't make sense because the text is visible
-                // in the sources.
                 reduceLocations(locations, document, position, false)
                 .then(reducedLocations => {
                     // Now read the comment lines above the document.
-                    // Normally there is only one but e.g. if there are 2 modules with teh same name there could be more.
+                    // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
                     const hoverTexts = new Array<string>();
                     const f = (index: number) => {
                         // Check for end
@@ -105,14 +102,14 @@ export class HoverProvider implements vscode.HoverProvider {
                             // End of processing.
                             // Check if 0 entries
                             if(hoverTexts.length == 0)
-                            return resolve(undefined);  // Nothing found
+                                return resolve(undefined);  // Nothing found
                             
                             // Remove first ('============');
                             hoverTexts.splice(0,1);
 
                             // return
                             const hover = new vscode.Hover(hoverTexts);
-                            return resolve(hover);
+                            resolve(hover);
                         }
                     };
 

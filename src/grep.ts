@@ -23,6 +23,7 @@ export interface FileMatch {
     match: RegExpExecArray
 }
 
+
 /**
  * This extends the vscode location object by 
  * the match object.
@@ -35,6 +36,11 @@ export class GrepLocation extends vscode.Location {
     /// The complete label on the line. (May miss the module name.)
     public symbol: string;
 
+    /// The label (symbol).
+    label: string;
+    
+    /// The full label (with module).
+    moduleLabel: string;
 
     /**
      * Creates a new location object.
@@ -292,6 +298,20 @@ export function grepTextDocumentMultiple(doc: vscode.TextDocument, regexes: RegE
 
 
 /**
+ * Returns the last portion of a label.
+ * @param label  E.g. 'explosion.init' or 'check_all'
+ * @return E.g. 'init' or 'check_all'.
+ */
+export function getLastLabelPart(label: string): string {
+    const k = label.indexOf('.');
+    if(k < 0)
+        return label;   // No dot.
+
+    return label.substr(k+1);
+}
+
+
+/**
  * Concatenates a module and a label.
  * @param module E.g. 'sound.effects'.
  * @param label  E.g. 'explosion'
@@ -384,8 +404,11 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  * @param locations An array with found locations of grepped labels.
  * @param document The document of the original label.
  * @param position The position inside the document with the original label.
+ * @param removeOwnLocation true (default) to remove the location of the searched word.
+ * @param checkFullName true (default) = During label check the full name is checked. false (e.g.
+ * for CompletionProvider) = It is checked with 'startsWith'.
  */
-export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position, removeOwnLocation = true): Promise<GrepLocation[]> {
+export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position, removeOwnLocation = true, checkFullName = true): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
 
     // 1. Get module label
@@ -394,6 +417,13 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
     .then(mLabel => {
         searchLabel = mLabel;
     });
+
+    // Check if we care about upper/lower case.
+    if(!checkFullName) {
+        // Do not care
+        searchLabel.label = searchLabel.label.toLowerCase();
+        searchLabel.moduleLabel = searchLabel.moduleLabel.toLowerCase();
+    }
 
     // Copy locations
     let redLocs = [...locations]
@@ -420,12 +450,45 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
 
         await getLabelAndModuleLabel(fileName, pos, docs)
         .then(mLabel => {
+            // Assign to location
+            loc.label = mLabel.label;
+            loc.moduleLabel = mLabel.moduleLabel;
             // 3. 'searchLabel' is compared with all labels.
-            if(searchLabel.label == mLabel.label
-                || searchLabel.moduleLabel == mLabel.moduleLabel
-                || searchLabel.label == mLabel.moduleLabel
-                || searchLabel.moduleLabel == mLabel.label)
-                return; // Please note: the test is ambiguous. There might be situations were this is wrong.
+            if(checkFullName) {
+                if(mLabel.label == searchLabel.label
+                    || mLabel.moduleLabel == searchLabel.moduleLabel
+                    || mLabel.moduleLabel == searchLabel.label
+                    || mLabel.label == searchLabel.moduleLabel)
+                    return; // Please note: the test is ambiguous. There might be situations were this is wrong.
+                }
+            else {
+                // Change to lower before comparison.
+                const lwrModuleLabel = mLabel.moduleLabel.toLowerCase();
+                const lwrLabel = mLabel.label.toLowerCase();
+                // This is used for the CompletionProvider.
+                if(lwrLabel.indexOf(searchLabel.label) >= 0
+                || lwrModuleLabel.indexOf(searchLabel.moduleLabel) >= 0
+                || lwrModuleLabel.indexOf(searchLabel.label) >= 0
+                || lwrLabel.indexOf(searchLabel.moduleLabel) >= 0)
+                    return;
+                /*let regex = new RegExp('^'+searchLabel.label, 'i');
+                let match = regex.exec(mLabel.label);
+                if(match)
+                    return;
+                regex = new RegExp(searchLabel.label, 'i');
+                match = regex.exec(mLabel.label);
+                if(match)
+                    return;
+                regex = new RegExp(searchLabel.label, 'i');
+                match = regex.exec(mLabel.label);
+                if(match)
+                    return;
+                regex = new RegExp(searchLabel.label, 'i');
+                match = regex.exec(mLabel.label);
+                if(match)
+                    return;
+                  */                          
+            }
             // 4. If 'searchLabel' is not equal to the direct label and not equal to the 
             //    concatenated label it is removed from 'locations'
             redLocs.splice(i,1);  // delete

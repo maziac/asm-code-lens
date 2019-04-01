@@ -36,7 +36,12 @@
                 "asm-code-lens.enableHoverProvider": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable/disabe the hover provider."
+                    "description": "Enable/disable the of showing information while hovering labels etc."
+                },
+                "asm-code-lens.enableCompletionItemProvider": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable symbol input completion."
                 }
             }
         },
@@ -58,7 +63,7 @@
         "@types/node": "^6.0.40",
         "mocha": "^5.2.0",
         "typescript": "^2.0.3",
-        "vscode": "^1.0.0"
+        "vscode": "^1.1.33"
     },
     "dependencies": {
         "fast-glob": "^2.2.2",
