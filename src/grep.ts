@@ -465,6 +465,7 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
                 // Change to lower before comparison.
                 const lwrModuleLabel = mLabel.moduleLabel.toLowerCase();
                 const lwrLabel = mLabel.label.toLowerCase();
+                console.log( 'Labels', lwrModuleLabel, lwrLabel);
                 // This is used for the CompletionProvider.
                 if(lwrLabel.indexOf(searchLabel.label) >= 0
                 || lwrModuleLabel.indexOf(searchLabel.moduleLabel) >= 0

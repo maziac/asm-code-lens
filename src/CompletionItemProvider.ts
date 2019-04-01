@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grepMultiple, reduceLocations, getCompleteLabel, getLastLabelPart, getModule } from './grep';
+import { grepMultiple, reduceLocations, getCompleteLabel, getLastLabelPart, getModule, getNonLocalLabel } from './grep';
+import { CodeLensProvider } from './CodeLensProvider';
 
 
 
@@ -49,7 +50,7 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
             // Get the module at the line of the searched word.
             const row = position.line;
             const moduleLabel = getModule(lines, row);
-
+            
             // Get the range of the whole input label.
             // Otherwise vscode takes only the part after the last dot.
             const lineContents = lines[row];
@@ -58,34 +59,56 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
             const end = start + label.length;
             const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, start+end));
 
+            // get the first non-local label
+            let nonLocalLabel;  // Only used for local labels
+            if(label.startsWith('.')) {
+                nonLocalLabel = getNonLocalLabel(lines, row);
+            }
+
             // Search
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             // Find all "something:" (labels) in the document
-            const searchNormal = new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + '[\\w\\.]*:', 'i');
+            const searchNormal = new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\._])', 'i');
+            const searchSjasmLabel = new RegExp('^([\\w\\.]*)\\b' + searchWord + '[\\w\\.]*(?![:\._])', 'i');
             // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s)' + searchWord + '\\b', 'i');
+            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '[\\w\\.]*', 'i');
             // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s)' + searchWord + '\\b', 'i');
+            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s+)' + searchWord + '[\\w\\.]*', 'i');
 
-            //grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
-            grepMultiple([searchNormal])
+            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
+            //grepMultiple([searchNormal])
             .then(locations => {
                 // Reduce the found locations.
-                reduceLocations(locations, document, position, false, false)
+                reduceLocations(locations, document, position, true, false)
                 .then(reducedLocations => {
                     // Now put all propsal texts in a list.
                     const proposals: vscode.CompletionItem[] = [];
                     for(const loc of reducedLocations) {
                         const text = loc.moduleLabel;
-                        //console.log('Proposal:', text);
+                        console.log('\n');
+                        console.log('Proposal:', text);
                         const item = new vscode.CompletionItem(text);
                         item.filterText = text;
                         item.range = range;
-                        
+
+                        // Check for local label
+                        if(nonLocalLabel) {
+                            // A previous non-local label was searched (and found), so label is local.
+                            item.filterText = label;
+                            // Change insert text
+                            const k = moduleLabel.length + 1 + nonLocalLabel.length;
+                            let part = text.substr(k);
+                            item.insertText = part;
+                            // change shown text
+                            item.label = part;
+                            // And filter text
+                            item.filterText = part;
+                            // Preselect this item
+                            item.preselect = true;
+                        }
                         // Maybe make the label local to current module.
-                        if(text.startsWith(moduleLabel+'.')) {
+                        else if(text.startsWith(moduleLabel+'.')) {
                             // Change insert text
                             const k = moduleLabel.length + 1;
                             let part = text.substr(k);

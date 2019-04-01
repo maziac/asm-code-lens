@@ -70,9 +70,9 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             // Find all sjasmplus labels without ":" in the document
             const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\._])');
             // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s)' + searchWord + '\\b');
+            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '\\b');
             // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s)' + searchWord + '\\b');
+            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s+)' + searchWord + '\\b');
 
             // Find all sjasmplus STRUCTs in the document
             const searchsJasmStruct = new RegExp('^(\\s+STRUCT\\s)' + searchWord + '\\b');
