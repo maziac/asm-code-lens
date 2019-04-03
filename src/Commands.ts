@@ -22,7 +22,7 @@ export class Commands {
      */
     public static findLabelsWithNoReference() {
         // Label regex:
-        const lblRegex = new RegExp('^[ \t]*\\b([a-z_]\\w*):[ \t]*(equ|macro)?', 'i');
+        const lblRegex = new RegExp('^[ \t]*\\b([a-z_][\\w\.]*):\s*(equ|macro)?', 'i');
         grep(lblRegex)
         .then(labelLocations => {
             // locations is a GrepLocation array that contains all found labels.
@@ -59,6 +59,12 @@ export class Commands {
                         continue;
 
                     const label = locLabel.fileMatch.match[1];
+
+
+
+
+
+                    
                     let leave = false;
                     const regex = new RegExp('^[^;]*\\b' + label + '(?![\\w:])');
                     const firstFileName = locLabel.fileMatch.filePath;

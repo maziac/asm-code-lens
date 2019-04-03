@@ -1,7 +1,8 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grepMultiple, reduceLocations, getCompleteLabel, getLastLabelPart, getModule, getNonLocalLabel } from './grep';
+import { grepMultiple, reduceLocations, getCompleteLabel, GrepLocation, getModule, getNonLocalLabel, removeDuplicates } from './grep';
 import { CodeLensProvider } from './CodeLensProvider';
+import { stringify } from 'querystring';
 
 
 
@@ -22,14 +23,22 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
 		context: vscode.CompletionContext
 	): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
         const settings = vscode.workspace.getConfiguration('asm-code-lens');
-        if(settings.enableCompletionItemsProvider != undefined 
-            && !settings.enableCompletionItemsProvider)
+        if(settings.enableCompletions != undefined 
+            && !settings.enableCompletions)
             return undefined;
+
+        // Get required length
+        let requiredLen = settings.completionsRequiredLength;
+        if(requiredLen == undefined || requiredLen < 1)
+            requiredLen = 1;
 
         const line = document.lineAt(position).text;
         const {label} = getCompleteLabel(line, position.character);
-        console.log('provideCompletionItems:', label);
-        if(label.length < 2)
+        //console.log('provideCompletionItems:', label);
+        let len = label.length;
+        if(label.startsWith('.'))
+            len --; // Require one more character for local labels.
+        if(len < requiredLen)
             return new vscode.CompletionList([new vscode.CompletionItem(' ')], false);  // A space is required, otherwise vscode will not ask again for comletion items.
 
         // Search proposals
@@ -57,7 +66,7 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
             const {label, preString} = getCompleteLabel(lineContents, position.character);
             const start = preString.length;
             const end = start + label.length;
-            const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, start+end));
+            const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, end));
 
             // get the first non-local label
             let nonLocalLabel;  // Only used for local labels
@@ -66,11 +75,12 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
             }
 
             // Search
-            const searchWord = document.getText(document.getWordRangeAtPosition(position));
+            let searchWord = document.getText(document.getWordRangeAtPosition(position));
+            searchWord = searchWord.replace(/(.)/g,'\\w*$1');
             // Find all "something:" (labels) in the document
             const searchNormal = new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^([\\w\\.]*)\\b' + searchWord + '[\\w\\.]*(?![:\._])', 'i');
+            const searchSjasmLabel = new RegExp('^([\\w\\.]*)\\b' + searchWord + '[\\w\\.]*(?![:\\._])', 'i'); 
             // Find all sjasmplus MODULEs in the document
             const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '[\\w\\.]*', 'i');
             // Find all sjasmplus MACROs in the document
@@ -82,13 +92,21 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
                 // Reduce the found locations.
                 reduceLocations(locations, document, position, true, false)
                 .then(reducedLocations => {
+                    // Remove all duplicates from the list:
+                    // Put all in a map;
+                    //const locMap = new Map<string,GrepLocation>();
+                    //reducedLocations.map(loc => locMap.set(loc.moduleLabel, loc));
+                    // Then generate an array from the map:
+                    //const propLocations = Array.from(locMap.values());
+                    const propLocations = removeDuplicates(reducedLocations, loc => loc.moduleLabel);
+                    
                     // Now put all propsal texts in a list.
                     const proposals: vscode.CompletionItem[] = [];
-                    for(const loc of reducedLocations) {
+                    for(const loc of propLocations) {
                         const text = loc.moduleLabel;
-                        console.log('\n');
-                        console.log('Proposal:', text);
-                        const item = new vscode.CompletionItem(text);
+                        //console.log('\n');
+                        //console.log('Proposal:', text);
+                        const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
                         item.filterText = text;
                         item.range = range;
 
@@ -123,7 +141,7 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
                     }
                     
                     // Return
-                    const completionList = new vscode.CompletionList(proposals, true); // TODO: true or false???
+                    const completionList = new vscode.CompletionList(proposals, false); // TODO: true or false???
                     resolve(completionList);
                 });
             });

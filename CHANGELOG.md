@@ -5,6 +5,8 @@
 - Support for sjasmplus macros.
 - Recognizes sjasmplus MODULE keyword in assembly files.
 - 'Go to definition' also for INCLUDE files.
+- Completions implemented. Also supports sjasmplus dots notation and MODULEs.
+- New settings: enableCompletions, completionsRequiredLength.
 
 
 ## 1.1.0

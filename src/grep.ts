@@ -57,6 +57,23 @@ export class GrepLocation extends vscode.Location {
     }
 }
 
+
+/**
+ * Remove all duplicates from the location list.
+ * @param locations An array with locations, some entries might be doubled.
+ * @param handler(loc) Returns a string that should be used to find equal entries.
+ * @returns An array of locations with unique entries.
+ */
+export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepLocation) => string): GrepLocation[] {
+    // Put all in a map;
+    const locMap = new Map<string,GrepLocation>();
+    locations.map(loc => locMap.set(handler(loc), loc));
+    // Then generate an array from the map:
+    const results = Array.from(locMap.values());
+    return results;
+}
+
+
 /**
  * Reads data from a stream.
  * @param stream 
@@ -214,7 +231,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
  * @return An array with all regex search results.
  */
 export async function grepMultiple(regexes: RegExp[]): Promise<GrepLocation[]> {
-    const allLocations: Array<GrepLocation> = [];
+    let allLocations: Array<GrepLocation> = [];
     
     // grep all regex
     for(const regex of regexes) {
@@ -222,6 +239,15 @@ export async function grepMultiple(regexes: RegExp[]): Promise<GrepLocation[]> {
         .then(locations => {
             // Add found locations
             allLocations.push(...locations);
+        });
+    }
+
+    // Remove double entries
+    if(regexes.length > 0) {
+        allLocations = removeDuplicates(allLocations, loc => {
+            const fm = loc.fileMatch;
+            const s = fm.filePath + ':' + fm.line + ':' + fm.start;
+            return s;
         });
     }
 
@@ -308,6 +334,45 @@ export function getLastLabelPart(label: string): string {
         return label;   // No dot.
 
     return label.substr(k+1);
+}
+
+
+/**
+ * Converts the given label into a regular expression.
+ * Changes the last part of the label into a regex that
+ * allows various other letters in between.
+ * E.g. 'sound.intal' will become 'sound.\\w*i\\w*n\\w*t\\w*a\\w*l\\w*
+ * so that the regular exception would also match if not all
+ * characters are in the right order.
+ * E.g. this would match: 'sound.initialize'.
+ * @param label  E.g. 'explosion.init' or 'check_all'
+ * @return E.g. 'explosion.\\w*i\\w*n\\w*i\\w*t\\w*'or 
+ * '\\w*c\\w*h\\w*e\\w*c\\w*k\\w*_\\w*a\\w*l\\w*l\\w*'
+ */
+export function getRegExFromLabel(label: string): RegExp {
+    // Get last portion
+    let prefix;
+    let lastPart;
+    const k = label.indexOf('.');
+    if(k < 0) {
+        // No dot
+        prefix = '';
+        lastPart = label;
+    }
+    else {
+        // Includes dot
+        prefix = label.substr(0,k+1);
+        lastPart = label.substr(k+1);
+    }
+
+    // Change last part 
+    const lastRegexStr = lastPart.replace(/(.)/g,'\\w*$1') + '\\w*';
+    let regexStr = prefix.replace(/(\.)/g,'\\.');  // Make sure to convert . to \. for regular expression.
+    regexStr += lastRegexStr;
+    
+    // Return
+    const regex = new RegExp(regexStr, 'i');
+    return regex;
 }
 
 
@@ -410,6 +475,9 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  */
 export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position, removeOwnLocation = true, checkFullName = true): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+    // For item completion:
+    let regexLabel; 
+    let regexModuleLabel;
 
     // 1. Get module label
     let searchLabel;
@@ -421,8 +489,10 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
     // Check if we care about upper/lower case.
     if(!checkFullName) {
         // Do not care
-        searchLabel.label = searchLabel.label.toLowerCase();
-        searchLabel.moduleLabel = searchLabel.moduleLabel.toLowerCase();
+        //searchLabel.label = searchLabel.label.toLowerCase();
+        //searchLabel.moduleLabel = searchLabel.moduleLabel.toLowerCase();
+        regexLabel = getRegExFromLabel(searchLabel.label);
+        regexModuleLabel = getRegExFromLabel(searchLabel.moduleLabel);
     }
 
     // Copy locations
@@ -462,16 +532,26 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
                     return; // Please note: the test is ambiguous. There might be situations were this is wrong.
                 }
             else {
+                // Compare regular expressions to catch also scrambled input.
+                if(regexLabel.exec(mLabel.label)
+                || regexModuleLabel.exec(mLabel.moduleLabel)
+                || regexLabel.exec(mLabel.moduleLabel)
+                || regexModuleLabel.exec(mLabel.label))
+                    return;
+
+                /*
                 // Change to lower before comparison.
                 const lwrModuleLabel = mLabel.moduleLabel.toLowerCase();
                 const lwrLabel = mLabel.label.toLowerCase();
-                console.log( 'Labels', lwrModuleLabel, lwrLabel);
+                //console.log( 'Labels', lwrModuleLabel, lwrLabel);
                 // This is used for the CompletionProvider.
                 if(lwrLabel.indexOf(searchLabel.label) >= 0
                 || lwrModuleLabel.indexOf(searchLabel.moduleLabel) >= 0
                 || lwrModuleLabel.indexOf(searchLabel.label) >= 0
                 || lwrLabel.indexOf(searchLabel.moduleLabel) >= 0)
                     return;
+                */
+               
                 /*let regex = new RegExp('^'+searchLabel.label, 'i');
                 let match = regex.exec(mLabel.label);
                 if(match)
@@ -498,7 +578,8 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
 
     // Return.
     // If reduced locations has removed too much (all) then fall back to the original array.
-    // This can e.g. happen for STRUCTS.
+    // This can e.g. happen for STRUCT fields.
+    /*
     if(redLocs.length == 0) {
         // Copy again.
         redLocs = [...locations];
@@ -506,6 +587,7 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
         if(removedSameLine >= 0)
             redLocs.splice(removedSameLine,1)
     }
+    */
     return redLocs;
 }
 
@@ -549,13 +631,14 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
  * Searches 'lines' from beginning to 'len' and returns the (concatenated)
  * module label.
  * 'lines' are searched for 'MODULE' and 'ENDMODULE' to retrieve the module information.
+ * Additional searches fro STRUCTs and treats them in the same way.
  * @param lines An array of strings containing the complete text.
  * @param len The line number up to which it will be searched. (excluding)
  * @returns A string like 'audio.samples'.
  */
 export function getModule(lines: Array<string>, len: number): string {
-    const regexModule = new RegExp(/^\s+(MODULE)\s+([\w\.]+)/i);
-    const regexEndmodule = new RegExp(/^\s+(ENDMODULE)[\s$]/i);
+    const regexModule = new RegExp(/^\s+(MODULE|STRUCT)\s+([\w\.]+)/i);
+    const regexEndmodule = new RegExp(/^\s+(ENDMODULE|ENDS)[\s$]/i);
     const modules: Array<string> = [];
     for (let row=0; row<len; row++) {
         const lineContents = lines[row];
