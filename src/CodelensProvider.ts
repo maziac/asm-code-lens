@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep, grepTextDocumentMultiple, read, reduceLocations, FileMatch } from './grep';
+import { grep, grepTextDocumentMultiple, read, reduceLocations, FileMatch, getTextDocument } from './grep';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ReferenceProvider } from './ReferenceProvider';
@@ -46,13 +46,14 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     
         return new Promise<vscode.CodeLens[]>((resolve, reject) => {
             // Find all "something:" (labels) in the document
-            const searchRegex = /^(\s*)\b\w+:/;
+            const searchRegex = /^(\s*)\b[a-z_]\w*:/i;
             // Find all sjasmplus labels without ":" in the document
-            const searchRegex2 = /^\w+\b(?!:)/;
+            const searchRegex2 = /^[a-z_][\w\.]*\b(?![:\.])/i;
             const matches = grepTextDocumentMultiple(document, [searchRegex, searchRegex2]);
             //const matches = grepTextDocumentMultiple(document, [searchRegex2]);
             // Loop all matches and create code lenses
             const codeLenses = new Array<vscode.CodeLens>();
+            
             for(const fmatch of matches) {
                 // Create codeLens
                 const lineNr = fmatch.line;
@@ -98,7 +99,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             grep(searchRegex)
             .then(locations => {
                 // Remove any locations because of module information (dot notation)
-                reduceLocations(locations, doc, pos)
+                reduceLocations(locations, doc.fileName, pos)
                 .then(reducedLocations => {
                     // create title
                     const count = reducedLocations.length;

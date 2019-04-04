@@ -38,7 +38,7 @@ export class RenameProvider implements vscode.RenameProvider {
 
             grep(searchRegex)
             .then(locations => {
-                reduceLocations(locations, document, position, false)
+                reduceLocations(locations, document.fileName, position, false)
                 .then(reducedLocations => {
                     // Change to WorkSpaceEdits.
                     // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.

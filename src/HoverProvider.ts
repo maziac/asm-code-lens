@@ -41,13 +41,13 @@ export class HoverProvider implements vscode.HoverProvider {
             const {label} = getCompleteLabel(lineContents, position.character);
             if(label.startsWith('.'))
                 return undefined;
-                
+
             // It is a non local label
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             // Find all "something:" (labels) in the document
             const searchNormal = new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + ':');
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\._])');
+            const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\\._])');
             // Find all sjasmplus MODULEs in the document
             const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '\\b');
             // Find all sjasmplus MACROs in the document
@@ -57,7 +57,7 @@ export class HoverProvider implements vscode.HoverProvider {
 //            grepMultiple([searchsJasmModule])
             .then(locations => {
                 // Reduce the found locations.
-                reduceLocations(locations, document, position, false)
+                reduceLocations(locations, document.fileName, position, false)
                 .then(reducedLocations => {
                     // Now read the comment lines above the document.
                     // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.

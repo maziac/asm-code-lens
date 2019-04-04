@@ -1,8 +1,9 @@
 'use strict';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
-import { grep, grepTextDocument, FileMatch } from './grep';
+import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations, dbgPrintLocations } from './grep';
 import { Location } from 'vscode';
+import { CodeLensProvider } from './CodeLensProvider';
 
 var grepit = require('grepit');
 
@@ -21,98 +22,73 @@ export class Commands {
      * Searches all labels and shows the ones that are not referenced.
      */
     public static findLabelsWithNoReference() {
-        // Label regex:
-        const lblRegex = new RegExp('^[ \t]*\\b([a-z_][\\w\.]*):\s*(equ|macro)?', 'i');
-        grep(lblRegex)
-        .then(labelLocations => {
+        // Find all "something:" (labels) in the document
+        const searchRegex = /^\s*\b([a-z_][\w\.]*):/i;
+        // Find all sjasmplus labels without ":" in the document
+        const searchRegex2 = /^([a-z_][\w\.]*)\b/i;
+        grepMultiple([searchRegex, searchRegex2])
+        .then(locations => {
+            //dbgPrintLocations(locations);
             // locations is a GrepLocation array that contains all found labels.
             // Convert this to an array of labels.
-            this.findLabels(labelLocations);
+            this.findLabels(locations);
         });
     }
 
 
 
     /**
-     * Searches files according to opts.
-     * opts includes the directory the glob pattern and the regular expression (the word) to
-     * search for.
-     * @param opts opts.regex = the regular expression to search for, 
-     * opts.singleResult = true/false, if true only a single result is 
-     * returned (faster).
+     * Finds all labels without reference.
+     * I.e. prints out all labels in 'locLabels' which are note referenced somewhere.
+     * @param locLabels A list of GrepLocations.
      */
     protected static async findLabels(locLabels) {
         output.appendLine("Unreferenced labels:");
         output.show(true);
-        let count = 0;
-
+    
         await vscode.workspace.findFiles('**/*.{asm,inc,s,a80}', null)
         .then(async uris => {
             try {
                 const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
                 uris.unshift(undefined);
 
+                let labelsCount = locLabels.length;
+                let unrefLabels = 0;
+                const regexEqu = /[\s:]\s*(equ|macro)/i;
                 for(const locLabel of locLabels) {
-                    // Skip all equ
-                    const equ = locLabel.fileMatch.match[2];
-                    if(equ)
+                    // Skip all EQU and MACRO
+                    const fm: FileMatch = locLabel.fileMatch;
+                    regexEqu.lastIndex = fm.match[1].length;
+                    const matchEqu = regexEqu.exec(fm.lineContents);
+                    if(matchEqu)
                         continue;
 
-                    const label = locLabel.fileMatch.match[1];
+                    // Get label
+                    const label = fm.match[1];
+                    const searchLabel = label.replace(/\./, '\\.');
+                    const pos = new vscode.Position(fm.line, fm.start);
+                    const fileName = fm.filePath;
 
-
-
-
-
-                    
-                    let leave = false;
-                    const regex = new RegExp('^[^;]*\\b' + label + '(?![\\w:])');
-                    const firstFileName = locLabel.fileMatch.filePath;
-                    const firstUri = vscode.Uri.file(firstFileName);
-                    uris[0] = firstUri;
-
-                    for(const uri of uris) {
-                        // get fileName
-                        const fileName = uri.fsPath;
-                        const filePath = fileName;
-
-                        // Check if file is opened in editor
-                        let foundDoc = undefined;
-                        for(const doc of docs) {
-                            if(doc.isDirty) {   // Only check dirty documents, other are on disk
-                                if(doc.fileName == filePath) {
-                                    foundDoc = doc;
-                                    break;
-                                }
+                    // And search for references
+                    const regex = new RegExp('^([^;"]*)\\b' + searchLabel + '\\b');
+                    grep(regex)
+                    .then(locations => {
+                        // Remove any locations because of module information (dot notation)
+                        reduceLocations(locations, fileName, pos)
+                        .then(reducedLocations => {
+                            // Check count
+                            const count = reducedLocations.length;
+                            if(count == 0) {
+                                // No reference
+                                unrefLabels ++;
+                                output.appendLine(label + ", " + fileName + ":" + (pos.line+1));
                             }
-                        }
-
-                        // Check if file on disk is checked or in vscode
-                        if(foundDoc) {
-                            // Check file in vscode
-                            const fileMatches = grepTextDocument(foundDoc, regex);
-                            if(fileMatches.length > 0) {
-                                leave = true;
-                                count ++;
-                            }
-                        }
-                        else {
-                            // Check file on disk
-                            const result = grepit(regex, filePath);
-                            if(result.length > 0) {
-                                leave = true;
-                                count ++;
-                            }
-                        }
-                        if(leave)
-                            break;
-                    }
-                    // Check if found
-                    if(!leave) {
-                        // Not found
-                        output.appendLine(label + ", " + firstFileName + ":" + (locLabel.fileMatch.line+1));
-    
-                    }
+                            // Check for last search
+                        labelsCount --;
+                            if(labelsCount == 0)
+                                output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's':'') + ".");
+                        });
+                    });
                 }
             }
             catch(e) {
@@ -121,7 +97,7 @@ export class Commands {
         });   
         
         // Check if any label is unreferenced
-        if(count == 0) 
+        if(locLabels.length == 0) 
             output.appendLine("None.");
     }
 

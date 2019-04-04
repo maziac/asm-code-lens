@@ -80,7 +80,7 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
             // Find all "something:" (labels) in the document
             const searchNormal = new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^([\\w\\.]*)\\b' + searchWord + '[\\w\\.]*(?![:\\._])', 'i'); 
+            const searchSjasmLabel = new RegExp('^([\\w\\.]*)\\b' + searchWord + '[\\w\\.]*\\b(?![:\\.])', 'i'); 
             // Find all sjasmplus MODULEs in the document
             const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '[\\w\\.]*', 'i');
             // Find all sjasmplus MACROs in the document
@@ -90,19 +90,11 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
             //grepMultiple([searchNormal])
             .then(locations => {
                 // Reduce the found locations.
-                reduceLocations(locations, document, position, true, false)
+                reduceLocations(locations, document.fileName, position, true, false)
                 .then(reducedLocations => {
-                    // Remove all duplicates from the list:
-                    // Put all in a map;
-                    //const locMap = new Map<string,GrepLocation>();
-                    //reducedLocations.map(loc => locMap.set(loc.moduleLabel, loc));
-                    // Then generate an array from the map:
-                    //const propLocations = Array.from(locMap.values());
-                    const propLocations = removeDuplicates(reducedLocations, loc => loc.moduleLabel);
-                    
                     // Now put all propsal texts in a list.
                     const proposals: vscode.CompletionItem[] = [];
-                    for(const loc of propLocations) {
+                    for(const loc of reducedLocations) {
                         const text = loc.moduleLabel;
                         //console.log('\n');
                         //console.log('Proposal:', text);

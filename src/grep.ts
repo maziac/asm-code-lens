@@ -473,7 +473,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  * @param checkFullName true (default) = During label check the full name is checked. false (e.g.
  * for CompletionProvider) = It is checked with 'startsWith'.
  */
-export async function reduceLocations(locations: GrepLocation[], document: vscode.TextDocument, position: vscode.Position, removeOwnLocation = true, checkFullName = true): Promise<GrepLocation[]> {
+export async function reduceLocations(locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
     // For item completion:
     let regexLabel; 
@@ -481,7 +481,7 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
 
     // 1. Get module label
     let searchLabel;
-    await getLabelAndModuleLabel(document.fileName, position, docs)
+    await getLabelAndModuleLabel(docFileName, position, docs)
     .then(mLabel => {
         searchLabel = mLabel;
     });
@@ -510,7 +510,7 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
         // Check if same location as searchLabel.
         if(removeOwnLocation
             && pos.line == position.line
-            && fileName == document.fileName) {
+            && fileName == fileName) {
             // Remove also this location
             redLocs.splice(i,1); 
             // Remember
@@ -588,7 +588,11 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
             redLocs.splice(removedSameLine,1)
     }
     */
-    return redLocs;
+
+    // Remove all duplicates from the list:
+    const uniqueLocations = removeDuplicates(redLocs, loc => loc.moduleLabel);
+
+    return uniqueLocations;
 }
 
 
@@ -601,9 +605,9 @@ export async function reduceLocations(locations: GrepLocation[], document: vscod
  */
 export function getNonLocalLabel(lines: Array<string>, index: number): string {
     // Find all "something:" (labels)
-    const regex = /^\s*\b(\w+):/;
+    const regex = /^\s*\b([a-z_][\w\.]*):/i;
     // Find all sjasmplus labels without ":"
-    const regex2 = /^(\w+)\b(?!:)/;
+    const regex2 = /^([a-z_][\w\.]*)\b(?!:)/i;
 
     // Loop
     let match;
@@ -638,7 +642,7 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
  */
 export function getModule(lines: Array<string>, len: number): string {
     const regexModule = new RegExp(/^\s+(MODULE|STRUCT)\s+([\w\.]+)/i);
-    const regexEndmodule = new RegExp(/^\s+(ENDMODULE|ENDS)[\s$]/i);
+    const regexEndmodule = new RegExp(/^\s+(ENDMODULE|ENDS)\b/i);
     const modules: Array<string> = [];
     for (let row=0; row<len; row++) {
         const lineContents = lines[row];
@@ -680,7 +684,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number): {lab
     let k;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
-        // Allow [a-z0-9]
+        // Allow [a-z0-9_]
         const match = /\w/.exec(s);
         if(!match)
             break;
@@ -691,7 +695,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number): {lab
     let i;
     for(i = startIndex-1; i>=0; i--) {
         const s = lineContents.charAt(i);
-        // Allow [a-z0-9.]
+        // Allow [a-z0-9_.]
         const match = /[\w\.]/.exec(s);
         if(!match)
             break;
@@ -718,4 +722,17 @@ function stripComment(text: string) {
         return text.substr(0, i);   // strip comment
     // No comment
     return text;    
+}
+
+
+
+/**
+ * Prints out all found locations.
+ * @param locs The locations.
+ * 
+ */
+export function dbgPrintLocations(locs: GrepLocation[]) {
+    for(let loc of locs) {
+        console.log(loc.symbol + ': ' + loc.label + ', ' + loc.moduleLabel);
+    }
 }

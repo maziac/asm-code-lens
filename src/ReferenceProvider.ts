@@ -33,7 +33,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
 
             grep(searchRegex)
             .then(locations => {
-                reduceLocations(locations, document, position)
+                reduceLocations(locations, document.fileName, position)
                 .then(reducedLocations => {
                     return resolve(reducedLocations);
                 });
