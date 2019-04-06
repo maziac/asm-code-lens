@@ -3,8 +3,6 @@ import * as fs from 'fs';
 //import * as path from 'path';
 import * as PQueue from 'p-queue';
 //import * as fastGlob from 'fast-glob';
-import { CodeLensProvider } from './CodeLensProvider';
-import { runInDebugContext } from 'vm';
 import { FileMatch } from './grep';
 
 

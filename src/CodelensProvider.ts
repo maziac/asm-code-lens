@@ -1,10 +1,9 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep, grepTextDocumentMultiple, read, reduceLocations, FileMatch, getTextDocument } from './grep';
-import * as fs from 'fs';
-import * as path from 'path';
-import { ReferenceProvider } from './ReferenceProvider';
-import { CodeLensProvider } from './CodeLensProvider';
+import { grep, grepTextDocumentMultiple, reduceLocations } from './grep';
+//import * as fs from 'fs';
+//import * as path from 'path';
+//import { ReferenceProvider } from './ReferenceProvider';
 
 
 /**
@@ -54,6 +53,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             // Loop all matches and create code lenses
             const codeLenses = new Array<vscode.CodeLens>();
             
+            // REMOVE:
+            //return resolve(codeLenses);
+
             for(const fmatch of matches) {
                 // Create codeLens
                 const lineNr = fmatch.line;

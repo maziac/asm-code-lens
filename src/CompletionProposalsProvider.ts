@@ -9,7 +9,7 @@ import { stringify } from 'querystring';
 /**
  * CompletionItemProvider for assembly language.
  */
-export class CompletionItemProvider implements vscode.CompletionItemProvider { 
+export class CompletionProposalsProvider implements vscode.CompletionItemProvider { 
     /**
      * Called from vscode if the user selects "Find all references".
      * @param document The current document.
@@ -19,8 +19,7 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
     public provideCompletionItems(
 		document: vscode.TextDocument,
 		position: vscode.Position,
-		token: vscode.CancellationToken,
-		context: vscode.CompletionContext
+		token: vscode.CancellationToken
 	): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
         const settings = vscode.workspace.getConfiguration('asm-code-lens');
         if(settings.enableCompletions != undefined 
@@ -114,8 +113,6 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
                             item.label = part;
                             // And filter text
                             item.filterText = part;
-                            // Preselect this item
-                            item.preselect = true;
                         }
                         // Maybe make the label local to current module.
                         else if(text.startsWith(moduleLabel+'.')) {
@@ -125,8 +122,6 @@ export class CompletionItemProvider implements vscode.CompletionItemProvider {
                             item.insertText = part;
                             // change shown text
                             item.label = '['+text.substr(0,k)+'] '+part;
-                            // Preselect this item
-                            item.preselect = true;
                         }
                         
                         proposals.push(item);

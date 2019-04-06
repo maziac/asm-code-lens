@@ -6,3 +6,4 @@ npm-debug.log
 logs/
 coverage/
 .nyc_output/
+.vscode-test/

@@ -41,6 +41,9 @@ export class HoverProvider implements vscode.HoverProvider {
             const {label} = getCompleteLabel(lineContents, position.character);
             if(label.startsWith('.'))
                 return undefined;
+                
+            //REMOVE:
+            return undefined;
 
             // It is a non local label
             const searchWord = document.getText(document.getWordRangeAtPosition(position));

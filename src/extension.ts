@@ -6,7 +6,7 @@ import { DefinitionProvider } from './DefinitionProvider';
 import { HoverProvider } from './HoverProvider';
 import { CodeLensProvider } from './CodeLensProvider';
 import { RenameProvider } from './RenameProvider';
-import { CompletionItemProvider } from './CompletionItemProvider';
+import { CompletionProposalsProvider } from './CompletionProposalsProvider';
 import { Commands } from './Commands';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionItemProvider()),
+        vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider()),
     );
 
     vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
