@@ -1,7 +1,8 @@
 'use strict';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
-import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations, dbgPrintLocations } from './grep';
+import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations } from './grep';
+import { regexLabelColon, regexLabelWithoutColon } from './regexes';
 import { Location } from 'vscode';
 import { CodeLensProvider } from './CodeLensProvider';
 
@@ -22,11 +23,7 @@ export class Commands {
      * Searches all labels and shows the ones that are not referenced.
      */
     public static findLabelsWithNoReference() {
-        // Find all "something:" (labels) in the document
-        const searchRegex = /^\s*\b([a-z_][\w\.]*):/i;
-        // Find all sjasmplus labels without ":" in the document
-        const searchRegex2 = /^([a-z_][\w\.]*)\b/i;
-        grepMultiple([searchRegex, searchRegex2])
+        grepMultiple([regexLabelColon(), regexLabelWithoutColon()])
         .then(locations => {
             //dbgPrintLocations(locations);
             // locations is a GrepLocation array that contains all found labels.
