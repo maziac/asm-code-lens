@@ -42,6 +42,18 @@ export function regexLabelEquOrMacro(): RegExp {
 }
 
 
+/**
+ * Checks for an INCLUDE directive.
+ * E.g. 'include "something"' or ' include "something"'.
+ * Capture groups:
+ *  1 = what is included, i.e. what is inside the ""
+ * Used by DefinitionProvider.
+ */
+export function regexInclude(): RegExp {
+    return /\s*INCLUDE\s+"(.*)"/i;
+}
+
+
 
 /**
  * Searches for labels that contains the given word.
@@ -109,6 +121,19 @@ export function regexStructForWord(searchWord: string): RegExp {
  */
 export function regexAnyReferenceForWord(searchWord: string): RegExp {
     return new RegExp('^([^"]*)\\b' + searchWord + '\\b');
+}
+
+
+
+
+/**
+ * Searches any reference for a given word (label).
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by RenameProvider.
+ */
+export function regexAnyReferenceForWordGlobal(searchWord: string): RegExp {
+    return new RegExp('(.*?)\\b' + searchWord + '\\b', 'g');
 }
 
 

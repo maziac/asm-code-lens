@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
 import { resolve } from 'path';
-import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
+import { regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
 
 
 
@@ -21,7 +21,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
         // Check for 'include "..."'
         const lineContents = document.lineAt(position.line).text;
-        const match = /\s*INCLUDE\s+"(.*)"/i.exec(lineContents);
+        const match = regexInclude().exec(lineContents);
         if(match) {
             // INCLUDE found
             return this.getInclude(match[1]);
