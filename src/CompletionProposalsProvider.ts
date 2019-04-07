@@ -4,6 +4,8 @@ import { grepMultiple, reduceLocations, getCompleteLabel, GrepLocation, getModul
 import { CodeLensProvider } from './CodeLensProvider';
 import { stringify } from 'querystring';
 import { regexPrepareFuzzy } from './regexes';
+import {regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
+
 
 
 /**
@@ -76,23 +78,15 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             // Search
             let searchWord = document.getText(document.getWordRangeAtPosition(position));
             searchWord = regexPrepareFuzzy(searchWord);
-            // Find all "something:" (labels) in the document
-            const searchNormal = new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
-            // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^([\\w\\.]*)\\b' + searchWord + '[\\w\\.]*\\b(?![:\\.])', 'i'); 
-            // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '[\\w\\.]*', 'i');
-            // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s+)' + searchWord + '[\\w\\.]*', 'i');
 
             // Find all "something:" (labels) in the document
-            const searchNormal = regexLabelColonForWord(searchWord);
+            const searchNormal = regexEveryLabelColonForWord(searchWord);
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
+            const searchSjasmLabel = regexEveryLabelWithoutColonForWord(searchWord);
             // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = regexModuleForWord(searchWord);
+            const searchsJasmModule = regexEveryModuleForWord(searchWord);
             // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = regexMacroForWord(searchWord);
+            const searchsJasmMacro = regexEveryMacroForWord(searchWord);
 
 
             grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])

@@ -151,3 +151,57 @@ export function regexPrepareFuzzy(searchWord: string): string {
 }
 
 
+
+/**
+ * Searches for labels that contains the given word.
+ * Checks for a label with a colon.
+ * The label can be everywhere. I.e. it can be a middle part of a dot
+ * notated label.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by CompletionProposalsProvider.
+ */
+export function regexEveryLabelColonForWord(searchWord: string): RegExp {
+    return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
+}
+
+
+/**
+ * Searches for labels that contains the given word.
+ * Checks for a label without a colon.
+ * The label can be everywhere. I.e. it can be a middle part of a dot
+ * notated label.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by CompletionProposalsProvider.
+ */
+export function regexEveryLabelWithoutColonForWord(searchWord: string): RegExp {
+    return new RegExp('^(([^0-9 ][\\w\\.]*)?)\\b' + searchWord + '[\\w\\.]*\\b(?![:\\w\\.])', 'i');
+}
+
+
+/**
+ * Searches for a (sjasmplus) MODULE that contains the given word.
+ * The label can be everywhere. I.e. it can be a middle part of a dot
+ * notated label.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by CompletionProposalsProvider.
+ */
+export function regexEveryModuleForWord(searchWord: string): RegExp {
+    return new RegExp('^(\\s+(MODULE)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+}
+
+
+/**
+ * Searches for a (sjasmplus) MACRO that contains the given word.
+ * The label can be everywhere. I.e. it can be a middle part of a dot
+ * notated label.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by CompletionProposalsProvider.
+ */
+export function regexEveryMacroForWord(searchWord: string): RegExp {
+    return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+}
+

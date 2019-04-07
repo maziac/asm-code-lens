@@ -237,36 +237,37 @@ suite('RegExes', () => {
     });
 
 
-    suite('RegEx with search-word', () => {
 
-        // insOuts: search-word, input-line, should-match, found-prefix
-        function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string|boolean)[]) {
-            try {
-                // Check the test
-                const count = insOuts.length;
-                const div = 4;  // Line divider
-                assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for(let i=0; i<count; i+=div) {
-                    const searchWord = insOuts[i];
-                    const input = insOuts[i+1] as string;
-                    const shouldMatch = insOuts[i+2];
-                    const prefix = insOuts[i+3];
-                    const regex = func(searchWord);
-                    const result = regex.exec(input);
-                    if(result) {
-                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "'");
-                        const foundPrefix = result[1];
-                        assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + (i/div));
-                    }
-                    else {
-                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "'");
-                    }
+    // insOuts: search-word, input-line, should-match, found-prefix
+    function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string|boolean)[]) {
+        try {
+            // Check the test
+            const count = insOuts.length;
+            const div = 4;  // Line divider
+            assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
+            for(let i=0; i<count; i+=div) {
+                const searchWord = insOuts[i];
+                const input = insOuts[i+1] as string;
+                const shouldMatch = insOuts[i+2];
+                const prefix = insOuts[i+3];
+                const regex = func(searchWord);
+                const result = regex.exec(input);
+                if(result) {
+                    assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "' in '" + input + "'");
+                    const foundPrefix = result[1];
+                    assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + (i/div));
+                }
+                else {
+                    assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "' in '" + input + "'");
                 }
             }
-            catch(e) {
-                assert.fail("Testcase assertion: " + e);
-            }
         }
+        catch(e) {
+            assert.fail("Testcase assertion: " + e);
+        }
+    }
+
+    suite('RegEx with search-word', () => {
 
         test('regexLabelColonForWord', (done) => {
             const insOuts = [
@@ -473,40 +474,13 @@ suite('RegExes', () => {
     });
 
 
+  
+
     
 
-    suite('RegEx with search-word 2, weg', () => {
+    suite('RegEx with search-word middle, ignore case', () => {
 
-        // insOuts: search-word, input-line, should-match, found-prefix
-        function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string|boolean)[]) {
-            try {
-                // Check the test
-                const count = insOuts.length;
-                const div = 4;  // Line divider
-                assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for(let i=0; i<count; i+=div) {
-                    const searchWord = insOuts[i];
-                    const input = insOuts[i+1] as string;
-                    const shouldMatch = insOuts[i+2];
-                    const prefix = insOuts[i+3];
-                    const regex = func(searchWord);
-                    const result = regex.exec(input);
-                    if(result) {
-                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "'");
-                        const foundPrefix = result[1];
-                        assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + (i/div));
-                    }
-                    else {
-                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "'");
-                    }
-                }
-            }
-            catch(e) {
-                assert.fail("Testcase assertion: " + e);
-            }
-        }
-
-        test('regexLabelColonForWord', (done) => {
+        test('regexEveryLabelColonForWord', (done) => {
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "label", "label:", true, "",
@@ -514,6 +488,7 @@ suite('RegExes', () => {
                 "label", "label:;", true, "",
                 "label", "  label:", true, "  ",
                 "label", "   label: ", true, "   ",
+                
                 "label", " label:;", true, " ",
                 "label", "label", false, "",
                 "label", "label ", false, "",
@@ -521,18 +496,222 @@ suite('RegExes', () => {
                 "LabelA_0123456789", "LabelA_0123456789:", true, "",
 
                 "_LabelA_0123456789", "_LabelA_0123456789:", true, "",
-                "label", "xxx.label:", true, "",
-                "label", "label.xxx:", false, "",
-                "label", "yyy.label.xxx:", false, "",
+                "label", "xxx.label:", true, "xxx.",
+                "label", "_xxx.label:", true, "_xxx.",
+                "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a nmber.  
+                "label", ".label:", true, ".",
+
+                "label", "label.xxx:", true, "",
+                "label", "yyy.label.xxx:", true, "yyy.",
                 "label", "xlabel:", false, "",
-                "label", "labely:", false, "",
+                "label", "labely:", true, "",
+                "label", "xxx.labely:", true, "xxx.",
                 "label", "xxx.xlabel:", false, "",
+
                 "label", "xlabel.yyy:", false, "",
+                "\\w*s\\w*n\\w*d", "sound:", true, "",
+                "\\w*s\\w*n\\w*d", "snd:", true, "",
+                "\\w*s\\w*n\\w*d", "xxx.soundaaa:", true, "xxx.",
+                "\\w*s\\w*n\\w*d", "yyy.sound.zzz:", true, "yyy.",
+
+                "label", "LaBeL:", true, "",
                 ];
 
-            checkResultsSearchWord(re.regexLabelColonForWord, insOuts);
+            checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);
+            done();
+        });
+
+
+        test('regexEveryLabelWithoutColonForWord', (done) => {
+            const insOuts = [
+                // search-word, input-line, should-match, found-prefix
+                "label", "label", true, "",
+                "label", "label ", true, "",
+                "label", "label  ", true, "",
+                "label", "  label", false, "",
+                "label", "   label ", false, "",
+
+                "label", " label  ", false, "",
+                "label", " label", false, "",
+                "label", " label ", false, "",
+                "label", " label  ", false, "",
+                "LabelA_0123456789", "LabelA_0123456789", true, "",
+
+                "_LabelA_0123456789", "_LabelA_0123456789", true, "",
+                "label", "xxx.label", true, "xxx.",
+                "label", "_xxx.label", true, "_xxx.",
+                "label", "0xxx.label", false, "",
+                "label", ".label", true, ".",
+
+                "label", "label.xxx", true, "",
+                "label", "yyy.label.xxx", true, "yyy.",
+                "label", "xlabel", false, "",
+                "label", "labely", true, "",
+                "label", "xxx.xlabel", false, "",
+                
+                "label", "xlabel.yyy", false, "",
+                "label", "label:", false, "",
+                "label", "label: ", false, "",
+                "label", "label:;", false, "",
+                "label", "xxx.label:", false, "",
+
+                "\\w*s\\w*n\\w*d", "sound", true, "",
+                "\\w*s\\w*n\\w*d", "snd", true, "",
+                "\\w*s\\w*n\\w*d", "xxx.soundaaa", true, "xxx.",
+                "\\w*s\\w*n\\w*d", "yyy.sound.zzz", true, "yyy.",
+
+                "label", "LaBeL", true, "",
+                ];
+
+            checkResultsSearchWord(re.regexEveryLabelWithoutColonForWord, insOuts);
+            done();
+        });
+
+
+        test('regexEveryModuleForWord', (done) => {
+            const insOuts = [
+                // search-word, input-line, should-match, found-prefix
+                "m", "module m", false, "",
+                "m", " module m", true, " module ",
+                "m", " MODULE m", true, " MODULE ",
+                "m", " module x", false, "",
+                "Mm_0123456789", "  module Mm_0123456789;", true, "  module ",
+                "m", "  module  maaa", true, "  module  ",
+                "m", " module m.aaa", true, " module ",
+                "m", " module maaa.bb", true, " module ",
+                "m", " module ma.b.c", true, " module ",
+                "m", " module a.m", false, "",
+                ];
+
+            checkResultsSearchWord(re.regexEveryModuleForWord, insOuts);
+            done();
+        });
+
+
+        test('regexEveryMacroForWord', (done) => {
+            const insOuts = [
+                "m", "macro m", false, "",
+                "m", " macro m", true, " macro ",
+                "m", " MACRO m", true, " MACRO ",
+                "m", " macro x", false, "",
+                "Mm_0123456789", "  macro Mm_0123456789;", true, "  macro ",
+                "m", "  macro  maaa", true, "  macro  ",
+                "m", " macro m.aaa", true, " macro ",
+                "m", " macro maaa.bb", true, " macro ",
+                "m", " macro ma.b.c", true, " macro ",
+                "m", " macro a.m", false, "",
+                ];
+
+            checkResultsSearchWord(re.regexEveryMacroForWord, insOuts);
+            done();
+        });
+
+
+        test('regexStructForWord', (done) => {
+            const insOuts = [
+                // search-word, input-line, should-match, found-prefix
+                "m", "struct m", false, "",
+                "m", " struct m", true, " struct ",
+                "m", " STRUCT m", true, " STRUCT ",
+                "m", " struct x", false, "",
+                "Mm_0123456789", "  struct Mm_0123456789;", true, "  struct ",
+                ];
+
+            checkResultsSearchWord(re.regexStructForWord, insOuts);
+            done();
+        });
+
+
+        test('regexAnyReferenceForWord', (done) => {
+            const insOuts = [
+                // search-word, input-line, should-match, found-prefix
+                "label", "label ", true, "",
+                "label", " label", true, " ",
+                "label", " jr label", true, " jr ",
+                "label", " jr label2", false, "",
+                "label", " jr zlabel", false, "",
+
+                "label", "  jr nz,label", true, "  jr nz,",
+                "label", "  jr nz,label.init", true, "  jr nz,",
+                "label", "  jr nz,init.label.l3", true, "  jr nz,init.",
+                "label", "  jr nz,init.label", true, "  jr nz,init.",
+                "label", "  ld a,(init.label)", true, "  ld a,(init.",
+                
+                "label", "  ld a,(ix+init.label)", true, "  ld a,(ix+init.",
+                "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
+                "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
+                "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
+                ];
+
+            checkResultsSearchWord(re.regexAnyReferenceForWord, insOuts);
+            done();
+        });
+
+
+        // insOuts: search-word, input-line, number of matches, found1, found2, ...
+        function checkResultsSearchWordGlobal(func: (string) => RegExp, insOuts: (string|number)[]) {
+            try {
+                // Check the test
+                const count = insOuts.length;
+                let i=0;
+                let lineNumber = 0;
+                while(i<count) {
+                    const searchWord = insOuts[i++];
+                    const input = insOuts[i++] as string;
+                    const countMatches = insOuts[i++] as number;
+                    const regex = func(searchWord);
+                    if(countMatches == 0) {
+                        // Assure that there is no match
+                        const result = regex.exec(input);
+                        assert.equal(result, undefined, "A match was found although no match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "'");
+                    }
+                    else {
+                        // Compare all matches
+                        for(let m=0; m<countMatches; m++) {
+                            const prefix = insOuts[i++] as string;
+                            const result = regex.exec(input);
+                            assert.notEqual(result, undefined, "No match was found although a match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "' (" + m + ")");
+                            const foundPrefix = result[1];
+                            assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + lineNumber + " (" + m + ")");
+                        }
+                    }
+
+                    // Next
+                    lineNumber++;
+                }
+            }
+            catch(e) {
+                assert.fail("Testcase assertion: " + e);
+            }
+        }
+
+        test('regexAnyReferenceForWordGlobal', (done) => {
+            const insOuts = [
+                // search-word, input-line, should-match, found-prefix
+                "label", "label ", 1, "",
+                "label", " label", 1, " ",
+                "label", " jr label", 1, " jr ",
+                "label", " jr label2", 0, "",
+                "label", " jr zlabel", 0, "",
+
+                "label", "  jr nz,label", 1, "  jr nz,",
+                "label", "  jr nz,label.init", 1, "  jr nz,",
+                "label", "  jr nz,init.label.l3", 1, "  jr nz,init.",
+                "label", "  jr nz,init.label", 1, "  jr nz,init.",
+                "label", "  ld a,(init.label)", 1, "  ld a,(init.",
+                
+                "label", "  ld a,(ix+init.label)", 1, "  ld a,(ix+init.",
+                "label", "  ld a,(ix-init.label)", 1, "  ld a,(ix-init.",
+                "label", "  ld a,(5+init.label)", 1, "  ld a,(5+init.",
+                "label", "  ld a,(5-init.label*8)", 1, "  ld a,(5-init.",
+
+                "label", "label: djnz sound.label", 2, "", ": djnz sound.",
+                ];
+
+                checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
             done();
         });
     });
+
 
 });
