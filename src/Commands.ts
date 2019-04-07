@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations } from './grep';
-import { regexLabelColon, regexLabelWithoutColon } from './regexes';
+import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro } from './regexes';
 import { Location } from 'vscode';
 import { CodeLensProvider } from './CodeLensProvider';
 
@@ -51,7 +51,7 @@ export class Commands {
 
                 let labelsCount = locLabels.length;
                 let unrefLabels = 0;
-                const regexEqu = /[\s:]\s*(equ|macro)/i;
+                const regexEqu = regexLabelEquOrMacro();
                 for(const locLabel of locLabels) {
                     // Skip all EQU and MACRO
                     const fm: FileMatch = locLabel.fileMatch;

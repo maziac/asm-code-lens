@@ -31,6 +31,17 @@ export function regexLabelWithoutColon(): RegExp {
 
 
 /**
+ * Checks for a label followed by MACRO or EQU.
+ * E.g. "label: MACRO" or "label2: equ" or "label equ".
+ * Used by findLabelsWithNoReference.
+ */
+export function regexLabelEquOrMacro(): RegExp {
+    return /^[\w\.]+:?\s*\b(equ|macro)/i;
+}
+
+
+
+/**
  * Searches for labels that contains the given word.
  * Checks for a label with a colon.
  * Used by DefinitionProvider.
@@ -75,5 +86,4 @@ export function regexMacroForWord(searchWord: string): RegExp {
 export function regexStructForWord(searchWord: string): RegExp {
     return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b', 'i');
 }
-
 

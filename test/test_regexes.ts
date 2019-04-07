@@ -8,6 +8,55 @@ import { AssertionError } from 'assert';
 
 
 suite('RegExes', () => {
+    
+    suite('Simple regexes', () => {
+
+        function checkResultsMatch(regex: RegExp, insOuts: (string|boolean)[]) {
+            try {
+                // Check the test
+                const count = insOuts.length;
+                const div = 2;  // Line divider
+                assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
+                for(let i=0; i<count; i+=div) {
+                    const input = insOuts[i] as string;
+                    const shouldMatch = insOuts[i+1];
+                    const result = regex.exec(input);
+                    if(result) {
+                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div));
+                    }
+                    else {
+                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div));
+                    }
+                }
+            }
+            catch(e) {
+                assert.fail("Testcase assertion: " + e);
+            }
+        }
+
+        test('regexLabelEquOrMacro', (done) => {
+            const regex = re.regexLabelEquOrMacro();
+            const insOuts = [
+                // input-line, found-prefix, found-label
+                "label:equ", true,
+                "label:macro", true,
+                "label: MACRO", true,
+                "label: equ", true,
+                "label: equ;", true,
+
+                "label: equ ;", true,
+                "label equ", true,
+                "label equ ", true,
+                "label equ;", true,
+                "equ  ", false,
+                " equ  ", false,
+                ];
+
+            checkResultsMatch(regex, insOuts);
+            done();
+        });
+    });
+
 
     suite('RegEx 1 capture', () => {
 
