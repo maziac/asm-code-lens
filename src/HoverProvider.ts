@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { grepMultiple, read, reduceLocations, getCompleteLabel } from './grep';
+import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -43,18 +44,18 @@ export class HoverProvider implements vscode.HoverProvider {
                 return undefined;
                 
             //REMOVE:
-            return undefined;
+            //return undefined;
 
             // It is a non local label
             const searchWord = document.getText(document.getWordRangeAtPosition(position));
             // Find all "something:" (labels) in the document
-            const searchNormal = new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + ':');
+            const searchNormal = regexLabelColonForWord(searchWord);
             // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\\._])');
+            const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
             // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '\\b');
+            const searchsJasmModule = regexModuleForWord(searchWord);
             // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s+)' + searchWord + '\\b');
+            const searchsJasmMacro = regexMacroForWord(searchWord);
 
             grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
 //            grepMultiple([searchsJasmModule])
