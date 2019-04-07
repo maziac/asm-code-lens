@@ -57,8 +57,13 @@ export class Commands {
                     const fm: FileMatch = locLabel.fileMatch;
                     regexEqu.lastIndex = fm.match[1].length;
                     const matchEqu = regexEqu.exec(fm.lineContents);
-                    if(matchEqu)
+                    if(matchEqu) {
+                        labelsCount --;
+                        // output.appendLine("labelCount="+labelsCount);
+                        if(labelsCount == 0)
+                            output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's':'') + ".");
                         continue;
+                    }
 
                     // Get label
                     const label = fm.match[2];
@@ -81,7 +86,8 @@ export class Commands {
                                 output.appendLine(label + ", " + fileName + ":" + (pos.line+1));
                             }
                             // Check for last search
-                        labelsCount --;
+                            labelsCount --;
+                            // output.appendLine("labelCount="+labelsCount);
                             if(labelsCount == 0)
                                 output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's':'') + ".");
                         });

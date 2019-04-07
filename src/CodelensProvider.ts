@@ -60,7 +60,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             for(const fmatch of matches) {
                 // Create codeLens
                 const lineNr = fmatch.line;
-                const colStart = (fmatch.match[2]) ? fmatch.match[2].length : 0;
+                const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
                 let colEnd = fmatch.end;
                 const lineContents = document.lineAt(lineNr).text;
                 let matchedText = lineContents.substr(colStart, colEnd-colStart);
