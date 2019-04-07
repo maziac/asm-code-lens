@@ -7,6 +7,7 @@
 - 'Go to definition' also for INCLUDE files.
 - Completions implemented. Also supports sjasmplus dots notation and MODULEs.
 - New settings: enableCompletions, completionsRequiredLength.
+- Unit tests for regular expressions.
 
 
 ## 1.1.0

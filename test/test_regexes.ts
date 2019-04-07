@@ -57,7 +57,7 @@ suite('RegExes', () => {
         });
 
 
-        function checkResultsMatchFound(regex: RegExp, insOuts: (string|boolean)[]) {
+        function checkResultsMatchFound(regex: RegExp, insOuts: (string|boolean)[], matchIndex = 1) {
             try {
                 // Check the test
                 const count = insOuts.length;
@@ -70,7 +70,7 @@ suite('RegExes', () => {
                     const result = regex.exec(input);
                     if(result) {
                         assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div));
-                        const found = result[1];
+                        const found = result[matchIndex];
                         assert.equal(found, shouldFind, "'" + found + "' == '" + shouldFind + "', Line " + (i/div));
                     }
                     else {
@@ -94,6 +94,39 @@ suite('RegExes', () => {
                 ];
 
                 checkResultsMatchFound(regex, insOuts);
+            done();
+        });
+
+
+        test('regexModuleStruct', (done) => {
+            const regex = re.regexModuleStruct();
+            const insOuts = [
+                // input-line, match, found-file
+                ' module   m', true, "m",
+                ' MODULE m', true, "m",
+                ' struct m', true, "m",
+                'module m', false, "",
+                '  module  m.aa.b', true, "m.aa.b",
+                ' module   ', false, "",
+                ' module', false, "",
+                ];
+
+                checkResultsMatchFound(regex, insOuts, 2);
+            done();
+        });
+
+        test('regexEndModuleStruct', (done) => {
+            const regex = re.regexEndModuleStruct();
+            const insOuts = [
+                // input-line, match, found-file
+                ' endmodule   ', true,
+                ' ENDMODULE ', true,
+                ' ends', true,
+                'endmodule', false,
+                ' endmodule   mm', true,  // Is also found although this is not 100% correct
+                ];
+
+                checkResultsMatch(regex, insOuts);
             done();
         });
 

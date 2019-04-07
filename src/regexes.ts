@@ -56,6 +56,25 @@ export function regexInclude(): RegExp {
 
 
 /**
+ * Checks for a MODULE or STRUCT directive.
+ * Used by getModule.
+ */
+export function regexModuleStruct(): RegExp {
+    return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
+}
+
+
+/**
+ * Checks for a ENDMODULE or ENDS directive.
+ * Used by getModule.
+ */
+export function regexEndModuleStruct(): RegExp {
+    return /^\s+(ENDMODULE|ENDS)\b/i;
+}
+
+
+
+/**
  * Searches for labels that contains the given word.
  * Checks for a label with a colon.
  * Capture groups:

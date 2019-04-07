@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as PQueue from 'p-queue';
 //import * as fastGlob from 'fast-glob';
 import { FileMatch } from './grep';
+import { regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct } from './regexes';
 
 
 export interface FileMatch {
@@ -364,7 +365,7 @@ export function getRegExFromLabel(label: string): RegExp {
     }
 
     // Change last part 
-    const lastRegexStr = lastPart.replace(/(.)/g,'\\w*$1') + '\\w*';
+    const lastRegexStr = regexPrepareFuzzy(lastPart) + '\\w*';
     let regexStr = prefix.replace(/(\.)/g,'\\.');  // Make sure to convert . to \. for regular expression.
     regexStr += lastRegexStr;
     
@@ -535,38 +536,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
                 || regexModuleLabel.exec(mLabel.moduleLabel)
                 || regexLabel.exec(mLabel.moduleLabel)
                 || regexModuleLabel.exec(mLabel.label))
-                    return;
-
-                /*
-                // Change to lower before comparison.
-                const lwrModuleLabel = mLabel.moduleLabel.toLowerCase();
-                const lwrLabel = mLabel.label.toLowerCase();
-                //console.log( 'Labels', lwrModuleLabel, lwrLabel);
-                // This is used for the CompletionProvider.
-                if(lwrLabel.indexOf(searchLabel.label) >= 0
-                || lwrModuleLabel.indexOf(searchLabel.moduleLabel) >= 0
-                || lwrModuleLabel.indexOf(searchLabel.label) >= 0
-                || lwrLabel.indexOf(searchLabel.moduleLabel) >= 0)
-                    return;
-                */
-               
-                /*let regex = new RegExp('^'+searchLabel.label, 'i');
-                let match = regex.exec(mLabel.label);
-                if(match)
-                    return;
-                regex = new RegExp(searchLabel.label, 'i');
-                match = regex.exec(mLabel.label);
-                if(match)
-                    return;
-                regex = new RegExp(searchLabel.label, 'i');
-                match = regex.exec(mLabel.label);
-                if(match)
-                    return;
-                regex = new RegExp(searchLabel.label, 'i');
-                match = regex.exec(mLabel.label);
-                if(match)
-                    return;
-                  */                          
+                    return;                      
             }
             // 4. If 'searchLabel' is not equal to the direct label and not equal to the 
             //    concatenated label it is removed from 'locations'
@@ -639,8 +609,8 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
  * @returns A string like 'audio.samples'.
  */
 export function getModule(lines: Array<string>, len: number): string {
-    const regexModule = new RegExp(/^\s+(MODULE|STRUCT)\s+([\w\.]+)/i);
-    const regexEndmodule = new RegExp(/^\s+(ENDMODULE|ENDS)\b/i);
+    const regexModule = regexModuleStruct();
+    const regexEndmodule = regexEndModuleStruct();
     const modules: Array<string> = [];
     for (let row=0; row<len; row++) {
         const lineContents = lines[row];

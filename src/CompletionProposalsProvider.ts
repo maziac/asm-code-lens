@@ -54,7 +54,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
      */
     protected propose(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.CompletionList>
     {
-        return new Promise<vscode.CompletionList>((resolve, reject) => {
+         return new Promise<vscode.CompletionList>((resolve, reject) => {
             // Get all lines
             const lines = document.getText().split('\n');
             // Get the module at the line of the searched word.
@@ -68,7 +68,8 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             const start = preString.length;
             const end = start + label.length;
             const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, end));
-
+            //console.log('Completions for: '+ label);
+   
             // get the first non-local label
             let nonLocalLabel;  // Only used for local labels
             if(label.startsWith('.')) {
@@ -134,8 +135,13 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                     // Create list from map
                     const propList = Array.from(proposals.values());
                   
-                    // Return
-                    const completionList = new vscode.CompletionList(propList, false); // TODO: true or false???
+                    // Return.
+                    // false: In fact the 'false' means that the list is not incomplete,
+                    // i.e. it is complete. vscode will not call completion
+                    // anymore if not something bigger chances.
+                    // So, in fact only for the first character the completion list
+                    // is build. vscode filters this list on its own.
+                    const completionList = new vscode.CompletionList(propList, false);
                     resolve(completionList);
                 });
             });
