@@ -95,8 +95,8 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                 // Reduce the found locations.
                 reduceLocations(locations, document.fileName, position, true, false)
                 .then(reducedLocations => {
-                    // Now put all propsal texts in a list.
-                    const proposals: vscode.CompletionItem[] = [];
+                    // Now put all propsal texts in a map. (A map to make sure every item is listed only once.)
+                    const proposals = new Map<string, vscode.CompletionItem>();
                     for(const loc of reducedLocations) {
                         const text = loc.moduleLabel;
                         //console.log('\n');
@@ -128,11 +128,14 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                             item.label = '['+text.substr(0,k)+'] '+part;
                         }
                         
-                        proposals.push(item);
+                        proposals.set(item.label as string, item);
                     }
                     
+                    // Create list from map
+                    const propList = Array.from(proposals.values());
+                  
                     // Return
-                    const completionList = new vscode.CompletionList(proposals, false); // TODO: true or false???
+                    const completionList = new vscode.CompletionList(propList, false); // TODO: true or false???
                     resolve(completionList);
                 });
             });
