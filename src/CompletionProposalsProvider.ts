@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel, GrepLocation, getModule, getNonLocalLabel, removeDuplicates } from './grep';
 import { CodeLensProvider } from './CodeLensProvider';
 import { stringify } from 'querystring';
-
+import { regexPrepareFuzzy } from './regexes';
 
 
 /**
@@ -75,7 +75,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 
             // Search
             let searchWord = document.getText(document.getWordRangeAtPosition(position));
-            searchWord = searchWord.replace(/(.)/g,'\\w*$1');
+            searchWord = regexPrepareFuzzy(searchWord);
             // Find all "something:" (labels) in the document
             const searchNormal = new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
             // Find all sjasmplus labels without ":" in the document
@@ -84,6 +84,16 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             const searchsJasmModule = new RegExp('^(\\s+MODULE\\s+)' + searchWord + '[\\w\\.]*', 'i');
             // Find all sjasmplus MACROs in the document
             const searchsJasmMacro = new RegExp('^(\\s+MACRO\\s+)' + searchWord + '[\\w\\.]*', 'i');
+
+            // Find all "something:" (labels) in the document
+            const searchNormal = regexLabelColonForWord(searchWord);
+            // Find all sjasmplus labels without ":" in the document
+            const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
+            // Find all sjasmplus MODULEs in the document
+            const searchsJasmModule = regexModuleForWord(searchWord);
+            // Find all sjasmplus MACROs in the document
+            const searchsJasmMacro = regexMacroForWord(searchWord);
+
 
             grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
             //grepMultiple([searchNormal])

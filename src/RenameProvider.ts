@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import { grep, read, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
-import { regexAnyReferenceForWordGlobal } from './regexes';
+import { regexInclude, regexAnyReferenceForWordGlobal } from './regexes';
 
 
 
@@ -35,7 +35,6 @@ export class RenameProvider implements vscode.RenameProvider {
         return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
             const oldName = document.getText(document.getWordRangeAtPosition(position));
             const searchRegex = regexAnyReferenceForWordGlobal(oldName);
-            //const searchRegex = new RegExp('^([^"]*)\\b' + oldName + '\\b');
 
             grep(searchRegex)
             .then(locations => {
@@ -111,7 +110,7 @@ export class RenameProvider implements vscode.RenameProvider {
         const lines = text.split('\n');
 
         // Process all changes
-        const regex = new RegExp('\\s*INCLUDE\\s+', 'i');
+        const regex = regexInclude();
         for(const range of changes) {
             const row = range.start.line;
             const clmn = range.start.character;

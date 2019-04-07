@@ -47,7 +47,7 @@ export function regexLabelEquOrMacro(): RegExp {
  * E.g. 'include "something"' or ' include "something"'.
  * Capture groups:
  *  1 = what is included, i.e. what is inside the ""
- * Used by DefinitionProvider.
+ * Used by DefinitionProvider, RenameProvider.
  */
 export function regexInclude(): RegExp {
     return /\s*INCLUDE\s+"(.*)"/i;
@@ -134,6 +134,20 @@ export function regexAnyReferenceForWord(searchWord: string): RegExp {
  */
 export function regexAnyReferenceForWordGlobal(searchWord: string): RegExp {
     return new RegExp('(.*?)\\b' + searchWord + '\\b', 'g');
+}
+
+
+
+/**
+ * Prepares a string for fuzzy search.
+ * I.e. allows to input a string like "snd" and it will find
+ * with a regular expression also "sound", "sounds", "snd" etc.
+ * but not e.g. "sn".
+ * Used by CompletionProposalsProvider.
+ */
+export function regexPrepareFuzzy(searchWord: string): string {
+    const replaced = searchWord.replace(/(.)/g,'\\w*$1');
+    return replaced;
 }
 
 

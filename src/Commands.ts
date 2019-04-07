@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations } from './grep';
-import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro } from './regexes';
+import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro, regexAnyReferenceForWord } from './regexes';
 import { Location } from 'vscode';
 import { CodeLensProvider } from './CodeLensProvider';
 
@@ -72,8 +72,7 @@ export class Commands {
                     const fileName = fm.filePath;
 
                     // And search for references
-                    const regex = new RegExp('^([^;"]*)\\b' + searchLabel + '\\b');
-                    grep(regex)
+                    const regex = regexAnyReferenceForWord(searchLabel);grep(regex)
                     .then(locations => {
                         // Remove any locations because of module information (dot notation)
                         reduceLocations(locations, fileName, pos)

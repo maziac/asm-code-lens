@@ -96,6 +96,55 @@ suite('RegExes', () => {
                 checkResultsMatchFound(regex, insOuts);
             done();
         });
+
+
+        test('regexFuzzyFind 1', (done) => {
+            assert.equal("\\w*a", re.regexPrepareFuzzy("a"));
+            assert.equal("\\w*a\\w*b\\w*c", re.regexPrepareFuzzy("abc"));
+            assert.equal("", re.regexPrepareFuzzy(""));
+            done();
+        });
+
+        test('regexFuzzyFind 2', (done) => {
+            const insOuts = [
+                // input-line, search-word, should-match
+                "snd", "snd", true,
+                "sound", "snd", true,
+                "asound", "snd", true,
+                "sounds", "snd", true,
+                "soun", "snd", false,
+                "sounkkkd", "snd", true,
+                ];
+
+            try{ 
+                // Check the test
+                const count = insOuts.length;
+                const div = 3;  // Line divider
+                assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
+                for(let i=0; i<count; i+=div) {
+                    const input = insOuts[i] as string;
+                    const searchWordRaw = insOuts[i+1] as string;
+                    
+                    // To be tested function:
+                    const searchWord = re.regexPrepareFuzzy(searchWordRaw);
+
+                    const regex = new RegExp(searchWord);
+                    const shouldMatch = insOuts[i+2] as boolean;
+                    const result = regex.exec(input);
+                    if(result) {
+                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div));
+                    }
+                    else {
+                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div));
+                    }
+                }
+            }
+            catch(e) {
+                assert.fail("Testcase assertion: " + e);
+            }
+
+            done();
+        });
     });
 
 
