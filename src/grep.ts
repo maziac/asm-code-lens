@@ -528,7 +528,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
                     || mLabel.moduleLabel == searchLabel.label
                     || mLabel.label == searchLabel.moduleLabel)
                     return; // Please note: the test is ambiguous. There might be situations were this is wrong.
-                }
+            }
             else {
                 // Compare regular expressions to catch also scrambled input.
                 if(regexLabel.exec(mLabel.label)
@@ -588,7 +588,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
     */
 
     // Remove all duplicates from the list:
-    const uniqueLocations = removeDuplicates(redLocs, loc => loc.moduleLabel);
+    const uniqueLocations = redLocs; // removeDuplicates(redLocs, loc => loc.moduleLabel);
 
     return uniqueLocations;
 }

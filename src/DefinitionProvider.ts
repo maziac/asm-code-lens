@@ -79,7 +79,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
 
             grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchsJasmStruct])
             .then(locations => {
-                reduceLocations(locations, document, position)
+                reduceLocations(locations, document.fileName, position)
                 .then(reducedLocations => {
                     // There should be only one location.
                     // Anyhow return the whole array.

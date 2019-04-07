@@ -44,7 +44,7 @@ export class HoverProvider implements vscode.HoverProvider {
                 return undefined;
                 
             //REMOVE:
-            //return undefined;
+            return undefined;
 
             // It is a non local label
             const searchWord = document.getText(document.getWordRangeAtPosition(position));

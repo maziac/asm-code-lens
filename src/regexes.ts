@@ -111,3 +111,4 @@ export function regexAnyReferenceForWord(searchWord: string): RegExp {
     return new RegExp('^([^"]*)\\b' + searchWord + '\\b');
 }
 
+
