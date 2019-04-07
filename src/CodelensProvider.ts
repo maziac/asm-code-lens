@@ -53,9 +53,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             //const matches = grepTextDocumentMultiple(document, [searchRegex2]);
             // Loop all matches and create code lenses
             const codeLenses = new Array<vscode.CodeLens>();
-            
-            // REMOVE:
-            //return resolve(codeLenses);
 
             for(const fmatch of matches) {
                 // Create codeLens
