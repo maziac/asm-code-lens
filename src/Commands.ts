@@ -61,7 +61,7 @@ export class Commands {
                         continue;
 
                     // Get label
-                    const label = fm.match[1];
+                    const label = fm.match[2];
                     const searchLabel = label.replace(/\./, '\\.');
                     const pos = new vscode.Position(fm.line, fm.start);
                     const fileName = fm.filePath;

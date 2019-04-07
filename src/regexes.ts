@@ -3,10 +3,13 @@
  * Checks for a label with a colon, e.g.
  * "label:", " label:" or "init.label_1:".
  * But not ".label:".
- * Used by Command.
+ * Capture groups:
+ * 1 = preceding spaces
+ * 2 = the label itself e.g. "init.label_1
+ * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelColon(): RegExp {
-    return /^\s*\b([a-z_][\w\.]*):/i;
+    return /(^\s*)\b([a-z_][\w\.]*):/i;
 }
 
 
@@ -15,10 +18,13 @@ export function regexLabelColon(): RegExp {
  * label used by sjasmplus.
  * E.g. "label" or "init.label_1".
  * But not ".label".
- * Used by Command.
+ * Capture groups:
+ * 1 = ''
+ * 2 = the label itself e.g. "init.label_1
+ * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelWithoutColon(): RegExp {
-    return /^([a-z_][\w\.]*)\b/i;
+    return /^()([a-z_][\w\.]*)\b(?![:\.])/i;
 }
 
 
@@ -30,7 +36,7 @@ export function regexLabelWithoutColon(): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexLabelColonForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s*)[\\w\\.]*\\b' + searchWord + ':');
+    return new RegExp('^(\\s*)([^0-9\\. ][\\w\\.]*)?\\b' + searchWord + ':');
 }
 
 
@@ -40,7 +46,7 @@ export function regexLabelColonForWord(searchWord: string): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexLabelWithoutColonForWord(searchWord: string): RegExp {
-    return new RegExp('^()[\\w\\.]*\\b' + searchWord + '\\b(?![:\\.])');
+    return new RegExp('^()([^0-9\\. ][\\w\\.]*)?\\b' + searchWord + '\\b(?![:\\.])');
 }
 
 
@@ -69,4 +75,5 @@ export function regexMacroForWord(searchWord: string): RegExp {
 export function regexStructForWord(searchWord: string): RegExp {
     return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b', 'i');
 }
+
 

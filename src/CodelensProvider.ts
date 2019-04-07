@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { grep, grepTextDocumentMultiple, reduceLocations } from './grep';
+import { regexLabelColon, regexLabelWithoutColon } from './regexes';
 //import * as fs from 'fs';
 //import * as path from 'path';
 //import { ReferenceProvider } from './ReferenceProvider';
@@ -44,10 +45,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.CodeLens[]> { // oder Promise<CodeLens[]>
     
         return new Promise<vscode.CodeLens[]>((resolve, reject) => {
-            // Find all "something:" (labels) in the document
-            const searchRegex = /^(\s*)\b[a-z_]\w*:/i;
+            // Find all "some.thing:" (labels) in the document
+            const searchRegex = regexLabelColon();
             // Find all sjasmplus labels without ":" in the document
-            const searchRegex2 = /^[a-z_][\w\.]*\b(?![:\.])/i;
+            const searchRegex2 = regexLabelWithoutColon();
             const matches = grepTextDocumentMultiple(document, [searchRegex, searchRegex2]);
             //const matches = grepTextDocumentMultiple(document, [searchRegex2]);
             // Loop all matches and create code lenses
@@ -59,7 +60,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             for(const fmatch of matches) {
                 // Create codeLens
                 const lineNr = fmatch.line;
-                const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
+                const colStart = (fmatch.match[2]) ? fmatch.match[2].length : 0;
                 let colEnd = fmatch.end;
                 const lineContents = document.lineAt(lineNr).text;
                 let matchedText = lineContents.substr(colStart, colEnd-colStart);
@@ -96,7 +97,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
             const doc = codeLens.document;
             const pos = codeLens.range.start;
-            const line = pos.line;
+            //const line = pos.line;
 
             grep(searchRegex)
             .then(locations => {
