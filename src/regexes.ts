@@ -4,8 +4,8 @@
  * "label:", " label:" or "init.label_1:".
  * But not ".label:".
  * Capture groups:
- * 1 = preceding spaces
- * 2 = the label itself e.g. "init.label_1
+ *  1 = preceding spaces
+ *  2 = the label itself e.g. "init.label_1
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelColon(): RegExp {
@@ -19,8 +19,8 @@ export function regexLabelColon(): RegExp {
  * E.g. "label" or "init.label_1".
  * But not ".label".
  * Capture groups:
- * 1 = ''
- * 2 = the label itself e.g. "init.label_1
+ *  1 = ''
+ *  2 = the label itself e.g. "init.label_1
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelWithoutColon(): RegExp {
@@ -33,6 +33,8 @@ export function regexLabelWithoutColon(): RegExp {
 /**
  * Checks for a label followed by MACRO or EQU.
  * E.g. "label: MACRO" or "label2: equ" or "label equ".
+ * Capture groups:
+ *  None.
  * Used by findLabelsWithNoReference.
  */
 export function regexLabelEquOrMacro(): RegExp {
@@ -44,6 +46,8 @@ export function regexLabelEquOrMacro(): RegExp {
 /**
  * Searches for labels that contains the given word.
  * Checks for a label with a colon.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
  * Used by DefinitionProvider.
  */
 export function regexLabelColonForWord(searchWord: string): RegExp {
@@ -54,6 +58,8 @@ export function regexLabelColonForWord(searchWord: string): RegExp {
 /**
  * Searches for labels that contains the given word.
  * Checks for a label without a colon.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
  * Used by DefinitionProvider.
  */
 export function regexLabelWithoutColonForWord(searchWord: string): RegExp {
@@ -63,6 +69,8 @@ export function regexLabelWithoutColonForWord(searchWord: string): RegExp {
 
 /**
  * Searches for a (sjasmplus) MODULE that contains the given word.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
  * Used by DefinitionProvider.
  */
 export function regexModuleForWord(searchWord: string): RegExp {
@@ -72,18 +80,34 @@ export function regexModuleForWord(searchWord: string): RegExp {
 
 /**
  * Searches for a (sjasmplus) MACRO that contains the given word.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
  * Used by DefinitionProvider.
  */
 export function regexMacroForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(macro|MACRO)\\s+)' + searchWord + '\\b', 'i');
+    return new RegExp('^(\\s+(macro|MACRO)\\s+)' + searchWord + '\\b');
 }
 
 
 /**
  * Searches for a (sjasmplus) STRUCT that contains the given word.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
  * Used by DefinitionProvider.
  */
 export function regexStructForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b', 'i');
+    return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
+}
+
+
+
+/**
+ * Searches any reference for a given word (label).
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by resolveCodeLens.
+ */
+export function regexAnyReferenceForWord(searchWord: string): RegExp {
+    return new RegExp('^([^"]*)\\b' + searchWord + '\\b');
 }
 

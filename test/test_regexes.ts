@@ -289,12 +289,38 @@ suite('RegExes', () => {
             checkResultsSearchWord(re.regexStructForWord, insOuts);
             done();
         });
+
+
+        test('regexAnyReferenceForWord', (done) => {
+            const insOuts = [
+                // search-word, input-line, should-match, found-prefix
+                "label", "label ", true, "",
+                "label", " label", true, " ",
+                "label", " jr label", true, " jr ",
+                "label", " jr label2", false, "",
+                "label", " jr zlabel", false, "",
+
+                "label", "  jr nz,label", true, "  jr nz,",
+                "label", "  jr nz,label.init", true, "  jr nz,",
+                "label", "  jr nz,init.label.l3", true, "  jr nz,init.",
+                "label", "  jr nz,init.label", true, "  jr nz,init.",
+                "label", "  ld a,(init.label)", true, "  ld a,(init.",
+                
+                "label", "  ld a,(ix+init.label)", true, "  ld a,(ix+init.",
+                "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
+                "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
+                "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
+                ];
+
+            checkResultsSearchWord(re.regexAnyReferenceForWord, insOuts);
+            done();
+        });
     });
 
 
+    
 
-
-    suite('RegEx with search-word 2', () => {
+    suite('RegEx with search-word 2, weg', () => {
 
         // insOuts: search-word, input-line, should-match, found-prefix
         function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string|boolean)[]) {

@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { grep, grepTextDocumentMultiple, reduceLocations } from './grep';
-import { regexLabelColon, regexLabelWithoutColon } from './regexes';
+import { regexLabelColon, regexLabelWithoutColon, regexAnyReferenceForWord } from './regexes';
 //import * as fs from 'fs';
 //import * as path from 'path';
 //import { ReferenceProvider } from './ReferenceProvider';
@@ -93,7 +93,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         return new Promise<vscode.CodeLens>((resolve, reject) => {
             // search the references
             const searchWord = codeLens.symbol;
-            const searchRegex = new RegExp('^([^;"]*)\\b' + searchWord + '\\b');
+            const searchRegex = regexAnyReferenceForWord(searchWord);
 
             const doc = codeLens.document;
             const pos = codeLens.range.start;
