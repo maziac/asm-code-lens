@@ -76,7 +76,6 @@
                 "title": "ASM Code Lens: Find labels with no reference "
             }
         ],
-
         "languages": [
             {
                 "id": "asm-collection",
@@ -101,7 +100,6 @@
             }
         ]
     },
-
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
         "compile": "tsc -watch -p ./",
@@ -111,7 +109,7 @@
     "devDependencies": {
         "@types/mocha": "^5.2.6",
         "@types/node": "^11.13.0",
-        "mocha": "^6.0.2",
+        "mocha": "^6.1.1",
         "nyc": "^13.3.0",
         "typescript": "^3.4.2",
         "vscode": "^1.1.33"
