@@ -35,7 +35,7 @@ This extension made use of code from 2 other packages:
 - [grob](https://www.npmjs.com/package/grob) by jamiebuilds
 
 I also included the grammar for syntax highlighting from Martin Bórik's vscode extension [z80-macroasm-vscode](https://github.com/mborik/z80-macroasm-vscode) because I got problems when running both extensions at the same time and I could not turn off features selectively.
-I.e. I copied the files language.configuration.json and z80-macroasm.tmLanguage.json. The z80-macroasm-vscode extension itself was forked from Imanol Barriuso's vscode extension [z80-vscode](https://github.com/Imanolea/z80asm-vscode). MIT licenes, Copyright (c) 2016 Imanol Barriuso (Imanolea).
+I.e. I copied the files language.configuration.json and z80-macroasm.tmLanguage.json. The z80-macroasm-vscode extension itself was forked from Imanol Barriuso's vscode extension [z80asm-vscode](https://github.com/Imanolea/z80asm-vscode). MIT license, copyright (c) 2016 Imanol Barriuso (Imanolea).
 
 
 Many thanks to the authors.
