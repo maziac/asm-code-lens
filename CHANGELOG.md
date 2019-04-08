@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+- Fix for hovering local labels.
+
+
 ## 1.2.0
 - Better support fo sjasmplus dot label notation.
 - Support for sjasmplus macros.

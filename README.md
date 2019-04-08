@@ -11,6 +11,7 @@ It provides support for:
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
 - Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
 - Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and most probably many other assemblers that use a standard notation for labels (e.g. "label:").
+- Assembler syntax highlighting.
 
 
 ## Installation
