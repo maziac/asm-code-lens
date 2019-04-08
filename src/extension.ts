@@ -16,30 +16,37 @@ export function activate(context: vscode.ExtensionContext) {
     // If the identifier is missing it also don't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
     const asmFiles: vscode.DocumentSelector = { scheme: "file", pattern:"**/*.{asm,s,a80,inc}"};
 
-    context.subscriptions.push(
-        //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())
-        vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider())
-    );
-
-    context.subscriptions.push(
-        vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider())
-    );
+    if(settings.enableGotoDefinition != false) {
+        context.subscriptions.push(
+            vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider()),
+        );
+    }
 
     context.subscriptions.push(
         vscode.languages.registerHoverProvider(asmFiles, new HoverProvider()),
     );
 
     context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider()),
-    );
-
-    context.subscriptions.push(
-        vscode.languages.registerRenameProvider(asmFiles, new RenameProvider()),
-    );
-
-    context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider()),
     );
+
+    if(settings.enableGotoDefinition != false) {
+            context.subscriptions.push(
+            vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider())
+        );
+    }
+    
+    context.subscriptions.push(
+        //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())
+        vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider())
+    );
+
+    if(settings.enableRenaming != false) {
+        context.subscriptions.push(
+            vscode.languages.registerRenameProvider(asmFiles, new RenameProvider()),
+        );
+    }
+
 
     vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
         Commands.findLabelsWithNoReference(); 

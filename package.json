@@ -36,7 +36,7 @@
                 "asm-code-lens.codeLenses": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable/disable the display of code lenses (references) above labels."
+                    "description": "Enable/disable the display of code lenses (references) above labels. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.enableHovering": {
                     "type": "boolean",
@@ -56,7 +56,7 @@
                 "asm-code-lens.enableGotoDefinition": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable/disable 'Go to Type Definition'."
+                    "description": "Enable/disable 'Go to Type Definition'. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.enableFindAllReferences": {
                     "type": "boolean",
@@ -66,7 +66,7 @@
                 "asm-code-lens.enableRenaming": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable/disable the possibility to rename labels."
+                    "description": "Enable/disable the possibility to rename labels. You need to reload the extension to take effect."
                 }
             }
         },

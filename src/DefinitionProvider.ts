@@ -19,11 +19,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @param token 
      */
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-        const settings = vscode.workspace.getConfiguration('asm-code-lens');
-        if(settings.enableGotoDefinition == false)
-            return undefined;
-
-            // Check for 'include "..."'
+        // Check for 'include "..."'
         const lineContents = document.lineAt(position.line).text;
         const match = regexInclude().exec(lineContents);
         if(match) {

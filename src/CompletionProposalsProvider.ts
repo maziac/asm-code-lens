@@ -23,11 +23,8 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 		position: vscode.Position,
 		token: vscode.CancellationToken
 	): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
-        const settings = vscode.workspace.getConfiguration('asm-code-lens');
-        if(settings.enableCompletions == false)
-            return undefined;
-
         // Get required length
+        const settings = vscode.workspace.getConfiguration('asm-code-lens');
         let requiredLen = settings.completionsRequiredLength;
         if(requiredLen == undefined || requiredLen < 1)
             requiredLen = 1;
