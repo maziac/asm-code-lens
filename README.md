@@ -34,4 +34,8 @@ This extension made use of code from 2 other packages:
 - [find all references](https://github.com/gayanhewa/vscode-find-all-references) by gayanhewa
 - [grob](https://www.npmjs.com/package/grob) by jamiebuilds
 
+I also included the grammar for syntax highlighting from Imanol Barriuso's vscode extension [z80-macroasm-vscode](https://github.com/mborik/z80-macroasm-vscode) because I got problems when running both extensions at the same time and I could not turn off features selectively.
+I.e. I copied the files language.configuration.json and z80-macroasm.tmLanguage.json.
+
+
 Many thanks to the authors.

@@ -1,0 +1,242 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "asm",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#mnemonics"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#labels"
+		}
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.block.asm",
+					"begin": "/\\*",
+					"end": "\\*/"
+				},
+				{
+					"name": "comment.line.asm",
+					"begin": ";",
+					"end": "\\n"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:equ|eval|org|end?t|align|(de|un)?phase|shift|save(bin|hob|sna|tap|trd)|empty(tap|trd)|inc(bin|hob|trd)|b?include|insert|binary|end|output|tap(out|end)|fpos|page|slot|size|outradix)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:cpu|device|encoding|charset|proc|macro|local|shared|public|rept|dup|block|endm|endp|edup|exitm|module|endmod(ule)?|(un)?define|export|disp|textarea|map|field|defarray)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdlmswir]|d[bcdszw]|abyte[cz]?|byte|word|dword)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:if|ifn?def|ifn?used|else|elseif|endif)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:bank|bankset|limit|protect|write\\s+direct|str|struct|endstruct)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:incl48|incl49|inclz4|inczx7|incexo|lz48|lz49|lz4|lzw7|lzexo|lzclose)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:print|fail|repeat|rend|until|switch|case|default|break|endswitch|stop|while|wend)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:amsdos|breakpoint|buildcpr|buildsna|run|save|setcpc|setcrtc)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:list|nolist|let)\\b)"
+				},
+				{
+					"name": "string.other.lua.asm",
+					"begin": "(?i:(?<=\\s)(lua)\\b)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.control.asm"
+						}
+					},
+					"end": "(?i:(?<=\\s)(endlua)\\b)",
+					"endCaptures": {
+						"1": {
+							"name": "keyword.control.asm"
+						}
+					}
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"match": "(?i:(af'))",
+					"captures": {
+						"1": {
+							"name": "support.type.register.asm"
+						}
+					}
+				},
+				{
+					"name": "string.quoted.single.asm",
+					"begin": "'",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.asm"
+						}
+					},
+					"end": "(\\')|((?:[^\\\\\\n])$)",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.string.end.asm"
+						},
+						"2": {
+							"name": "invalid.illegal.newline.asm"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#string-character-escape"
+						}
+					]
+				},
+				{
+					"name": "string.quoted.double.asm",
+					"begin": "\"",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.asm"
+						}
+					},
+					"end": "(\")|((?:[^\\\\\\n])$)",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.string.end.asm"
+						},
+						"2": {
+							"name": "invalid.illegal.newline.asm"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#string-character-escape"
+						}
+					]
+				}
+			]
+		},
+		"string-character-escape": {
+			"patterns": [
+				{
+					"name": "constant.character.escape.asm",
+					"match": "\\\\(x[0-9A-Fa-f]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)"
+				}
+			]
+		},
+		"mnemonics": {
+			"patterns": [
+				{
+					"name": "support.type.flag.asm",
+					"match": "\\b(?i:(j[pr]|call|ret))(?:\\s+(?i:([cmpz]|n[cz]|p[eo])))?\\b",
+					"captures": {
+						"1": {
+							"name": "keyword.mnemonic.asm"
+						},
+						"2": {
+							"name": "meta.preprocessor.flag.asm"
+						}
+					}
+				},
+				{
+					"name": "constant.numeric.operator.asm",
+					"match": "\\b(?i:high|low|not|mod|sh[lr])\\b"
+				},
+				{
+					"name": "keyword.mnemonic.asm",
+					"match": "\\s(?i:adc|add|and|bit|ccf|cp|cpdr?|cpir?|cpl|daa|dec|[de]i|djnz|exx?|halt|im|in|inc|indr?|inir?|ld|lddr?|ldir?|neg|nop|or|ot[di]r|out|out[di]|pop|push|res|ret[in]|rl|rla|rlc|rlca|rld|rr|rra|rrc|rrca|rrd|rst|sbc|scf|set|sli?a|sll|swap|sra|srl|sub|xor)\\s"
+				},
+				{
+					"name": "support.type.register.asm",
+					"match": "\\b(?i:[abcdefhlir]|ix|iy|af'?|bc|de|hl|pc|sp|ix[lu]|iy[lu]|[lh]x|x[lh]|[lh]y|y[lh])\\b"
+				},
+				{
+					"name": "constant.language.operator.asm",
+					"match": "(?i:\\{(?:hex[248]?|bin(?:8|16|32)?|int|eval)?\\})"
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "invalid",
+					"match": "^\\{5}"
+				},
+				{
+					"name": "constant.numeric.integer.hexadecimal.asm",
+					"match": "[\\$#][0-9a-fA-F]+"
+				},
+				{
+					"name": "constant.numeric.integer.hexadecimal.asm",
+					"match": "(\\-?[0-9a-fA-F]+[hH])\\b"
+				},
+				{
+					"name": "constant.numeric.integer.hexadecimal.asm",
+					"match": "(\\-?0x[0-9a-fA-F]+)\\b"
+				},
+				{
+					"name": "constant.numeric.integer.binary.asm",
+					"match": "%[01]+\\b"
+				},
+				{
+					"name": "constant.numeric.integer.binary.asm",
+					"match": "\\b[01]+[bB]\\b"
+				},
+				{
+					"name": "constant.numeric.integer.decimal.asm",
+					"match": "\\-?\\d+"
+				}
+			]
+		},
+		"labels": {
+			"patterns": [
+				{
+					"match": "^\\@?((\\$\\$(?!\\.))?[\\w\\.]+)[:\\s]",
+					"captures": {
+						"1": {
+							"name": "entity.name.function.asm"
+						}
+					}
+				},
+				{
+					"match": "\\b([a-zA-Z][\\w\\.]+)\\b",
+					"name": "variable.parameter.label.asm"
+				}
+			]
+		}
+	},
+	"scopeName": "source.asm"
+}

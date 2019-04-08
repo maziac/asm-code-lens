@@ -9,6 +9,7 @@
 - New settings: enableCompletions, completionsRequiredLength.
 - Unit tests for regular expressions.
 - Configurable through settings.json.
+- Added syntax highlighting.
 
 
 ## 1.1.0

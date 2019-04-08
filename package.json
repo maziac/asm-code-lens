@@ -75,8 +75,33 @@
                 "command": "asm-code-lens.find-labels-with-no-reference",
                 "title": "ASM Code Lens: Find labels with no reference "
             }
+        ],
+
+        "languages": [
+            {
+                "id": "asm-collection",
+                "extensions": [
+                    ".list",
+                    ".lis",
+                    ".a80",
+                    ".asm",
+                    ".inc",
+                    ".s"
+                ],
+                "aliases": [
+                    "Assembler file"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "asm-collection",
+                "scopeName": "source.asm",
+                "path": "./grammar/asm.json"
+            }
         ]
     },
+
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
         "compile": "tsc -watch -p ./",
