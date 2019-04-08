@@ -19,9 +19,12 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param token 
      */
     public provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Thenable<vscode.WorkspaceEdit> {
-
+        const settings = vscode.workspace.getConfiguration('asm-code-lens');
+        if(settings.enableRenaming == false)
+            return undefined;
+        
         return new Promise<vscode.WorkspaceEdit>((resolve,reject) => {
-            return resolve(this.rename(document, position, newName));
+                return resolve(this.rename(document, position, newName));
         });
     }
 

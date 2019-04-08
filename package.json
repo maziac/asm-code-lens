@@ -33,7 +33,12 @@
             "type": "object",
             "title": "asm-code-lens configuration",
             "properties": {
-                "asm-code-lens.enableHoverProvider": {
+                "asm-code-lens.codeLenses": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable the display of code lenses (references) above labels."
+                },
+                "asm-code-lens.enableHovering": {
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable the of showing information while hovering labels etc."
@@ -47,6 +52,21 @@
                     "type": "number",
                     "default": 1,
                     "description": "The number of characters required before completion proposals will be presented."
+                },
+                "asm-code-lens.enableGotoDefinition": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable 'Go to Type Definition'."
+                },
+                "asm-code-lens.enableFindAllReferences": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable 'Find All References'."
+                },
+                "asm-code-lens.enableRenaming": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable the possibility to rename labels."
                 }
             }
         },

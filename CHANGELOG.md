@@ -8,6 +8,7 @@
 - Completions implemented. Also supports sjasmplus dots notation and MODULEs.
 - New settings: enableCompletions, completionsRequiredLength.
 - Unit tests for regular expressions.
+- Configurable through settings.json.
 
 
 ## 1.1.0

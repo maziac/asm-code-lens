@@ -17,8 +17,12 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param token 
      */
     public provideReferences(document: vscode.TextDocument, position: vscode.Position, options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-            return this.search(document, position);
-    }
+        const settings = vscode.workspace.getConfiguration('asm-code-lens');
+        if(settings.enableFindAllReferences == false)
+            return undefined;
+
+        return this.search(document, position);
+        }
 
     
     /**

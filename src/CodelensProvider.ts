@@ -43,6 +43,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token 
      */
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.CodeLens[]> { // oder Promise<CodeLens[]>
+        const settings = vscode.workspace.getConfiguration('asm-code-lens');
+        if(settings.codeLenses == false)
+            return undefined;
     
         return new Promise<vscode.CodeLens[]>((resolve, reject) => {
             // Find all "some.thing:" (labels) in the document

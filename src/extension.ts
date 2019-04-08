@@ -10,6 +10,8 @@ import { CompletionProposalsProvider } from './CompletionProposalsProvider';
 import { Commands } from './Commands';
 
 export function activate(context: vscode.ExtensionContext) {
+    const settings = vscode.workspace.getConfiguration('asm-code-lens');
+    
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
     // If the identifier is missing it also don't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
     const asmFiles: vscode.DocumentSelector = { scheme: "file", pattern:"**/*.{asm,s,a80,inc}"};
