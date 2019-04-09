@@ -2,6 +2,7 @@
 
 ## 1.2.1
 - Fix for hovering local labels.
+- Completions for z80 instructions.
 
 
 ## 1.2.0

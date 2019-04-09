@@ -7,6 +7,48 @@ import { regexPrepareFuzzy } from './regexes';
 import {regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
 
 
+/// All additional completions like Z80 instructions and assembler
+/// directives etc.
+const completions = [
+    // Z80 instructions
+	'adc',  'add',  'and',  'bit',  'call', 'ccf',  'cp',   'cpd',
+	'cpdr', 'cpi',  'cpir', 'cpl',  'daa',  'dec',  'di',   'ei',
+	'djnz', 'ex',   'exx',  'halt', 'im',   'inc',  'in',   'ind',
+	'indr', 'ini',  'inir', 'jp',   'jr',   'ld',   'ldd',  'lddr',
+	'ldi',  'ldir', 'neg',  'nop',  'or',   'otdr', 'otir', 'out',
+	'outd', 'outi', 'pop',  'push', 'res',  'ret',  'reti', 'retn',
+	'rl',   'rla',  'rlc',  'rlca', 'rld',  'rr',   'rra',  'rrc',
+	'rrca', 'rrd',  'rst',  'sbc',  'scf',  'set',  'sla',  'slia',
+    'sll',  'swap', 'sra',  'srl',  'sub',  'xor',
+
+    // Z80N instructions
+    'ldix', 'ldws', 'ldirx', 'lddx', 'lddrx', 'ldpirx', 
+    'outinb', 'mul', 'swapnib', 'mirror', 'nextreg',
+    'pixeldn', 'pixelup', 'setae', 'test',
+    'bsla', 'bsra', 'bsrl', 'bsrf', 'brlc',
+
+    // sjasmplus fake instructions
+    'ldi',
+
+    // sjasmplus
+    'macro', 'endm', 'module', 'endmodule', 'struct', 'ends', 'dup', 'edup',
+    'if', 'ifn', 'ifdef', 'ifndef', 'ifused', 'ifnused', 'else', 'endif',
+    'include', 'device', 'zxspectrum', 
+    'abyte', 'abytec', 'abytez', 'align', 'assert', 
+    'binary', 'block', 'defb', 'defw', 'defm', 'defs', 'dephase', 'disp',
+    'display', 'byte', 'word', 'dword', 
+    'emptytap', 'emptytrd', 
+    'equ', 'export', 
+    'end', 'endlua', 'endt', 'ent',
+    'incbin', 'includelua', 'inctrd', 'insert', 
+    'lua', 'org', 'outend', 'output',
+    'page', 'rept', 'savebin', 'savesna', 'savetap', 'savetrd', 
+    'shellexec', 'size', 'slot', 
+    'tapend', 'tapout',
+    'textarea',
+    'define', 'undefine',
+];
+
 
 /**
  * CompletionItemProvider for assembly language.
@@ -92,11 +134,13 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                 // Reduce the found locations.
                 reduceLocations(locations, document.fileName, position, true, false)
                 .then(reducedLocations => {
-                    // Now put all propsal texts in a map. (A map to make sure every item is listed only once.)
+                    // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
                     const proposals = new Map<string, vscode.CompletionItem>();
+
+                    // go through all found locations
                     for(const loc of reducedLocations) {
                         const text = loc.moduleLabel;
-                        //console.log('\n');
+                        //console.log('');
                         //console.log('Proposal:', text);
                         const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
                         item.filterText = text;
@@ -131,13 +175,40 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                     // Create list from map
                     const propList = Array.from(proposals.values());
                   
+
+                    // Check if word includes a dot
+                    let allCompletions;
+                    let k = label.lastIndexOf('.');
+                    if(k < 0) {
+                        // No dot.
+                        // Check if word starts with a capital letter
+                        const upperCase = (label[0] == label[0].toUpperCase());
+                        // Add the instruction proposals
+                        let i = 0;
+                        allCompletions = completions.map(text => {
+                            if(upperCase)
+                                text = text.toUpperCase();
+                            const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
+                            item.sortText = i.toString(); // To make sure they are shown at first.
+                            i ++;
+                            item.range = range;
+                            return item;
+                        });
+                        // Add grepped words
+                        allCompletions.push(...propList);
+                    }
+                    else {
+                        // Simply use grepped list.
+                        allCompletions = propList;
+                    }
+
                     // Return.
                     // false: In fact the 'false' means that the list is not incomplete,
                     // i.e. it is complete. vscode will not call completion
                     // anymore if not something bigger chances.
                     // So, in fact only for the first character the completion list
                     // is build. vscode filters this list on its own.
-                    const completionList = new vscode.CompletionList(propList, false);
+                    const completionList = new vscode.CompletionList(allCompletions, false);
                     resolve(completionList);
                 });
             });
