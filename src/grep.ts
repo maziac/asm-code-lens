@@ -447,9 +447,8 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
     // 4. The MODULE info is added to the orignal label
     const moduleLabel = concatenateModuleAndLabel(module, label);
 
-    // return
-    const match = /\S/.exec(preString); // Check that no character is preceding the label.
-    if(!match) {
+    // Check that no character is preceding the label.
+    if(preString.length == 0) {
         // It's the definition of a label, so moduleLabel is the only possible label.
         label = moduleLabel;
     }

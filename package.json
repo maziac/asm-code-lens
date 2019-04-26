@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information and symbol renaming in assembler files.",
     "author": {
@@ -109,8 +109,8 @@
     "devDependencies": {
         "@types/mocha": "^5.2.6",
         "@types/node": "^11.13.0",
-        "mocha": "^6.1.1",
-        "nyc": "^13.3.0",
+        "mocha": "^6.1.4",
+        "nyc": "^14.1.0",
         "typescript": "^3.4.2",
         "vscode": "^1.1.33"
     },

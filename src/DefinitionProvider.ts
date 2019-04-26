@@ -78,6 +78,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             const searchsJasmStruct = regexStructForWord(searchWord);
 
             grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchsJasmStruct])
+            //grepMultiple([searchsJasmMacro])
             .then(locations => {
                 reduceLocations(locations, document.fileName, position)
                 .then(reducedLocations => {
