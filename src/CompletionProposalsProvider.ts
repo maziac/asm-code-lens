@@ -10,6 +10,11 @@ import {regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEv
 /// All additional completions like Z80 instructions and assembler
 /// directives etc.
 const completions = [
+    // Z80 registers
+    'a', 'b', 'c', 'd', 'e', 'h', 'l',
+    'af', 'bc', 'de', 'hl', 'ix', 'iy', 'sp',
+    'ixl', 'ixh', 'iyl', 'iyh', 
+
     // Z80 instructions
 	'adc',  'add',  'and',  'bit',  'call', 'ccf',  'cp',   'cpd',
 	'cpdr', 'cpi',  'cpir', 'cpl',  'daa',  'dec',  'di',   'ei',

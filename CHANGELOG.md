@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2
+- Added Z80 register names as proposals for completions.
+- Fixed "Go to definition" for sjasm macros.
+
+
 ## 1.2.1
 - Fix for hovering local labels.
 - Completions for z80 instructions.
