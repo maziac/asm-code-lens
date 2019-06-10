@@ -29,7 +29,7 @@ const completions = [
     // Z80N instructions
     'ldix', 'ldws', 'ldirx', 'lddx', 'lddrx', 'ldpirx', 
     'outinb', 'mul', 'swapnib', 'mirror', 'nextreg',
-    'pixeldn', 'pixelup', 'setae', 'test',
+    'pixeldn', 'pixelad', 'setae', 'test',
     'bsla', 'bsra', 'bsrl', 'bsrf', 'brlc',
 
     // sjasmplus fake instructions
