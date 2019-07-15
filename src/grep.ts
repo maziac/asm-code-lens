@@ -74,21 +74,6 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
 
 
 /**
- * Reads data from a stream.
- * @param stream 
- * @param onData 
- */
-export function read(stream, onData) {
-    return new Promise((resolve, reject) => {
-        const promises = [];
-        stream.on('data', data => promises.push(onData(data)));
-        stream.on('error', reject);
-        stream.on('end', () => Promise.all(promises).then(resolve));
-    });
-}
-
-
-/**
  * Checks the list of 'docs' for a given 'filePath' and returns the corresponding 
  * text document.
  * @param filePath 
@@ -148,56 +133,57 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                 }
                 else {
                     // Check file on disk
-                    const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
                     let fileMatches = allMatches.get(fileName);
                     let lastIndex = 0;
             
-                    await read(readStream, data => {
-                        const lines = data.split('\n');
-                        const len = lines.length;
-                        for (let index = 0; index < len; index++) {
-                            const lineContents = stripComment(lines[index]);
-                            const line = lastIndex + index;
-                            regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
-                            const lineMatches: Array<FileMatch> = [];
-                            do {
-                                const match = regex.exec(lineContents);
-                                if(!match) 
-                                    break;
-                            
-                                // Found: get start and end
-                                let start = match.index;
-                                if(match[1]) {
-                                    // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                                    const i = match[1].length;
-                                    start += i;
-                                }
-                                const end = match.index + match[0].length;
+                    const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+                    const lines = linesData.split('\n');
 
-                                // Make sure that the map entry exists.
-                                if (!fileMatches) {
-                                    fileMatches = [];
-                                    allMatches.set(fileName, fileMatches);
-                                }
-                    
-                                // Reverse order (useful if names should be replaced later on)
-                                lineMatches.unshift({
-                                    filePath,
-                                    line,
-                                    start,
-                                    end,
-                                    lineContents,
-                                    match
-                                });
-                            } while(regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+                    const len = lines.length;
+                    for (let index = 0; index < len; index++) {
+                        const lineContents = stripComment(lines[index]);
+                        if(lineContents.length == 0)
+                            continue;
+                        const line = lastIndex + index;
+                        regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
+                        const lineMatches: Array<FileMatch> = [];
+                        do {
+                            const match = regex.exec(lineContents);
+                            if(!match) 
+                                break;
+                        
+                            // Found: get start and end
+                            let start = match.index;
+                            if(match[1]) {
+                                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+                                const i = match[1].length;
+                                start += i;
+                            }
+                            const end = match.index + match[0].length;
 
-                            // Put in global array.
-                            if(fileMatches)
-                                fileMatches.push(...lineMatches);
-                        }
-            
-                        lastIndex += len;
-                    });
+                            // Make sure that the map entry exists.
+                            if (!fileMatches) {
+                                fileMatches = [];
+                                allMatches.set(fileName, fileMatches);
+                            }
+                
+                            // Reverse order (useful if names should be replaced later on)
+                            lineMatches.unshift({
+                                filePath,
+                                line,
+                                start,
+                                end,
+                                lineContents,
+                                match
+                            });
+                        } while(regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+
+                        // Put in global array.
+                        if(fileMatches)
+                            fileMatches.push(...lineMatches);
+                    }
+        
+                    lastIndex += len;
                 }
             });
         }
@@ -423,11 +409,8 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
     }
     else {
         // Doc is read from disk.
-        const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
-
-        await read(readStream, data => {
-            lines = data.split('\n');
-        });
+        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+        lines = linesData.split('\n');
     }
     
     // 1. Get original label

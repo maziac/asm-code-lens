@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grepMultiple, read, reduceLocations, getCompleteLabel } from './grep';
+import { grepMultiple, reduceLocations, getCompleteLabel } from './grep';
 import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -71,34 +71,32 @@ export class HoverProvider implements vscode.HoverProvider {
                             const loc = reducedLocations[index];
                             const lineNr = loc.range.start.line;
                             const filePath = loc.uri.fsPath;
-                            const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
-
-                            read(readStream, data => {
-                                const lines = data.split('\n');
-                                // Now find all comments above the found line
-                                const text = lines[lineNr];
-                                if(text.indexOf(';') >= 0)
-                                    hoverTexts.unshift(text);
-                                let startLine = lineNr-1;
-                                const prevHoverTextArrayLength = hoverTexts.length;
-                                while(startLine >= 0) {
-                                    // Check if line starts with ";"
-                                    const line = lines[startLine];
-                                    const match = /^\s*;(.*)/.exec(line);
-                                    if(!match)
-                                        break;
-                                    // Add text
-                                    hoverTexts.unshift(match[1]);     
-                                    // Next
-                                    startLine --;
-                                }
-                                // Separate several entries
-                                if(prevHoverTextArrayLength != hoverTexts.length)
-                                    hoverTexts.unshift('============'); 
-                                
-                                // Call next
-                                f(index+1);
-                            });
+                            const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+                            const lines = linesData.split('\n');
+ 
+                            // Now find all comments above the found line
+                            const text = lines[lineNr];
+                            if(text.indexOf(';') >= 0)
+                                hoverTexts.unshift(text);
+                            let startLine = lineNr-1;
+                            const prevHoverTextArrayLength = hoverTexts.length;
+                            while(startLine >= 0) {
+                                // Check if line starts with ";"
+                                const line = lines[startLine];
+                                const match = /^\s*;(.*)/.exec(line);
+                                if(!match)
+                                    break;
+                                // Add text
+                                hoverTexts.unshift(match[1]);     
+                                // Next
+                                startLine --;
+                            }
+                            // Separate several entries
+                            if(prevHoverTextArrayLength != hoverTexts.length)
+                                hoverTexts.unshift('============'); 
+                            
+                            // Call next
+                            f(index+1);
                         }
                         else {
                             // End of processing.

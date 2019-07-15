@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { grep, read, reduceLocations, getTextDocument } from './grep';
+import { grep, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
 import { regexInclude, regexAnyReferenceForWordGlobal } from './regexes';
 
@@ -100,13 +100,8 @@ export class RenameProvider implements vscode.RenameProvider {
         const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
 
         // Read and exchange
-        let text = '';
-        await read(readStream, data => {
-            text += data;
-        });
-        
-        // Get lines
-        const lines = text.split('\n');
+        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+        const lines = linesData.split('\n');
 
         // Process all changes
         const regex = regexInclude();

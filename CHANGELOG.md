@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+- Settings
+- Fixed error reading files, sometimes wrong data was read, i.e. sometimes labels were not found.
+
 ## 1.2.2
 - Added Z80 register names as proposals for completions.
 - Fixed "Go to definition" for sjasm macros.
