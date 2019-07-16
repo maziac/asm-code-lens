@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as assert from 'assert';
 import * as fs from 'fs';
 //import * as path from 'path';
 import * as PQueue from 'p-queue';
@@ -95,6 +96,19 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
 
 
 /**
+ * Sets the glob patterns to check for files while grepping.
+ * @param globInclude Include pattern
+ * @param globExclude Exclude pattern
+ */
+export function setGrepGlobPatterns(globInclude: string, globExclude: string) {
+    grepGlobInclude = globInclude;
+    grepGlobExclude = globExclude;
+}
+let grepGlobInclude;
+let grepGlobExclude;
+
+
+/**
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
@@ -106,7 +120,8 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
     //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
    
-    await vscode.workspace.findFiles('**/*.{asm,inc,s,a80}', null)
+    assert(grepGlobInclude);
+    await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude)
     .then(async uris => {
         const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
  

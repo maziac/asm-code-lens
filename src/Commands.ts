@@ -1,10 +1,10 @@
 'use strict';
 import * as vscode from 'vscode';
-import * as assert from 'assert';
+//import * as assert from 'assert';
 import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations } from './grep';
 import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro, regexAnyReferenceForWord } from './regexes';
-import { Location } from 'vscode';
-import { CodeLensProvider } from './CodeLensProvider';
+//import { Location } from 'vscode';
+//import { CodeLensProvider } from './CodeLensProvider';
 
 var grepit = require('grepit');
 
