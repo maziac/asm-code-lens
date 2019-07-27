@@ -79,7 +79,7 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
  * text document.
  * @param filePath 
  * @param docs The list of text documents. Obtained with vscode.workspace.textDocuments.filter(doc => doc.isDirty)
- * @returns The vscode.TextDcoument or undefined if not found.
+ * @returns The vscode.TextDocument or undefined if not found.
  */
 export function getTextDocument(filePath: string, docs: Array<vscode.TextDocument>): vscode.TextDocument {
     // Check if file is opened in editor
@@ -227,7 +227,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
  * Greps for multiple regular expressions. E.g. used to search for labels
  * terminated by a ':' and for labels that start on 1rst column.
  * Simply calls 'grep' multiple times.
- * @param regexs Array of regexes.
+ * @param regexes Array of regexes.
  * @return An array with all regex search results.
  */
 export async function grepMultiple(regexes: RegExp[]): Promise<GrepLocation[]> {
@@ -341,7 +341,7 @@ export function getLastLabelPart(label: string): string {
  * Converts the given label into a regular expression.
  * Changes the last part of the label into a regex that
  * allows various other letters in between.
- * E.g. 'sound.intal' will become 'sound.\\w*i\\w*n\\w*t\\w*a\\w*l\\w*
+ * E.g. 'sound.initial' will become 'sound.\\w*i\\w*n\\w*i\\w*t\\w*a\\w*l\\w*
  * so that the regular exception would also match if not all
  * characters are in the right order.
  * E.g. this would match: 'sound.initialize'.
@@ -380,7 +380,7 @@ export function getRegExFromLabel(label: string): RegExp {
  * Concatenates a module and a label.
  * @param module E.g. 'sound.effects'.
  * @param label  E.g. 'explosion'
- * @return E.g. sound.effects.explosion. If module is undefined or an emtpy string then label is returned unchanged.
+ * @return E.g. sound.effects.explosion. If module is undefined or an empty string then label is returned unchanged.
  */
 function concatenateModuleAndLabel(module: string, label: string): string {
     if(!module)
@@ -400,7 +400,7 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * 1. The original label is constructed from the document and position info.
  * 2. If local label: The document is parsed from position to begin for a non-local label.
  * 3. The document is parsed from begin to position for 'MODULE' info.
- * 4. The MODULE info is added to the orignal label (this is now the searchLabel).
+ * 4. The MODULE info is added to the original label (this is now the searchLabel).
  * 4. Both are returned.
  * @param fileName The filename of the document.
  * @param pos The position that points to the label.
@@ -442,7 +442,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
     // 3. The document is parsed from begin to 'pos' for 'MODULE' info.
     const module = getModule(lines, row);
 
-    // 4. The MODULE info is added to the orignal label
+    // 4. The MODULE info is added to the original label
     const moduleLabel = concatenateModuleAndLabel(module, label);
 
     // Check that no character is preceding the label.

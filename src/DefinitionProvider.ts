@@ -71,14 +71,14 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             // Find all sjasmplus labels without ":" in the document
             const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
             // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = regexModuleForWord(searchWord);
+            const searchSjasmModule = regexModuleForWord(searchWord);
             // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = regexMacroForWord(searchWord);
+            const searchSjasmMacro = regexMacroForWord(searchWord);
             // Find all sjasmplus STRUCTs in the document
-            const searchsJasmStruct = regexStructForWord(searchWord);
+            const searchSjasmStruct = regexStructForWord(searchWord);
 
-            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchsJasmStruct])
-            //grepMultiple([searchsJasmMacro])
+            grepMultiple([searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct])
+            //grepMultiple([searchSjasmMacro])
             .then(locations => {
                 reduceLocations(locations, document.fileName, position)
                 .then(reducedLocations => {
