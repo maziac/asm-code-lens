@@ -65,7 +65,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
     protected search(document, position): Thenable<vscode.Location[]>
     {
         return new Promise<vscode.Location[]>((resolve, reject) => {
-            const searchWord = document.getText(document.getWordRangeAtPosition(position));
+            const searchWord = document.getText(document.getWordRangeAtPosition(position)); //, /[a-z0-9_.]+/i));
             // Find all "something:" (labels) in the document
             const searchNormal = regexLabelColonForWord(searchWord);
             // Find all sjasmplus labels without ":" in the document

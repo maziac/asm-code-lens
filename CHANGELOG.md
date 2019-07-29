@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+- Improved 'Goto Definition' and 'Rename' for concatenated (sjasmplus) labels.
+
+
 ## 1.3.0
 - Settings fixed.
 - Added settings for globbing include and exclude files.

@@ -83,7 +83,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         if(label.startsWith('.'))
             len --; // Require one more character for local labels.
         if(len < requiredLen)
-            return new vscode.CompletionList([new vscode.CompletionItem(' ')], false);  // A space is required, otherwise vscode will not ask again for comletion items.
+            return new vscode.CompletionList([new vscode.CompletionItem(' ')], false);  // A space is required, otherwise vscode will not ask again for completion items.
 
         // Search proposals
         return this.propose(document, position);
@@ -137,7 +137,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             //grepMultiple([searchNormal])
             .then(locations => {
                 // Reduce the found locations.
-                reduceLocations(locations, document.fileName, position, true, false)
+            reduceLocations(locations, document.fileName, position, true, false)
                 .then(reducedLocations => {
                     // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
                     const proposals = new Map<string, vscode.CompletionItem>();

@@ -169,9 +169,9 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                         
                             // Found: get start and end
                             let start = match.index;
-                            if(match[1]) {
+                            for(let j=1; j<match.length; j++) {
                                 // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                                const i = match[1].length;
+                                const i = match[j].length;
                                 start += i;
                             }
                             const end = match.index + match[0].length;
@@ -222,6 +222,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
  
     return locations;
 }
+
 
 /**
  * Greps for multiple regular expressions. E.g. used to search for labels
@@ -277,9 +278,9 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
             
             // Found: get start and end
             let start = match.index;
-            if(match[1]) {
+            for(let j=1; j<match.length; j++) {
                 // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                const i = match[1].length;
+                const i = match[j].length;
                 start += i;
             }
             const end = match.index + match[0].length;
@@ -644,13 +645,14 @@ export function getModule(lines: Array<string>, len: number): string {
  * is found before 'label'.
  */
 export function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
+    const regexEnd = /[\w]/;
     // Find end of label.
     const len = lineContents.length;
-    let k;
+    let k: number;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
         // Allow [a-z0-9_]
-        const match = /\w/.exec(s);
+        const match = regexEnd.exec(s);
         if(!match)
             break;
     }
