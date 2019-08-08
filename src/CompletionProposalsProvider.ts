@@ -38,7 +38,7 @@ const completions = [
     // sjasmplus
     'macro', 'endm', 'module', 'endmodule', 'struct', 'ends', 'dup', 'edup',
     'if', 'ifn', 'ifdef', 'ifndef', 'ifused', 'ifnused', 'else', 'endif',
-    'include', 'device', 'zxspectrum', 
+    'include', 'incbin',
     'abyte', 'abytec', 'abytez', 'align', 'assert', 
     'binary', 'block', 'defb', 'defw', 'defm', 'defs', 'dephase', 'disp',
     'display', 'byte', 'word', 'dword', 
@@ -47,11 +47,13 @@ const completions = [
     'end', 'endlua', 'endt', 'ent',
     'incbin', 'includelua', 'inctrd', 'insert', 
     'lua', 'org', 'outend', 'output',
-    'page', 'rept', 'savebin', 'savesna', 'savetap', 'savetrd', 
+    'page', 'rept', 'savebin', 'savesna', 'savetap', 'savetrd', 'savenex',
     'shellexec', 'size', 'slot', 
     'tapend', 'tapout',
     'textarea',
     'define', 'undefine',
+    'device', 'ZXSPECTRUM48', 'ZXSPECTRUM128', 'ZXSPECTRUM256', 'ZXSPECTRUM512', 'ZXSPECTRUM1024', 'ZXSPECTRUMNEXT', 'NONE',
+    'open', 'close' 
 ];
 
 
@@ -137,7 +139,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             //grepMultiple([searchNormal])
             .then(locations => {
                 // Reduce the found locations.
-            reduceLocations(locations, document.fileName, position, true, false)
+                reduceLocations(locations, document.fileName, position, true, false)
                 .then(reducedLocations => {
                     // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
                     const proposals = new Map<string, vscode.CompletionItem>();
@@ -179,7 +181,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                     
                     // Create list from map
                     const propList = Array.from(proposals.values());
-                  
+                
 
                     // Check if word includes a dot
                     let allCompletions;
