@@ -1,4 +1,4 @@
-# ASM Code Lense
+# ASM Code Lens
 
 ![](assets/codelens_usage.gif)
 
