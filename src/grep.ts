@@ -4,7 +4,7 @@ import * as fs from 'fs';
 //import * as path from 'path';
 import * as PQueue from 'p-queue';
 //import * as fastGlob from 'fast-glob';
-import { FileMatch } from './grep';
+//import { FileMatch } from './grep';
 import { regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct } from './regexes';
 
 
