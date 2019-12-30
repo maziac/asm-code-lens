@@ -82,7 +82,7 @@ export function regexEndModuleStruct(): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexLabelColonForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s*)([^0-9\\. ][\\w\\.]*)?\\b' + searchWord + ':');
+    return new RegExp('^(\\s*)([^0-9\\.\\s][\\w\\.]*)?\\b' + searchWord + ':');
 }
 
 
@@ -94,7 +94,7 @@ export function regexLabelColonForWord(searchWord: string): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexLabelWithoutColonForWord(searchWord: string): RegExp {
-    return new RegExp('^()([^0-9\\. ][\\w\\.]*)?\\b' + searchWord + '\\b(?![:\\.])');
+    return new RegExp('^()([^0-9\\.\\s][\\w\\.]*)?\\b' + searchWord + '\\b(?![:\\.])');
 }
 
 

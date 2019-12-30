@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.2
+- Fixed falsy recognition of opcodes as labels.
+
+
 ## 1.3.1
 - Improved 'Goto Definition' and 'Rename' for concatenated (sjasmplus) labels.
 

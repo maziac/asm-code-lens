@@ -42,7 +42,8 @@ export class HoverProvider implements vscode.HoverProvider {
             }
 
             // It is a non local label
-            const searchWord = document.getText(document.getWordRangeAtPosition(position));
+            const range = document.getWordRangeAtPosition(position);
+            const searchWord = document.getText(range);
             // Find all "something:" (labels) in the document
             const searchNormal = regexLabelColonForWord(searchWord);
             // Find all sjasmplus labels without ":" in the document
@@ -53,7 +54,7 @@ export class HoverProvider implements vscode.HoverProvider {
             const searchsJasmMacro = regexMacroForWord(searchWord);
 
             grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
-//            grepMultiple([searchsJasmModule])
+//            grepMultiple([searchSjasmLabel])
             .then(locations => {
                 // Reduce the found locations.
                 reduceLocations(locations, document.fileName, position, false)
