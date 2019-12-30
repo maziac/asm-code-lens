@@ -1,10 +1,7 @@
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs';
-//import * as path from 'path';
-import * as PQueue from 'p-queue';
-//import * as fastGlob from 'fast-glob';
-//import { FileMatch } from './grep';
+const {default: PQueue} = require('p-queue');
 import { regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct } from './regexes';
 
 
