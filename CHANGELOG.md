@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+- New icon.
+
+
 ## 1.3.2
 - Fixed falsy recognition of opcodes as labels.
 
