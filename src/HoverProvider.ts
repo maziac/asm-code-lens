@@ -19,7 +19,6 @@ export class HoverProvider implements vscode.HoverProvider {
      * @param token 
      */
     public provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Hover> {
-        const settings = vscode.workspace.getConfiguration('asm-code-lens');
         return this.search(document, position);
     }
 
