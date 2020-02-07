@@ -55,7 +55,8 @@ const completions = [
     'device', 'ZXSPECTRUM48', 'ZXSPECTRUM128', 'ZXSPECTRUM256', 'ZXSPECTRUM512', 'ZXSPECTRUM1024', 'ZXSPECTRUMNEXT', 'NONE',
     'open', 'close',
     'setbp', 'setbreakpoint',
-    'bplist', 'unreal', 'zesarux'
+    'bplist', 'unreal', 'zesarux',
+    'opt'
 ];
 
 
