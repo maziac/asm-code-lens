@@ -53,7 +53,9 @@ const completions = [
     'textarea',
     'define', 'undefine',
     'device', 'ZXSPECTRUM48', 'ZXSPECTRUM128', 'ZXSPECTRUM256', 'ZXSPECTRUM512', 'ZXSPECTRUM1024', 'ZXSPECTRUMNEXT', 'NONE',
-    'open', 'close' 
+    'open', 'close',
+    'setbp', 'setbreakpoint',
+    'bplist', 'unreal', 'zesarux'
 ];
 
 
