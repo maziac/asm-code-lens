@@ -76,7 +76,7 @@
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:setbp|setbreakpoint|bplist)\\b)"
+					"match": "(?i:(?<=\\s)(?:setb(p|reakpoint)|bplist)\\b)"
 				},
 				{
 					"name": "string.other.lua.asm",
