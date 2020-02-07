@@ -40,7 +40,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:equ|eval|org|end?t|align|(de|un)?phase|shift|save(bin|hob|sna|tap|trd|nex)|empty(tap|trd)|inc(bin|hob|trd)|b?include|insert|labelslist|binary|end|output|tap(out|end)|fpos|page|slot|size|outradix)\\b)"
+					"match": "(?i:(?<=\\s)(?:equ|eval|org|end?t|align|(de|un)?phase|shift|save(bin|hob|sna|tap|trd|nex)|empty(tap|trd)|inc(bin|hob|trd)|b?include|insert|labelslist|binary|end|output|tap(out|end)|fpos|page|slot|size|outradix|opt)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
