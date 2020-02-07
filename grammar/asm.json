@@ -75,6 +75,10 @@
 					"match": "(?i:(?<=\\s)(?:list|nolist|let)\\b)"
 				},
 				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:setbp|setbreakpoint|bplist)\\b)"
+				},
+				{
 					"name": "string.other.lua.asm",
 					"begin": "(?i:(?<=\\s)(lua)\\b)",
 					"beginCaptures": {
