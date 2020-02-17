@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1
+- Added support for more sjasmplus directives thanks to kborowinski.
+
+
 ## 1.4.0
 - New icon.
 
