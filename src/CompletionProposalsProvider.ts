@@ -40,7 +40,7 @@ const completions = [
     'if', 'ifn', 'ifdef', 'ifndef', 'ifused', 'ifnused', 'else', 'endif',
     'include', 'incbin',
     'abyte', 'abytec', 'abytez', 'align', 'assert', 
-    'binary', 'block', 'defb', 'defw', 'defm', 'defs', 'dephase', 'disp', 'dh', 'hex',
+    'binary', 'block', 'defb', 'defg', 'defw', 'defm', 'defs', 'dephase', 'disp', 'dh', 'hex', 'dg',
     'display', 'byte', 'word', 'dword', 
     'emptytap', 'emptytrd', 
     'equ', 'export', 
