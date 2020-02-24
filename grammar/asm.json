@@ -48,7 +48,7 @@
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdlmswir]|d[bcdszw]|abyte[cz]?|byte|word|dword)\\b)"
+					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdlmswir]|d[bcdhszw]|abyte[cz]?|byte|word|dword|hex)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
