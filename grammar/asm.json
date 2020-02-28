@@ -40,15 +40,15 @@
 			"patterns": [
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:equ|eval|org|end?t|align|(de|un)?phase|shift|save(bin|hob|sna|tap|trd|nex)|empty(tap|trd)|inc(bin|hob|trd)|b?include|insert|labelslist|binary|end|output|tap(out|end)|fpos|page|slot|size|outradix|opt)\\b)"
+					"match": "(?i:(?<=\\s)(?:equ|eval|org|end?t|align|(de|un)?phase|shift|save(bin|dev|hob|sna|tap|trd|nex)|empty(tap|trd)|inc(bin|hob|trd)|b?include|includelua|insert|labelslist|binary|end|output|tap(out|end)|fpos|page|slot|size|outradix|opt)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:cpu|device|encoding|charset|proc|macro|local|shared|public|rept|dup|block|endm|endp|edup|exitm|module|endmod(ule)?|(un)?define|export|disp|textarea|map|field|defarray)\\b)"
+					"match": "(?i:(?<=\\s)(?:cpu|device|encoding|charset|proc|macro|local|shared|public|rept|dup|block|end[mpr]|edup|exitm|module|endmod(ule)?|(un)?define|export|disp|textarea|(memory|cspect)?map|mmu|field|defarray)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdlmswir]|d[bcdszw]|abyte[cz]?|byte|word|dword)\\b)"
+					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdghlmswir]|d[bcdghmszw]|d24|abyte[cz]?|byte|word|dword|hex)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
@@ -77,6 +77,10 @@
 				{
 					"name": "keyword.control.asm",
 					"match": "(?i:(?<=\\s)(?:setb(p|reakpoint)|bplist)\\b)"
+				},
+				{
+					"name": "keyword.control.asm",
+					"match": "(?i:(?<=\\s)(?:_(sjasmplus|version|release|errors|warnings))\\b)"
 				},
 				{
 					"name": "string.other.lua.asm",

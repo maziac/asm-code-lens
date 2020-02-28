@@ -4,7 +4,7 @@ import { grepMultiple, reduceLocations, getCompleteLabel, GrepLocation, getModul
 import { CodeLensProvider } from './CodeLensProvider';
 import { stringify } from 'querystring';
 import { regexPrepareFuzzy } from './regexes';
-import {regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
+import { regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
 
 
 /// All additional completions like Z80 instructions and assembler
@@ -33,30 +33,37 @@ const completions = [
     'bsla', 'bsra', 'bsrl', 'bsrf', 'brlc',
 
     // sjasmplus fake instructions
-    'ldi',
+    'sli',
 
     // sjasmplus
     'macro', 'endm', 'module', 'endmodule', 'struct', 'ends', 'dup', 'edup',
     'if', 'ifn', 'ifdef', 'ifndef', 'ifused', 'ifnused', 'else', 'endif',
     'include', 'incbin',
-    'abyte', 'abytec', 'abytez', 'align', 'assert', 
-    'binary', 'block', 'defb', 'defw', 'defm', 'defs', 'dephase', 'disp',
-    'display', 'byte', 'word', 'dword', 
-    'emptytap', 'emptytrd', 
-    'equ', 'export', 
+    'abyte', 'abytec', 'abytez', 'align', 'assert',
+    'binary', 'block', 'defb', 'defd', 'defg', 'defh', 'defl', 'defm', 'defs', 'defw', 'dephase', 'disp', 'phase', 'unphase',
+    'd24', 'db', 'dc', 'dd', 'dg', 'dh', 'hex', 'dm', 'ds', 'dw', 'dz',
+    'display', 'byte', 'word', 'dword',
+    'emptytap', 'emptytrd', 'encoding',
+    'equ', 'export',
     'end', 'endlua', 'endt', 'ent',
-    'incbin', 'includelua', 'inctrd', 'insert', 
-    'lua', 'org', 'outend', 'output',
-    'page', 'rept', 'savebin', 'savesna', 'savetap', 'savetrd', 'savenex',
-    'shellexec', 'size', 'slot', 
+    'includelua', 'inchob', 'inctrd', 'insert',
+    'lua', 'labelslist', 'org', 'outend', 'output',
+    'memorymap', 'mmu',
+    'page', 'rept', 'endr', 'savebin', 'savedev', 'savehob', 'savesna', 'savetrd',
+    'savetap', 'basic', 'code', 'numbers', 'chars', 'headless',
+    'savenex', 'core', 'cfg', 'cfg3', 'bar', 'palette', 'default', 'mem', 'bmp', 'screen',
+    'l2', 'l2_320', 'l2_640', 'scr', 'shc', 'shr', 'tile', 'cooper', 'bank', 'auto',
+    'shellexec', 'size', 'slot',
     'tapend', 'tapout',
     'textarea',
     'define', 'undefine',
-    'device', 'ZXSPECTRUM48', 'ZXSPECTRUM128', 'ZXSPECTRUM256', 'ZXSPECTRUM512', 'ZXSPECTRUM1024', 'ZXSPECTRUMNEXT', 'NONE',
+    'defarray', 'defarray+',
+    'device', 'ZXSPECTRUM48', 'ZXSPECTRUM128', 'ZXSPECTRUM256', 'ZXSPECTRUM512', 'ZXSPECTRUM1024', 'ZXSPECTRUM2048', 'ZXSPECTRUM4096', 'ZXSPECTRUM8192', 'ZXSPECTRUMNEXT', 'NONE', 'ramtop',
     'open', 'close',
     'setbp', 'setbreakpoint',
     'bplist', 'unreal', 'zesarux',
-    'opt'
+    'opt', 'cspectmap', 'fpos',
+    '_sjasmplus', '_version', '_release', '_errors', '_warnings'
 ];
 
 
