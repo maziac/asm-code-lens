@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.3
+- Fixed issue #23 for Linux.
+
 ## 1.4.2
 - Added more commands/fixes (kborowinski).
 
