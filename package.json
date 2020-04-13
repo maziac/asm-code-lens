@@ -11,7 +11,8 @@
     "keywords": [
         "assembler",
         "references",
-        "code lens"
+        "code lens",
+        "z80"
     ],
     "repository": {
         "type": "git",
