@@ -73,7 +73,7 @@ export class HoverProvider implements vscode.HoverProvider {
  
                             // Now find all comments above the found line
                             const text = lines[lineNr];
-                            if(text.indexOf(';') >= 0)
+                            if(text.indexOf(';') >= 0)  // TODO: indexOf of undefined
                                 hoverTexts.unshift(text);
                             let startLine = lineNr-1;
                             const prevHoverTextArrayLength = hoverTexts.length;

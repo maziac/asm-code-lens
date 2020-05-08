@@ -655,7 +655,7 @@ export function getModule(lines: Array<string>, len: number): string {
 export function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
     const regexEnd = /[\w]/;
     // Find end of label.
-    const len = lineContents.length;
+    const len = lineContents.length;    // TODO: length of undefined
     let k: number;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
