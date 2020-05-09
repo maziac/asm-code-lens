@@ -125,7 +125,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, end));
             //console.log('Completions for: '+ label);
    
-            // get the first non-local label
+            // Get the first non-local label
             let nonLocalLabel;  // Only used for local labels
             if(label.startsWith('.')) {
                 nonLocalLabel = getNonLocalLabel(lines, row);
@@ -154,7 +154,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                     // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
                     const proposals = new Map<string, vscode.CompletionItem>();
 
-                    // go through all found locations
+                    // Go through all found locations
                     for(const loc of reducedLocations) {
                         const text = loc.moduleLabel;
                         //console.log('');
@@ -168,7 +168,8 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                             // A previous non-local label was searched (and found), so label is local.
                             item.filterText = label;
                             // Change insert text
-                            const k = moduleLabel.length + 1 + nonLocalLabel.length;
+                            //const k=moduleLabel.length+1+nonLocalLabel.length;
+                            const k=moduleLabel.length+nonLocalLabel.length;
                             let part = text.substr(k);
                             item.insertText = part;
                             // change shown text

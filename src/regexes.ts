@@ -195,6 +195,7 @@ export function regexEveryLabelColonForWord(searchWord: string): RegExp {
  * Used by CompletionProposalsProvider.
  */
 export function regexEveryLabelWithoutColonForWord(searchWord: string): RegExp {
+    //searchWord=searchWord.replace(/\./g, '\\.');
     return new RegExp('^(([^0-9 ][\\w\\.]*)?)\\b' + searchWord + '[\\w\\.]*\\b(?![:\\w\\.])', 'i');
 }
 

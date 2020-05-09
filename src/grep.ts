@@ -215,7 +215,10 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
         // Iterate all matches inside file
         for(const match of matches) {
             const lineNr = match.line;
-            const colStart = match.start;
+            let colStart=match.start;
+            // Check fro dot label
+            //if (match.match[1].indexOf('.')>=0)
+            //    colStart--; // include the dot
             const colEnd = match.end;
             const startPos = new vscode.Position(lineNr, colStart);
             const endPos = new vscode.Position(lineNr, colEnd);
