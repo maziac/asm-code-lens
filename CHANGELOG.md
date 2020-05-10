@@ -6,6 +6,7 @@
 ## 1.4.3/4
 - Fixed issue #23 for Linux.
 - Added anderson-arc's list of x86 instructions.
+- Fixed dot command completion.
 
 ## 1.4.2
 - Added more commands/fixes (kborowinski).
