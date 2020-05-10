@@ -1,9 +1,6 @@
 # Changelog
 
-## 1.4.4
-- 
-
-## 1.4.3
+## 1.4.3/4
 - Fixed issue #23 for Linux.
 
 ## 1.4.2
