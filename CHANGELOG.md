@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.5
+## 1.4.5
 - Fixed changelog.
 
 ## 1.4.3/4
