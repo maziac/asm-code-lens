@@ -1,7 +1,11 @@
 # Changelog
 
+## 1.2.5
+- Fixed changelog.
+
 ## 1.4.3/4
 - Fixed issue #23 for Linux.
+- Added anderson-arc's list of x86 instructions.
 
 ## 1.4.2
 - Added more commands/fixes (kborowinski).
