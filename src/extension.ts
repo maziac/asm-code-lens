@@ -1,14 +1,15 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { ReferenceProvider } from './ReferenceProvider';
-import { DefinitionProvider } from './DefinitionProvider';
-import { HoverProvider } from './HoverProvider';
-import { CodeLensProvider } from './CodeLensProvider';
-import { RenameProvider } from './RenameProvider';
-import { CompletionProposalsProvider } from './CompletionProposalsProvider';
-import { Commands } from './Commands';
-import { setGrepGlobPatterns } from './grep';
+import {ReferenceProvider} from './ReferenceProvider';
+import {DefinitionProvider} from './DefinitionProvider';
+import {HoverProvider} from './HoverProvider';
+import {CodeLensProvider} from './CodeLensProvider';
+import {RenameProvider} from './RenameProvider';
+import {DocumentSymbolProvider} from './DocumentSymbolProvider';
+import {CompletionProposalsProvider} from './CompletionProposalsProvider';
+import {Commands} from './Commands';
+import {setGrepGlobPatterns} from './grep';
 
 export function activate(context: vscode.ExtensionContext) {
 	// Enable logging.
@@ -141,18 +142,33 @@ function configure(context: vscode.ExtensionContext, event?) {
         }
     }
 
-    if(settings.enableRenaming) {
-        if(!regRenameProvider) {
+    if (settings.enableRenaming) {
+        if (!regRenameProvider) {
             // Register
-            regRenameProvider = vscode.languages.registerRenameProvider(asmFiles, new RenameProvider());
+            regRenameProvider=vscode.languages.registerRenameProvider(asmFiles, new RenameProvider());
             context.subscriptions.push(regRenameProvider);
         }
     }
     else {
-        if(regRenameProvider) {
+        if (regRenameProvider) {
             // Deregister
             regRenameProvider.dispose();
-            regRenameProvider = undefined;
+            regRenameProvider=undefined;
+        }
+    }
+
+    if (settings.enableOutlineView) {
+        if (!regDocumentSymbolProvider) {
+            // Register
+            regDocumentSymbolProvider=vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider());
+            context.subscriptions.push(regDocumentSymbolProvider);
+        }
+    }
+    else {
+        if (regDocumentSymbolProvider) {
+            // Deregister
+            regDocumentSymbolProvider.dispose();
+            regDocumentSymbolProvider=undefined;
         }
     }
 }
@@ -162,6 +178,7 @@ let regCompletionProposalsProvider;
 let regDefinitionProvider;
 let regReferenceProvider;
 let regRenameProvider;
+let regDocumentSymbolProvider;
 
 
 

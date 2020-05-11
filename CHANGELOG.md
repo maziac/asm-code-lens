@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.0
+- Outline view.
+
 ## 1.4.5
 - Fixed changelog.
 

@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.4.5",
+    "version": "1.5.0",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information and symbol renaming in assembler files.",
     "author": {
@@ -37,6 +37,11 @@
             "type": "object",
             "title": "asm-code-lens configuration",
             "properties": {
+                "asm-code-lens.enableOutlineView": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable/disable outline view for the active document."
+                },
                 "asm-code-lens.enableCodeLenses": {
                     "type": "boolean",
                     "default": true,

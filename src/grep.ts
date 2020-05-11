@@ -694,7 +694,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number): {lab
  * @param text Text with comment.
  * @returns string before the first ";"
  */
-function stripComment(text: string) {
+export function stripComment(text: string) {
     const i = text.indexOf(';');
     if(i >= 0)
         return text.substr(0, i);   // strip comment

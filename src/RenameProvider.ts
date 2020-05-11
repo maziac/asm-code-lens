@@ -1,4 +1,3 @@
-'use strict';
 import * as vscode from 'vscode';
 import { grep, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';

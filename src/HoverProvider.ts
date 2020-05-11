@@ -1,4 +1,3 @@
-'use strict';
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel } from './grep';
 import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
