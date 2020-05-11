@@ -49,7 +49,9 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // Those symbols are returned.
         let symbols=new Array<vscode.DocumentSymbol>();
         const regexLabel=/^([.a-z_][\w\.]*\b)(:?)/i;
-        const regexConst=/\s*equ\s+(.*)/i;
+        const regexNotLabels=/^(include|if|endif|else)$/i;
+        const regexConst=/\s*(equ)\s+(.*)/i;
+        const regexData=/\s*(d[bcdghmsw]|def[bdghmsw])\s+(.*)/i;
         let lastSymbol;
         let lastSymbols=new Array<vscode.DocumentSymbol>();
         let lastSymbolsLength=0;
@@ -62,41 +64,64 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
             const match=regexLabel.exec(lineContents);
             if (match) {
                 // It is a label
-            
-                // Create symbol
+                let isLabel=true;
                 const label=match[1];
-                const range=new vscode.Range(line, 0, line, 10000);
-                lastSymbol=new vscode.DocumentSymbol(label, 'detail', vscode.SymbolKind.Method, range, range);
 
-                // Insert as absolute or relative label
-                if (label.startsWith('.')&&lastSymbolsLength>0) {
-                    // Relative label
-                    lastSymbols[lastSymbolsLength-1].children.push(lastSymbol);
-                }
-                else {
-                    // Absolute label
-                    symbols.push(lastSymbol);
-                    lastSymbols.pop();
-                    lastSymbols.push(lastSymbol);
-                    lastSymbolsLength=lastSymbols.length;
+                // Ignore a few false positives (for languages other than sjasmplus).
+                // Required because of the sjasmplus labels without colons.
+                if (!match[2]) {    // no colon after label
+                    const matchNotLabel=regexNotLabels.exec(label);
+                    if (matchNotLabel)
+                        isLabel=false;
                 }
 
-                // Remove label from line contents.
-                let len=label.length;
-                if (match[2])    // colon after label
-                    len++;
-                lineContents=lineContents.substr(len);
+                if (isLabel) {
+                    // Create symbol
+                    const range=new vscode.Range(line, 0, line, 10000);
+                    const selRange=range; //new vscode.Range(line, 0, line, 3);
+                    lastSymbol=new vscode.DocumentSymbol(label, '', vscode.SymbolKind.Function, range, selRange);
+
+                    // Insert as absolute or relative label
+                    if (label.startsWith('.')&&lastSymbolsLength>0) {
+                        // Relative label
+                        lastSymbols[lastSymbolsLength-1].children.push(lastSymbol);
+                    }
+                    else {
+                        // Absolute label
+                        symbols.push(lastSymbol);
+                        lastSymbols.pop();
+                        lastSymbols.push(lastSymbol);
+                        lastSymbolsLength=lastSymbols.length;
+                    }
+
+                    // Remove label from line contents.
+                    let len=label.length;
+                    if (match[2])    // colon after label
+                        len++;
+                    lineContents=lineContents.substr(len);
+                }
             }
 
             // Now check which kind of data it is:
             // code, const or data
             if (lastSymbol) {
+                // Check for EQU
                 const matchConstType=regexConst.exec(lineContents);
                 if (matchConstType) {
                     // It's const data, e.g. EQU
                     lastSymbol.kind=vscode.SymbolKind.Constant
-                    lastSymbol.detail=matchConstType[1].trimRight();
+                    lastSymbol.detail=matchConstType[1]+' '+matchConstType[2].trimRight();
                     lastSymbol=undefined;
+                    continue;
+                }
+                // Check for data
+                const matchDataType=regexData.exec(lineContents);
+                if (matchDataType) {
+                    // It's data data, e.g. defb
+                    lastSymbol.kind=vscode.SymbolKind.Field;
+                    lastSymbol.detail=matchDataType[1]+' '+matchDataType[2].trimRight();
+                    lastSymbol=undefined;
+                    continue;
                 }
             }
         }
