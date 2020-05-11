@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.0
+## 1.4.6
 - Outline view.
 
 ## 1.4.5
