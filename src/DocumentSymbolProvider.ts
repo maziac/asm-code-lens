@@ -48,35 +48,56 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // data-label and creates symbols for each.
         // Those symbols are returned.
         let symbols=new Array<vscode.DocumentSymbol>();
-        const regexLabel=/^([.a-z_][\w\.]*)\b/i;
+        const regexLabel=/^([.a-z_][\w\.]*\b)(:?)/i;
+        const regexConst=/\s*equ\s+(.*)/i;
+        let lastSymbol;
         let lastSymbols=new Array<vscode.DocumentSymbol>();
         let lastSymbolsLength=0;
 
         const len=document.lineCount;
         for (let line=0; line<len; line++) {
             const textLine=document.lineAt(line);
-            const lineContents=stripComment(textLine.text);
+            let lineContents=stripComment(textLine.text);
 
             const match=regexLabel.exec(lineContents);
-            if (!match)
-                continue;
+            if (match) {
+                // It is a label
             
-            // Create symbol
-            const label=match[1];
-            const range=new vscode.Range(line, 0, line, 10000);
-            const symbol=new vscode.DocumentSymbol(label, '', vscode.SymbolKind.Method, range, range);
+                // Create symbol
+                const label=match[1];
+                const range=new vscode.Range(line, 0, line, 10000);
+                lastSymbol=new vscode.DocumentSymbol(label, 'detail', vscode.SymbolKind.Method, range, range);
 
-            // Insert as absolute or relative label
-            if (label.startsWith('.')&&lastSymbolsLength>0) {
-                // Relative label
-                lastSymbols[lastSymbolsLength-1].children.push(symbol);
+                // Insert as absolute or relative label
+                if (label.startsWith('.')&&lastSymbolsLength>0) {
+                    // Relative label
+                    lastSymbols[lastSymbolsLength-1].children.push(lastSymbol);
+                }
+                else {
+                    // Absolute label
+                    symbols.push(lastSymbol);
+                    lastSymbols.pop();
+                    lastSymbols.push(lastSymbol);
+                    lastSymbolsLength=lastSymbols.length;
+                }
+
+                // Remove label from line contents.
+                let len=label.length;
+                if (match[2])    // colon after label
+                    len++;
+                lineContents=lineContents.substr(len);
             }
-            else {
-                // Absolute label
-                symbols.push(symbol);
-                lastSymbols.pop();
-                lastSymbols.push(symbol);
-                lastSymbolsLength=lastSymbols.length;
+
+            // Now check which kind of data it is:
+            // code, const or data
+            if (lastSymbol) {
+                const matchConstType=regexConst.exec(lineContents);
+                if (matchConstType) {
+                    // It's const data, e.g. EQU
+                    lastSymbol.kind=vscode.SymbolKind.Constant
+                    lastSymbol.detail=matchConstType[1].trimRight();
+                    lastSymbol=undefined;
+                }
             }
         }
         return symbols;
