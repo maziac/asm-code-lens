@@ -7,6 +7,7 @@ It provides support for:
 - Completions: While you type completions are proposed based on the labels in your asm files.
 - "Find all references": through a right mouse click in your assembler source file. It will come up with all found references in the other files.
 - Hovering: When hovering over  symbol it shows the comments for the symbol.
+- Outline view: View your labels (code, data, constants) in the outline view.
 - Rename symbols.
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
 - Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
@@ -23,6 +24,17 @@ The extension is called "ASM Code Lens".
 
 It supports the following assembler file extensions:
 .asm, .s, .inc, .a80.
+
+
+## Outline View
+
+An outline view of the assembly can be shown like this:
+![](assets/outline_view.jpg)
+
+"ASM Code Lens" uses some heuristics to tell what labels are data, const or code. 
+So be aware that it's decision might be wrong sometimes.
+
+Note: The outline view also supports sjasmplus MODULE information.
 
 
 ## Known Issues

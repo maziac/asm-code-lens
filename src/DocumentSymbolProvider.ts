@@ -48,13 +48,15 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // data-label and creates symbols for each.
         // Those symbols are returned.
         let symbols=new Array<vscode.DocumentSymbol>();
-        const regexLabel=/^([.a-z_][\w\.]*\b)(:?)/i;
+        const regexLabel=/^([.a-z_@][\w.]*\b)(:?)/i;
+        const regexModule=/\s+\b(module\s+([a-z_][\w.]*)|endmodule)/i;
         const regexNotLabels=/^(include|if|endif|else)$/i;
-        const regexConst=/\s*(equ)\s+(.*)/i;
-        const regexData=/\s*(d[bcdghmsw]|def[bdghmsw])\s+(.*)/i;
+        const regexConst=/\b(equ)\s+(.*)/i;
+        const regexData=/\b(d[bcdghmsw]|def[bdghmsw])\s+(.*)/i;
         let lastSymbol;
-        let lastSymbols=new Array<vscode.DocumentSymbol>();
-        let lastSymbolsLength=0;
+        let lastAbsSymbolChildren;
+        let lastModules=new Array<vscode.DocumentSymbol>();
+        let defaultSymbolKind=vscode.SymbolKind.Function;
 
         const len=document.lineCount;
         for (let line=0; line<len; line++) {
@@ -63,9 +65,9 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
             const match=regexLabel.exec(lineContents);
             if (match) {
-                // It is a label
-                let isLabel=true;
+                // It is a label or module (or both)
                 const label=match[1];
+                let isLabel=true;
 
                 // Ignore a few false positives (for languages other than sjasmplus).
                 // Required because of the sjasmplus labels without colons.
@@ -75,23 +77,36 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                         isLabel=false;
                 }
 
+                // First check label
                 if (isLabel) {
-                    // Create symbol
+                    // Create range
                     const range=new vscode.Range(line, 0, line, 10000);
                     const selRange=range; //new vscode.Range(line, 0, line, 3);
-                    lastSymbol=new vscode.DocumentSymbol(label, '', vscode.SymbolKind.Function, range, selRange);
+
+                    // Create Symbol
+                    lastSymbol=new vscode.DocumentSymbol(label, '', defaultSymbolKind, range, selRange);
 
                     // Insert as absolute or relative label
-                    if (label.startsWith('.')&&lastSymbolsLength>0) {
+                    if (label.startsWith('.')) {
                         // Relative label
-                        lastSymbols[lastSymbolsLength-1].children.push(lastSymbol);
+                        lastAbsSymbolChildren?.push(lastSymbol);
+                    }
+                    else if (label.startsWith('@')) {
+                        // Absolute label ignoring MODULE
+                        symbols.push(lastSymbol);
                     }
                     else {
                         // Absolute label
-                        symbols.push(lastSymbol);
-                        lastSymbols.pop();
-                        lastSymbols.push(lastSymbol);
-                        lastSymbolsLength=lastSymbols.length;
+                        // Add to children of last module
+                        const len=lastModules.length;
+                        if (len>0) {
+                            const lastModule=lastModules[len-1];
+                            lastModule.children.push(lastSymbol);
+                        }
+                        else {
+                            symbols.push(lastSymbol);
+                        }
+                        lastAbsSymbolChildren=lastSymbol.children;
                     }
 
                     // Remove label from line contents.
@@ -99,27 +114,75 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     if (match[2])    // colon after label
                         len++;
                     lineContents=lineContents.substr(len);
+                    // Add a whitespace to recognize a directly following MODULE
+                    lineContents+=' ';
                 }
             }
 
+            // Now check for MODULE
+            const matchModule=regexModule.exec(lineContents);
+            if (matchModule) {
+                const moduleName=matchModule[2];
+                if (moduleName) {
+                    // Handle MODULE
+                    // Create range
+                    const range=new vscode.Range(line, 0, line, 10000);
+                    const selRange=range; //new vscode.Range(line, 0, line, 3);
+                    // Create symbol
+                    const moduleSymbol=new vscode.DocumentSymbol(moduleName, '', vscode.SymbolKind.Module, range, selRange);
+                    // Add to children of last module
+                    const len=lastModules.length;
+                    if (len>0) {
+                        const lastModule=lastModules[len-1];
+                        lastModule.children.push(moduleSymbol);
+                    }
+                    else {
+                        symbols.push(moduleSymbol);
+                    }
+                    lastModules.push(moduleSymbol);
+                }
+
+                // Check for ENDMODULE
+                const moduleTag=matchModule[1];
+                if (moduleTag.toLowerCase()=="endmodule") {
+                    // Handle ENDMODULE
+                    lastModules.pop();
+                    lastAbsSymbolChildren=undefined;
+                }
+
+                lastSymbol=undefined;
+                continue;
+            }
+        
+            // Trim
+            lineContents=lineContents.trim();
             // Now check which kind of data it is:
             // code, const or data
+            if (!lineContents)
+                defaultSymbolKind=vscode.SymbolKind.Function;
             if (lastSymbol) {
-                // Check for EQU
-                const matchConstType=regexConst.exec(lineContents);
-                if (matchConstType) {
-                    // It's const data, e.g. EQU
-                    lastSymbol.kind=vscode.SymbolKind.Constant
-                    lastSymbol.detail=matchConstType[1]+' '+matchConstType[2].trimRight();
-                    lastSymbol=undefined;
-                    continue;
-                }
-                // Check for data
-                const matchDataType=regexData.exec(lineContents);
-                if (matchDataType) {
-                    // It's data data, e.g. defb
-                    lastSymbol.kind=vscode.SymbolKind.Field;
-                    lastSymbol.detail=matchDataType[1]+' '+matchDataType[2].trimRight();
+                if (lineContents) {
+                    // Check for EQU
+                    const matchConstType=regexConst.exec(lineContents);
+                    if (matchConstType) {
+                        // It's const data, e.g. EQU
+                        lastSymbol.kind=vscode.SymbolKind.Constant
+                        lastSymbol.detail=matchConstType[1]+' '+matchConstType[2].trimRight();
+                        defaultSymbolKind=lastSymbol.kind;
+                        lastSymbol=undefined;
+                        continue;
+                    }
+                    // Check for data
+                    const matchDataType=regexData.exec(lineContents);
+                    if (matchDataType) {
+                        // It's data data, e.g. defb
+                        lastSymbol.kind=vscode.SymbolKind.Field;
+                        lastSymbol.detail=matchDataType[1]+' '+matchDataType[2].trimRight();
+                        defaultSymbolKind=lastSymbol.kind;
+                        lastSymbol=undefined;
+                        continue;
+                    }
+                    // Something different, so assume code
                     lastSymbol=undefined;
                     continue;
                 }
