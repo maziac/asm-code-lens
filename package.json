@@ -117,6 +117,25 @@
                 "scopeName": "source.asm",
                 "path": "./grammar/asm.json"
             }
+        ],
+        "problemMatchers": [
+            {
+                "name": "problem-matcher-sjasmplus",
+                "owner": "asm-code-lens",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": [
+                    {
+                        "regexp": "^(.*)\\((\\d+)\\):\\s+(warning|error):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "severity": 3,
+                        "message": 4
+                    }
+                ]
+            }
         ]
     },
     "scripts": {

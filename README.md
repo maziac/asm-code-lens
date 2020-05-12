@@ -37,6 +37,18 @@ So be aware that it's decision might be wrong sometimes.
 Note: The outline view also supports sjasmplus MODULE information.
 
 
+## Problem Matcher
+
+For the [sjasmplus](https://github.com/z00m128/sjasmplus) assembler there is a problem matcher included to ease navigation to compile errors.
+
+You can use it simply by adding this to your tasks.json:
+~~~
+"problemMatcher": "$problem-matcher-sjasmplus",
+~~~
+
+
+
+
 ## Known Issues
 
 - [CodeLens lifetime #57227](https://github.com/Microsoft/vscode/issues/57227): Updates of the CodeLens is not working optimal. At the moment it is necessary to reload or save the file to update the CodeLens info.
