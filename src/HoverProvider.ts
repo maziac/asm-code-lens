@@ -71,11 +71,11 @@ export class HoverProvider implements vscode.HoverProvider {
                             const lines = linesData.split('\n');
  
                             // Now find all comments above the found line
+                            const prevHoverTextArrayLength=hoverTexts.length;
                             const text = lines[lineNr];
-                            if(text.indexOf(';') >= 0)  // TODO: indexOf of undefined
+                            if(text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >=0)  // TODO: indexOf of undefined
                                 hoverTexts.unshift(text);
                             let startLine = lineNr-1;
-                            const prevHoverTextArrayLength = hoverTexts.length;
                             while(startLine >= 0) {
                                 // Check if line starts with ";"
                                 const line = lines[startLine];
@@ -87,6 +87,7 @@ export class HoverProvider implements vscode.HoverProvider {
                                 // Next
                                 startLine --;
                             }
+
                             // Separate several entries
                             if(prevHoverTextArrayLength != hoverTexts.length)
                                 hoverTexts.unshift('============'); 

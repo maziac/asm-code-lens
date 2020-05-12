@@ -2,6 +2,7 @@
 
 ## 1.4.6
 - Outline view.
+- Hovering now shows also EQU value if on the same line as label.
 
 ## 1.4.5
 - Fixed changelog.
