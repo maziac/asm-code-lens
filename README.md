@@ -14,7 +14,7 @@ It provides support for:
 - Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and most probably many other assemblers that use a standard notation for labels (e.g. "label:").
 - Assembler syntax highlighting.
 
-Please see the "Feature Contributions" tab to find how to enable/disable certain features.
+Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
 
 
 ## Installation
