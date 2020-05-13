@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.0
+- Outline view tested.
+
 ## 1.4.6
 - Outline view.
 - Hovering now shows also EQU value if on the same line as label.
