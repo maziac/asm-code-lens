@@ -33,6 +33,11 @@
 					"name": "comment.line.asm",
 					"begin": ";",
 					"end": "\\n"
+				},
+				{
+					"name": "comment.line_slash.asm",
+					"begin": "//",
+					"end": "\\n"
 				}
 			]
 		},

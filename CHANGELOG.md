@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.1
+- Syntax highlighting for "// ... " style comments
+
 ## 1.5.0
 - Outline view tested.
 
