@@ -19,28 +19,6 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
      * signaled by returning `undefined`, `null`, or an empty array.
      */
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[]|vscode.DocumentSymbol[]> {
-        /*
-        let symbols;
-        
-        if (false) {
-            symbols=new Array<vscode.SymbolInformation>();
-            const symbol=new vscode.SymbolInformation("Mein Name", vscode.SymbolKind.Function, "Mein Container", new vscode.Location(document.uri, new vscode.Range(10, 0, 10, 10000)));
-            symbols.push(new vscode.SymbolInformation("Mein Function", vscode.SymbolKind.Function, "Mein Container", new vscode.Location(document.uri, new vscode.Range(10, 0, 10, 10000))));
-            symbols.push(new vscode.SymbolInformation("Mein Variable", vscode.SymbolKind.Variable, "Mein Container2", new vscode.Location(document.uri, new vscode.Range(10, 0, 10, 10000))));
-        }
-        else {
-            symbols=new Array<vscode.DocumentSymbol>();
-
-            const absLabel=new vscode.DocumentSymbol("Mein Symbol/Method", "Mein Detail", vscode.SymbolKind.Method, new vscode.Range(10, 0, 10, 10000), new vscode.Range(10, 0, 10, 10000));
-
-            absLabel.children.push(new vscode.DocumentSymbol(".label", "Mein Detail .label", vscode.SymbolKind.Method, new vscode.Range(10, 0, 10, 10000), new vscode.Range(10, 0, 10, 10000)));
-                    
-            symbols.push(absLabel);
-        }
-
-        return symbols;
-        */
-        
         // Loops through the whole document line by line and
         // extracts the labels.
         // Determines for each label if it is code-label,
@@ -54,6 +32,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         const regexConst=/\b(equ)\s+(.*)/i;
         const regexData=/\b(d[bcdghmsw]|def[bdghmsw])\s+(.*)/i;
         let lastSymbol;
+        let lastSymbols=new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;
         let lastModules=new Array<vscode.DocumentSymbol>();
         let defaultSymbolKind=vscode.SymbolKind.Function;
@@ -85,6 +64,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
                     // Create Symbol
                     lastSymbol=new vscode.DocumentSymbol(label, '', defaultSymbolKind, range, selRange);
+                    lastSymbols.push(lastSymbol);
 
                     // Insert as absolute or relative label
                     if (label.startsWith('.')) {
@@ -130,6 +110,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     const selRange=range; //new vscode.Range(line, 0, line, 3);
                     // Create symbol
                     const moduleSymbol=new vscode.DocumentSymbol(moduleName, '', vscode.SymbolKind.Module, range, selRange);
+                    moduleSymbol
                     // Add to children of last module
                     const len=lastModules.length;
                     if (len>0) {
@@ -151,6 +132,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 }
 
                 lastSymbol=undefined;
+                lastSymbols.length=0;
                 continue;
             }
         
@@ -162,28 +144,33 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 defaultSymbolKind=vscode.SymbolKind.Function;
             if (lastSymbol) {
                 if (lineContents) {
+                    let kind;
                     // Check for EQU
-                    const matchConstType=regexConst.exec(lineContents);
-                    if (matchConstType) {
+                    let match=regexConst.exec(lineContents);
+                    if (match) {
                         // It's const data, e.g. EQU
-                        lastSymbol.kind=vscode.SymbolKind.Constant
-                        lastSymbol.detail=matchConstType[1]+' '+matchConstType[2].trimRight();
-                        defaultSymbolKind=lastSymbol.kind;
-                        lastSymbol=undefined;
-                        continue;
+                        kind=vscode.SymbolKind.Constant
                     }
-                    // Check for data
-                    const matchDataType=regexData.exec(lineContents);
-                    if (matchDataType) {
-                        // It's data data, e.g. defb
-                        lastSymbol.kind=vscode.SymbolKind.Field;
-                        lastSymbol.detail=matchDataType[1]+' '+matchDataType[2].trimRight();
-                        defaultSymbolKind=lastSymbol.kind;
-                        lastSymbol=undefined;
-                        continue;
+                    else {
+                        // Check for data
+                        match=regexData.exec(lineContents);
+                        if (match) {
+                            // It's data data, e.g. defb
+                            kind=vscode.SymbolKind.Field;
+                        }
+                    }
+                    // Check if found
+                    if (kind!=undefined) {
+                        // It's something else than code
+                        for (const elem of lastSymbols) {
+                            elem.kind=kind;
+                            elem.detail=match[1]+' '+match[2].trimRight();
+                        }match
+                        defaultSymbolKind=kind;
                     }
                     // Something different, so assume code
                     lastSymbol=undefined;
+                    lastSymbols.length=0;
                     continue;
                 }
             }
