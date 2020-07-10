@@ -1,7 +1,16 @@
 # Changelog
 
 # 1.5.2
-- 
+- Fixes:
+	- #39: "Wrong substitution: e.label"
+	- #38: "Completion: wrong label"
+	- #37: "Outline: Data label shown as code"
+	- #36: "Outline: STRUCTs wrong."
+	- #34: "local labels not recognized properly?"
+	- #33: "Quarte in binary numbers highlighted wrong"
+	- #32: "ENDS not correctly colored"
+	- #31: "Some grammar for Z80N missing"
+	- #30: "Goto definition to local label not working"
 
 # 1.5.1
 - Syntax highlighting for "// ... " style comments
