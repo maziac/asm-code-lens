@@ -237,7 +237,7 @@
 				},
 				{
 					"name": "constant.numeric.integer.binary.asm",
-					"match": "\\b[01]+[bB]\\b"
+					"match": "\\b[01'_]+[bB]\\b"
 				},
 				{
 					"name": "constant.numeric.integer.decimal.asm",
