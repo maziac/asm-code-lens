@@ -61,7 +61,7 @@
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:bank|bankset|limit|protect|write\\s+direct|str|struct|endstruct)\\b)"
+					"match": "(?i:(?<=\\s)(?:bank|bankset|limit|protect|write\\s+direct|str|struct|endstruct|ends)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
