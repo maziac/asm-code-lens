@@ -189,8 +189,12 @@
 					"match": "\\s(?i:adc|add|and|bit|ccf|cp|cpdr?|cpir?|cpl|daa|dec|[de]i|djnz|exx?|halt|im|in|inc|indr?|inir?|ld|lddr?|ldir?|neg|nop|or|ot[di]r|out|out[di]|pop|push|res|ret[in]|rl|rla|rlc|rlca|rld|rr|rra|rrc|rrca|rrd|rst|sbc|scf|set|sli?a|sll|swap|sra|srl|sub|xor)\\s"
 				},
 				{
+					"name": "keyword.mnemonic.z80n.asm",
+					"match": "\\s(?i:bsla|bsr[alf]|brlc|setae|pixelad|pixeldn|nextreg|mirror|ldws|ldix|ld[di]rx|outinb|mul|swapnib|test)\\s"
+				},
+				{
 					"name": "support.type.register.z80.asm",
-					"match": "\\b(?i:[abcdefhlir]|ix|iy|af'?|bc|de|hl|pc|sp|ix[lu]|iy[lu]|[lh]x|x[lh]|[lh]y|y[lh])\\b"
+					"match": "\\b(?i:[abcdefhlir]|ix|iy|af'?|bc|de|hl|pc|sp|ix[luh]|iy[luh]|[lh]x|x[lh]|[lh]y|y[lh])\\b"
 				},
 
 				{
