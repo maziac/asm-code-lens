@@ -36,7 +36,6 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         let lastSymbols=new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;
         let lastModules=new Array<vscode.DocumentSymbol>();
-        let lastStructs=new Array<vscode.DocumentSymbol>();
         let defaultSymbolKind=vscode.SymbolKind.Function;
 
         const len=document.lineCount;
@@ -140,44 +139,6 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 continue;
             }
 
-            /*
-            // Now check for STRUCT
-            const matchStruct=regexStruct.exec(lineContents);
-            if (matchStruct) {
-                const structName=matchStruct[2];
-                if (structName) {
-                    // Handle STRUCT
-                    // Create range
-                    const range=new vscode.Range(line, 0, line, 10000);
-                    const selRange=range; 
-                    // Create symbol
-                    const structSymbol=new vscode.DocumentSymbol(structName, '', vscode.SymbolKind.Struct, range, selRange);
-                    // Add to children of last struct
-                    const len=lastStructs.length;
-                    if (len>0) {
-                        const lastStruct=lastStructs[len-1];
-                        lastStruct.children.push(structSymbol);
-                    }
-                    else {
-                        symbols.push(structSymbol);
-                    }
-                    lastStructs.push(structSymbol);
-                }
-
-                // Check for ENDS
-                const structTag=matchStruct[1];
-                if (structTag.toLowerCase()=="ends") {
-                    // Handle ENDS
-                    lastStructs.pop();
-                    lastAbsSymbolChildren=undefined;
-                }
-
-                lastSymbol=undefined;
-                lastSymbols.length=0;
-                continue;
-            }
-            */
-            
             // Trim
             lineContents=lineContents.trim();
             // Now check which kind of data it is:
