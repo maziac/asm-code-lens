@@ -216,7 +216,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
         for(const match of matches) {
             const lineNr = match.line;
             let colStart=match.start;
-            // Check fro dot label
+            // Check for dot label
             //if (match.match[1].indexOf('.')>=0)
             //    colStart--; // include the dot
             const colEnd = match.end;
@@ -612,7 +612,7 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
  * Searches 'lines' from beginning to 'len' and returns the (concatenated)
  * module label.
  * 'lines' are searched for 'MODULE' and 'ENDMODULE' to retrieve the module information.
- * Additional searches fro STRUCTs and treats them in the same way.
+ * Additional searches for STRUCTs and treats them in the same way.
  * @param lines An array of strings containing the complete text.
  * @param len The line number up to which it will be searched. (excluding)
  * @returns A string like 'audio.samples'.
