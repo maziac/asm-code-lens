@@ -27,14 +27,16 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // Those symbols are returned.
         let symbols=new Array<vscode.DocumentSymbol>();
         const regexLabel=/^([.a-z_@][\w.]*\b)(:?)/i;
-        const regexModule=/\s+\b(module\s+([a-z_][\w.]*)|endmodule)/i;
+        const regexModule=/\s+\b(module\s+([a-z_][\w\.]*)|endmodule.*)/i;
+        const regexStruct=/\s+\b(struct\s+([a-z_][\w\.]*)|ends.*)/i;
         const regexNotLabels=/^(include|if|endif|else)$/i;
         const regexConst=/\b(equ)\s+(.*)/i;
-        const regexData=/\b(d[bcdghmsw]|def[bdghmsw])\s+(.*)/i;
+        const regexData=/\b(d[bcdghmsw]|def[bdghmsw])\b\s*(.*)/i;
         let lastSymbol;
         let lastSymbols=new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;
         let lastModules=new Array<vscode.DocumentSymbol>();
+        let lastStructs=new Array<vscode.DocumentSymbol>();
         let defaultSymbolKind=vscode.SymbolKind.Function;
 
         const len=document.lineCount;
@@ -99,9 +101,12 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 }
             }
 
-            // Now check for MODULE
-            const matchModule=regexModule.exec(lineContents);
+            // Now check for MODULE or STRUCT
+            let matchModule=regexModule.exec(lineContents);
+            if (!matchModule)
+                matchModule=regexStruct.exec(lineContents);
             if (matchModule) {
+                const keyword=matchModule[1].toLowerCase();
                 const moduleName=matchModule[2];
                 if (moduleName) {
                     // Handle MODULE
@@ -109,8 +114,8 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     const range=new vscode.Range(line, 0, line, 10000);
                     const selRange=range; //new vscode.Range(line, 0, line, 3);
                     // Create symbol
-                    const moduleSymbol=new vscode.DocumentSymbol(moduleName, '', vscode.SymbolKind.Module, range, selRange);
-                    moduleSymbol
+                    const kind=(keyword.startsWith("module"))? vscode.SymbolKind.Module:vscode.SymbolKind.Struct;
+                    const moduleSymbol=new vscode.DocumentSymbol(moduleName, '', kind, range, selRange);
                     // Add to children of last module
                     const len=lastModules.length;
                     if (len>0) {
@@ -124,8 +129,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 }
 
                 // Check for ENDMODULE
-                const moduleTag=matchModule[1];
-                if (moduleTag.toLowerCase()=="endmodule") {
+                if (keyword=="endmodule"||keyword=="ends") {
                     // Handle ENDMODULE
                     lastModules.pop();
                     lastAbsSymbolChildren=undefined;
@@ -135,7 +139,45 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 lastSymbols.length=0;
                 continue;
             }
-        
+
+            /*
+            // Now check for STRUCT
+            const matchStruct=regexStruct.exec(lineContents);
+            if (matchStruct) {
+                const structName=matchStruct[2];
+                if (structName) {
+                    // Handle STRUCT
+                    // Create range
+                    const range=new vscode.Range(line, 0, line, 10000);
+                    const selRange=range; 
+                    // Create symbol
+                    const structSymbol=new vscode.DocumentSymbol(structName, '', vscode.SymbolKind.Struct, range, selRange);
+                    // Add to children of last struct
+                    const len=lastStructs.length;
+                    if (len>0) {
+                        const lastStruct=lastStructs[len-1];
+                        lastStruct.children.push(structSymbol);
+                    }
+                    else {
+                        symbols.push(structSymbol);
+                    }
+                    lastStructs.push(structSymbol);
+                }
+
+                // Check for ENDS
+                const structTag=matchStruct[1];
+                if (structTag.toLowerCase()=="ends") {
+                    // Handle ENDS
+                    lastStructs.pop();
+                    lastAbsSymbolChildren=undefined;
+                }
+
+                lastSymbol=undefined;
+                lastSymbols.length=0;
+                continue;
+            }
+            */
+            
             // Trim
             lineContents=lineContents.trim();
             // Now check which kind of data it is:
