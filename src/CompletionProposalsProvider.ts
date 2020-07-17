@@ -168,8 +168,10 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                             // A previous non-local label was searched (and found), so label is local.
                             item.filterText = label;
                             // Change insert text
-                            const k=moduleLabel.length+1+nonLocalLabel.length;
-                            //const k=moduleLabel.length+nonLocalLabel.length;
+                            let k=moduleLabel.length;
+                            if (k>0)
+                                k++;    // For the dot '.'
+                            k+=nonLocalLabel.length;
                             let part = text.substr(k);
                             item.insertText = part;
                             // change shown text

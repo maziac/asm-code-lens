@@ -3,6 +3,7 @@
 # 1.5.3
 - Fixes:
 	- #40: "Hover display incorrect"
+	- #41: "No completion of local label"
 
 # 1.5.2
 - Fixes:
