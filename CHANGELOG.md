@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.5.3
+- Fixes:
+	- #40: "Hover display incorrect"
+
 # 1.5.2
 - Fixes:
 	- #39: "Wrong substitution: e.label"

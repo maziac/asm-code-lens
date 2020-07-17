@@ -59,7 +59,7 @@ export class HoverProvider implements vscode.HoverProvider {
                 .then(reducedLocations => {
                     // Now read the comment lines above the document.
                     // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
-                    const hoverTexts = new Array<string>();
+                    const hoverTexts = new Array<vscode.MarkdownString>();
                     const f = (index: number) => {
                         // Check for end
                         if(index < reducedLocations.length) {
@@ -72,9 +72,11 @@ export class HoverProvider implements vscode.HoverProvider {
  
                             // Now find all comments above the found line
                             const prevHoverTextArrayLength=hoverTexts.length;
-                            const text = lines[lineNr];
+                            const text=lines[lineNr];
+                            const textMd=new vscode.MarkdownString();
+                            textMd.appendText(text);
                             if(text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >=0)  // TODO: indexOf of undefined
-                                hoverTexts.unshift(text);
+                                hoverTexts.unshift(textMd);
                             let startLine = lineNr-1;
                             while(startLine >= 0) {
                                 // Check if line starts with ";"
@@ -83,14 +85,16 @@ export class HoverProvider implements vscode.HoverProvider {
                                 if(!match)
                                     break;
                                 // Add text
-                                hoverTexts.unshift(match[1]);     
+                                const textMatch=new vscode.MarkdownString();
+                                textMatch.appendText(match[1]);
+                                hoverTexts.unshift(textMatch);     
                                 // Next
                                 startLine --;
                             }
 
                             // Separate several entries
                             if(prevHoverTextArrayLength != hoverTexts.length)
-                                hoverTexts.unshift('============'); 
+                                hoverTexts.unshift(new vscode.MarkdownString('============')); 
                             
                             // Call next
                             f(index+1);
