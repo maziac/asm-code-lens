@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import {ReferenceProvider} from './ReferenceProvider';
 import {DefinitionProvider} from './DefinitionProvider';
@@ -10,29 +8,50 @@ import {DocumentSymbolProvider} from './DocumentSymbolProvider';
 import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
+import {WhatsNewContentProvider} from './whatsnew/whatsnewprovider';
+import {AsmCodeLensWhatsNewMgr} from './whatsnew/asmcodelenswhatsnewmanager';
 
 export function activate(context: vscode.ExtensionContext) {
-	// Enable logging.
+
+    // Register the "Whatsnew" provider
+    const whatsnewProvider=new WhatsNewContentProvider();
+    const viewer=new AsmCodeLensWhatsNewMgr(context);
+    viewer.registerContentProvider("asm-code-lens", whatsnewProvider);
+    if (viewer.checkIfVersionDiffers()) var a=1; // TODO
+        viewer.showPage();
+
+    // TODO: remove
+    // Show the page (if necessary)
+    if (viewer.checkIfVersionDiffers()) {
+        setTimeout(() => {
+            // Show after 1 s, so that it is shown above other stuff
+        }, 1000);
+    }
+    // Register the additional command to view the "Whats' New" page.
+    context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => viewer.showPage()));
+
+
+    // Enable logging.
     configure(context);
-    
+
     // Check for every change.
 	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         configure(context, event);
     }));
-    
+
     // Register command once.
     vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
-        Commands.findLabelsWithNoReference(); 
+        Commands.findLabelsWithNoReference();
     });
 }
- 
+
 
 /**
  * Reads the confguration.
  */
 function configure(context: vscode.ExtensionContext, event?) {
     const settings = vscode.workspace.getConfiguration('asm-code-lens');
-    
+
     // Check if grep paths have changed
     if(event) {
         if(event.affectsConfiguration('asm-code-lens.includeFiles')
@@ -42,7 +61,7 @@ function configure(context: vscode.ExtensionContext, event?) {
                 // Deregister
                 regCodeLensProvider.dispose();
                 regCodeLensProvider = undefined;
-            }            
+            }
             if(regReferenceProvider) {
                 // Deregister
                 regReferenceProvider.dispose();
@@ -100,7 +119,7 @@ function configure(context: vscode.ExtensionContext, event?) {
             // Register
             regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider());
             context.subscriptions.push(regCompletionProposalsProvider);
-        
+
         }
     }
     else {
@@ -125,11 +144,11 @@ function configure(context: vscode.ExtensionContext, event?) {
             regDefinitionProvider = undefined;
         }
     }
-    
+
     if(settings.enableFindAllReferences) {
         if(!regReferenceProvider) {
             // Register
-            //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())   
+            //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())
             regReferenceProvider = vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider());
             context.subscriptions.push(regReferenceProvider);
         }

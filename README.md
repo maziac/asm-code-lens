@@ -20,7 +20,7 @@ It provides support for:
 - Rename symbols.
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
 - Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
-- Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and most probably many other assemblers that use a standard notation for labels (e.g. "label:").
+- Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and many other assemblers that use a standard notation for labels (e.g. "label:").
 - Assembler syntax highlighting.
 
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
@@ -64,22 +64,16 @@ You can use it simply by adding this to your tasks.json:
 - This extension doesn't use a structured approach but just looks at all asm files without hierarchy. This means that sjasmplus MODULE definitions are only taken into account if they are used within the same file.
 
 
-## License
+## License and Acknowledgements
 
 ASM-Code-Lens is licensed under the [MIT license](https://github.com/maziac/dezog/blob/master/LICENSE.txt).
 
-For the "What's New" feature the [vscode-whats-new](https://github.com/alefragnani/vscode-whats-new) project from Alessandro Fragnani aka [alefragni](https://github.com/alefragnani) has been incorporated. The project is MIT licensed.
-
-
-
-## Acknowledgements
-
 This extension made use of code from 2 other packages:
-- [find all references](https://github.com/gayanhewa/vscode-find-all-references) by gayanhewa
-- [grob](https://www.npmjs.com/package/grob) by jamiebuilds
+- [find all references](https://github.com/gayanhewa/vscode-find-all-references) by gayanhewa, MIT License
+- [grob](https://www.npmjs.com/package/grob) by jamiebuilds, MIT License
+- [vscode-whats-new](https://github.com/alefragnani/vscode-whats-new) project from Alessandro Fragnani aka [alefragni](https://github.com/alefragnani), MIT License
 
 I also included the grammar for syntax highlighting from Martin Bórik's vscode extension [z80-macroasm-vscode](https://github.com/mborik/z80-macroasm-vscode) because I got problems when running both extensions at the same time and I could not turn off features selectively.
 I.e. I copied the files language.configuration.json and z80-macroasm.tmLanguage.json. The z80-macroasm-vscode extension itself was forked from Imanol Barriuso's vscode extension [z80asm-vscode](https://github.com/Imanolea/z80asm-vscode). MIT license, copyright (c) 2016 Imanol Barriuso (Imanolea).
-
 
 Many thanks to the authors.

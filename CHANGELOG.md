@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.4
+- Donate button added.
+
 # 1.5.3
 - Fixes:
 	- #40: "Hover display incorrect"

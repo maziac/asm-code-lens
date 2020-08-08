@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.5.3",
+    "version": "1.5.4",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -17,6 +17,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/maziac/asm-code-lens"
+    },
+    "bugs": {
+        "url": "https://github.com/maziac/asm-code-lens/issues"
     },
     "engines": {
         "vscode": "^1.35.1"
@@ -91,8 +94,14 @@
         },
         "commands": [
             {
+                "command": "asm-code-lens.whatsNew",
+                "title": "Show 'What's New' page of this ASM-Code-Lens release.",
+                "category": "asm-code-lens"
+            },
+            {
                 "command": "asm-code-lens.find-labels-with-no-reference",
-                "title": "ASM Code Lens: Find labels with no reference"
+                "title": "Find labels with no reference",
+                "category": "asm-code-lens"
             }
         ],
         "languages": [
