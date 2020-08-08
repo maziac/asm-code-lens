@@ -1,3 +1,12 @@
+# Support
+
+If you like ASM-Code-Lens please consider supporting it.
+
+<a title="PayPal" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url">
+	<img src="assets/btn_donate_SM.gif" />
+</a>
+
+
 # ASM Code Lens
 
 ![](assets/codelens_usage.gif)
@@ -31,7 +40,7 @@ It supports the following assembler file extensions:
 An outline view of the assembly can be shown like this:
 ![](assets/outline_view.jpg)
 
-"ASM Code Lens" uses some heuristics to tell what labels are data, const or code. 
+"ASM Code Lens" uses some heuristics to tell what labels are data, const or code.
 So be aware that it's decision might be wrong sometimes.
 
 Note: The outline view also supports sjasmplus MODULE information.
@@ -53,6 +62,14 @@ You can use it simply by adding this to your tasks.json:
 
 - [CodeLens lifetime #57227](https://github.com/Microsoft/vscode/issues/57227): Updates of the CodeLens is not working optimal. At the moment it is necessary to reload or save the file to update the CodeLens info.
 - This extension doesn't use a structured approach but just looks at all asm files without hierarchy. This means that sjasmplus MODULE definitions are only taken into account if they are used within the same file.
+
+
+## License
+
+ASM-Code-Lens is licensed under the [MIT license](https://github.com/maziac/dezog/blob/master/LICENSE.txt).
+
+For the "What's New" feature the [vscode-whats-new](https://github.com/alefragnani/vscode-whats-new) project from Alessandro Fragnani aka [alefragni](https://github.com/alefragnani) has been incorporated. The project is MIT licensed.
+
 
 
 ## Acknowledgements
