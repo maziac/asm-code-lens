@@ -2,6 +2,7 @@
 
 # 1.5.4
 - Donate button added.
+- What's new added.
 
 # 1.5.3
 - Fixes:
