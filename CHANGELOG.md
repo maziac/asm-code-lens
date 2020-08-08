@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.5
+- What's new only shown once.
+
 # 1.5.4
 - Donate button added.
 - What's new added.

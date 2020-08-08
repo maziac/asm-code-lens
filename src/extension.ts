@@ -17,19 +17,10 @@ export function activate(context: vscode.ExtensionContext) {
     const whatsnewProvider=new WhatsNewContentProvider();
     const viewer=new AsmCodeLensWhatsNewMgr(context);
     viewer.registerContentProvider("asm-code-lens", whatsnewProvider);
-    if (viewer.checkIfVersionDiffers()) var a=1; // TODO
+    if (viewer.checkIfVersionDiffers())
         viewer.showPage();
-
-    // TODO: remove
-    // Show the page (if necessary)
-    if (viewer.checkIfVersionDiffers()) {
-        setTimeout(() => {
-            // Show after 1 s, so that it is shown above other stuff
-        }, 1000);
-    }
     // Register the additional command to view the "Whats' New" page.
     context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => viewer.showPage()));
-
 
     // Enable logging.
     configure(context);
