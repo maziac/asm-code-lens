@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.5.5",
+    "version": "1.5.7",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -169,6 +169,7 @@
         "fs-extra": "^8.1.0",
         "grepit": "^1.0.0",
         "p-queue": "^6.4.0",
+        "semver": "^7.3.2",
         "ts-node": "^8.10.1"
     },
     "nyc": {

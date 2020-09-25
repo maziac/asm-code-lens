@@ -1,5 +1,11 @@
 # Changelog
 
+# 1.5.7
+- Fixed IFN highlighting #44 thanks to kborowinski.
+
+# 1.5.6
+- Fixed semver package.
+
 # 1.5.5
 - What's new only shown once.
 
