@@ -57,7 +57,7 @@
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:if|ifn?def|ifn?used|else|elseif|endif)\\b)"
+					"match": "(?i:(?<=\\s)(?:ifn?|ifn?def|ifn?used|else|elseif|endif)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
