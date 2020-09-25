@@ -2,6 +2,7 @@
 
 # 1.5.7
 - Fixed IFN highlighting #44 thanks to kborowinski.
+- Fixed line comment toggling #45
 
 # 1.5.6
 - Fixed semver package.

@@ -117,7 +117,8 @@
                 ],
                 "aliases": [
                     "Assembler file"
-                ]
+                ],
+                "configuration": "./language-configuration.json"
             }
         ],
         "grammars": [
