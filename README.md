@@ -11,7 +11,7 @@ If you like ASM-Code-Lens please consider supporting it.
 
 ![](assets/codelens_usage.gif)
 
-'ASM Code Lense' is a language server extension for Visual Studio Code for assembler files.
+'ASM Code Lens' is a language server extension for Visual Studio Code for assembler files.
 It provides support for:
 - Completions: While you type completions are proposed based on the labels in your asm files.
 - "Find all references": through a right mouse click in your assembler source file. It will come up with all found references in the other files.
