@@ -194,7 +194,7 @@
 							"name": "keyword.mnemonic.z80.asm"
 						},
 						"2": {
-							"name": "meta.preprocessor.flag.asm"
+							"name": "keyword.operator.z80.flag.asm"
 						}
 					}
 				},

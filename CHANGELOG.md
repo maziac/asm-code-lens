@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.5.8
+- Fixed #46: Syntax highlighting: clash of Z80 vs. x86
+- Added syntax highlighting for DeZog WPMEM, LOGPOINT and ASSERTION.
+- Flags in Z80 jp, jr and call are now highlighted in different color than mnemonic.
+
 # 1.5.7
 - Fixed IFN highlighting #44 thanks to kborowinski.
 - Fixed line comment toggling #45
