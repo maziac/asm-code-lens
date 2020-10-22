@@ -30,6 +30,20 @@
 					"end": "\\*/"
 				},
 				{
+					"match": "(?i:(;)(.*)\\b(wpmem|logpoint|assertion)\\b)",
+					"captures": {
+						"1": {
+							"name": "keyword.control.dezog"
+						},
+						"2": {
+							"name": "comment.line.asm"
+						},
+						"3": {
+							"name": "keyword.control.dezog"
+						}
+					}
+				},
+				{
 					"name": "comment.line.asm",
 					"begin": ";",
 					"end": "\\n"
