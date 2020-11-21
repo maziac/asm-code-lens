@@ -56,6 +56,9 @@ You can use it simply by adding this to your tasks.json:
 ~~~
 
 
+# Hovers in Debug Mode
+
+vscode turns the normal hovers off if in debug mode. To make them visible press the "ALT" key while hovering.
 
 
 ## Known Issues
