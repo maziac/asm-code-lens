@@ -30,7 +30,7 @@
 					"end": "\\*/"
 				},
 				{
-					"match": "(?i:(;)(.*)\\b(wpmem|logpoint|assertion)\\b)",
+					"match": "(?i:(;)(?!\\s*sldopt)(.*?)\\b(wpmem|logpoint|assertion)\\b)",
 					"captures": {
 						"1": {
 							"name": "keyword.control.dezog"

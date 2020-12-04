@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.9
+- Added syntax highlighting for SLDOPT sjasmplus keyword thanks to kborowinski.
+- Fixed sjasmplus OUTEND highlighting thanks to kborowinski.
 # 1.5.8
 - Fixed #46: Syntax highlighting: clash of Z80 vs. x86
 - Added syntax highlighting for DeZog WPMEM, LOGPOINT and ASSERTION.
