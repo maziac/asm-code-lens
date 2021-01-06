@@ -35,6 +35,23 @@ It supports the following assembler file extensions:
 .asm, .s, .inc, .a80.
 
 
+## Hexadecimal Calculator
+
+A view in the sidebar of the explorer and in debug mode.
+It adds a decimal and hexadecimal calculator to vscode.
+It always shows 2 columns: decimal and hexadecimal.
+If you enter a number in one column it is automatically converted to the other type.
+
+This way it is easily possible to mix calculations between decimal and hexadecimal.
+
+The calculator allows the basic integer calculations:
+- addition
+- subtraction
+- multiplication
+- division
+
+![](assets/hexcalculator.gif)
+
 ## Outline View
 
 An outline view of the assembly can be shown like this:

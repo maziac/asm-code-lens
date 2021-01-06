@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<base href="${vscodeResPath}/">
+	<link rel="stylesheet" href="html/main.css">
+</head>
+<body>
+
+	<div>
+		<table>
+			<th>
+			<tr>
+				<th class="heading">Decimal:</th>
+				<th class="heading">Hex:</th>
+			</tr>
+			<tr>
+				<td>
+					<div class="textbox" id="dec_output">
+					</div>
+				</td>
+				<td>
+					<div class="textbox" id="hex_output">
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div>
+						<input type="text" id="dec_input" onkeyup="keypress(this, event, 10)" placeholder="0"></input>
+					</div>
+				</td>
+				<td>
+					<input type="text" id="hex_input" onkeyup="keypress(this, event, 16)" placeholder="0"></input>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<button onclick="clearCalculator()">Clear</button>
+				</td>
+				<td>
+					<!--${donate}-->
+				</td>
+			</tr>
+		</table>
+
+	</div>
+
+</body>
+<script>
+	//${init}
+</script>
+<script src="out/src/html/main.js"></script>
+</html>

@@ -34,6 +34,24 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "views": {
+            "explorer": [
+                {
+                    "type": "webview",
+                    "id": "asm-code-lens.calcview-explorer",
+                    "name": "HexaDecimal Calculator",
+                    "when": "config.asm-code-lens.hexCalculator.showInExplorer"
+                }
+            ],
+            "debug": [
+                {
+                    "type": "webview",
+                    "id": "asm-code-lens.calcview-debug",
+                    "name": "HexaDecimal Calculator",
+                    "when": "config.asm-code-lens.hexCalculator.showInDebug"
+                }
+            ]
+        },
         "configuration": {
             "type": "object",
             "title": "asm-code-lens configuration",
@@ -87,6 +105,30 @@
                     "type": "string",
                     "default": "",
                     "description": "Choose what files or directories to exclude e.g '**/*.{inc,s}'."
+                },
+                "asm-code-lens.hexCalculator.showInExplorer": {
+                    "description": "Set to false to disable calculator in explorer view.",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": true
+                },
+                "asm-code-lens.hexCalculator.showInDebug": {
+                    "description": "Set to false to disable calculator in debug view.",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": true
+                },
+                "asm-code-lens.hexCalculator.hexPrefix": {
+                    "description": "The prefix to use for hex values, e.g. '0x' or '$'",
+                    "type": "string",
+                    "scope": "resource",
+                    "default": "0x"
+                },
+                "asm-code-lens.donated": {
+                    "description": "If you donated (press the 'Donate...' button in hex calculator to do so) you can hide the button by setting this parameter.",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": false
                 }
             }
         },

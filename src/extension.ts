@@ -10,6 +10,7 @@ import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
 import {WhatsNewContentProvider} from './whatsnew/whatsnewprovider';
 import {AsmCodeLensWhatsNewMgr} from './whatsnew/asmcodelenswhatsnewmanager';
+import {HexCalcProvider} from './HexCalcProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -21,6 +22,16 @@ export function activate(context: vscode.ExtensionContext) {
         viewer.showPage();
     // Register the additional command to view the "Whats' New" page.
     context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => viewer.showPage()));
+
+    // Register the hex calculator webviews
+    const providerExplorer = new HexCalcProvider();
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider("asm-code-lens.calcview-explorer", providerExplorer, {webviewOptions: {retainContextWhenHidden: true}})
+    );
+    const providerDebug = new HexCalcProvider();
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider("asm-code-lens.calcview-debug", providerDebug, {webviewOptions: {retainContextWhenHidden: true}})
+    );
 
     // Enable logging.
     configure(context);
@@ -42,6 +53,18 @@ export function activate(context: vscode.ExtensionContext) {
  */
 function configure(context: vscode.ExtensionContext, event?) {
     const settings = vscode.workspace.getConfiguration('asm-code-lens');
+
+    // Check for the hex calculator params
+    if (event) {
+        if (event.affectsConfiguration('asm-code-lens.hexCalculator.hexPrefix')
+            || event.affectsConfiguration('asm-code-lens.donated')) {
+            // Update the hex calculators
+            if (hexCalcExplorerProvider)
+                hexCalcExplorerProvider.setMainHtml();
+            if (hexCalcDebugProvider)
+                hexCalcDebugProvider.setMainHtml();
+        }
+    }
 
     // Check if grep paths have changed
     if(event) {
@@ -182,6 +205,9 @@ function configure(context: vscode.ExtensionContext, event?) {
         }
     }
 }
+
+let hexCalcExplorerProvider;
+let hexCalcDebugProvider;
 let regCodeLensProvider;
 let regHoverProvider;
 let regCompletionProposalsProvider;
