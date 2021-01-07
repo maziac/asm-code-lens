@@ -34,14 +34,37 @@
 				<div class="section-group__content">
 
 					<section id="whats-new" class="changelog">
-						<h2 class="changelog__title">What's New in <b>${extensionDisplayName} ${extensionVersion}</b>
+						<h2>What's New in <b>${extensionDisplayName} ${extensionVersion}</b>
 						</h2>
-						<div class="changelog__scroller">
-							<ul class="changelog__list">
+						<div>
+							<ul>
 								${changeLog}
 							</ul>
 						</div>
 					</section>
+
+				</div>
+				<div class="section-group__sidebar section-group__sidebar--welcome">
+					<div class="sidebar-group">
+						<h2>Show Your Support</h2>
+						<p>
+							While <b>${extensionDisplayName}</b> is offered for free,
+							if you find it useful, please consider supporting it.
+						</p>
+						<div class="button-group">
+							<a class="button button--flat-primary" title="Become a sponsor on Github"
+								href="https://github.com/sponsors/maziac" target="_blank">Become a Sponsor</a>
+							<a class="button button--flat-primary" title="Donate via PayPal"
+								href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url"
+								target="_blank">Donate via PayPal</a>
+						</div>
+						<ul>
+							<li><a title="Write a review"
+									href="https://marketplace.visualstudio.com/items?itemName=${extensionName}&ssr=false#review-details">Write
+									a Review</a>
+							</li>
+						</ul>
+
 
 					<h2>Need Help?</h2>
 					<ul>
@@ -52,29 +75,6 @@
 							<a href="${repositoryIssues}">Questions &amp; Issues</a>
 						</li>
 					</ul>
-
-				</div>
-				<div class="section-group__sidebar section-group__sidebar--welcome">
-					<div class="sidebar-group">
-						<h2>Show Your Support</h2>
-						<p>
-							While <b>${extensionDisplayName}</b> is offered for free,
-							if you find it useful, please consider supporting it.
-						</p>
-						<div class="button-group button-group--support-alefragnani">
-							<a class="button button--flat-primary" title="Become a sponsor on Patreon"
-								href="https://www.patreon.com/alefragnani" target="_blank">Become a Sponsor</a>
-							<a class="button button--flat-primary" title="Donate via PayPal"
-								href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url"
-								target="_blank">Donate via PayPal</a>
-						</div>
-						<ul>
-							<li><a title="Write a review"
-									href="https://marketplace.visualstudio.com/items?itemName=${extensionName}&ssr=false#review-details">Write
-									a Review</a></li>
-						</ul>
-					</div>
-					<div class="sidebar-group">
 
 					</div>
 				</div>

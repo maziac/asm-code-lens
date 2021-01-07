@@ -8,8 +8,6 @@ import {DocumentSymbolProvider} from './DocumentSymbolProvider';
 import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
-import {WhatsNewContentProvider} from './whatsnew/whatsnewprovider';
-import {AsmCodeLensWhatsNewMgr} from './whatsnew/asmcodelenswhatsnewmanager';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNew} from './WhatsNewView';
 
@@ -21,16 +19,6 @@ export function activate(context: vscode.ExtensionContext) {
         // Major or minor version changed so show the whatsnew page.
         new WhatsNew();
     }
-/*
-    // Register the "Whatsnew" provider
-    const whatsnewProvider=new WhatsNewContentProvider();
-    const viewer=new AsmCodeLensWhatsNewMgr(context);
-    viewer.registerContentProvider("asm-code-lens", whatsnewProvider);
-    if (viewer.checkIfVersionDiffers())
-        viewer.showPage();
-    // Register the additional command to view the "Whats' New" page.
-    context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => viewer.showPage()));
-*/
 
     // Register the hex calculator webviews
     hexCalcExplorerProvider = new HexCalcProvider();
