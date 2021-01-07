@@ -3,6 +3,7 @@
 *  Licensed under the MIT License. See License.md in the project root for license information.
 *--------------------------------------------------------------------------------------------*/
 
+import * as vscode from 'vscode';
 import * as fs from "fs";
 import * as semver from "semver";
 import { ChangeLogItem, ChangeLogIssue, ChangeLogVersion, ChangeLogKind, Header, Sponsor, IssueKind } from "./ContentProvider";
@@ -18,6 +19,12 @@ export class WhatsNewPageBuilder {
 
     constructor(htmlFile: string) {
         this.htmlFile = fs.readFileSync(htmlFile).toString();
+    }
+
+    public updateResourcePath(resourcePath: string) {
+        // Exchange local path
+        this.htmlFile = this.htmlFile.replace('${vscodeResPath}', resourcePath);
+        return this;
     }
 
     public updateExtensionDisplayName(extensionDisplayName: string) {

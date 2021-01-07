@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.6.0
+- Added a hex calculator for the sidebar.
+
 # 1.5.9
 - Added syntax highlighting for SLDOPT sjasmplus keyword thanks to kborowinski.
 - Fixed sjasmplus OUTEND highlighting thanks to kborowinski.

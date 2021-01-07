@@ -13,15 +13,16 @@ If you like ASM-Code-Lens please consider supporting it.
 
 'ASM Code Lens' is a language server extension for Visual Studio Code for assembler files.
 It provides support for:
+- Assembler syntax highlighting.
 - Completions: While you type completions are proposed based on the labels in your asm files.
 - "Find all references": through a right mouse click in your assembler source file. It will come up with all found references in the other files.
 - Hovering: When hovering over  symbol it shows the comments for the symbol.
 - Outline view: View your labels (code, data, constants) in the outline view.
 - Rename symbols.
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
-- Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
+- Command: asm-codspec
+e-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
 - Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and many other assemblers that use a standard notation for labels (e.g. "label:").
-- Assembler syntax highlighting.
 
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
 
@@ -31,8 +32,9 @@ Please refer to the "Feature Contributions" tab to see how to enable/disable cer
 Install through Visual Studio Code Marketplace.
 The extension is called "ASM Code Lens".
 
-It supports the following assembler file extensions:
+It supports the following assembler file suffixes by default:
 .asm, .s, .inc, .a80.
+Others are configurable.
 
 
 ## Hexadecimal Calculator
@@ -52,9 +54,11 @@ The calculator allows the basic integer calculations:
 
 ![](assets/hexcalculator.gif)
 
+
 ## Outline View
 
 An outline view of the assembly can be shown like this:
+
 ![](assets/outline_view.jpg)
 
 "ASM Code Lens" uses some heuristics to tell what labels are data, const or code.

@@ -17,6 +17,8 @@ export class WhatsNewManager {
 
     protected extension: vscode.Extension<any>;
 
+    protected vscodeResPath: string;
+
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
     }
@@ -56,7 +58,12 @@ export class WhatsNewManager {
         // Local path to main script run in the webview
         const logoPathOnDisk = vscode.Uri.file(
             path.join(this.context.extensionPath, "images", `vscode-${this.extensionName.toLowerCase()}-logo-readme.png`));
-        const logoUri = logoPathOnDisk.with({ scheme: "vscode-resource" });
+        const logoUri = logoPathOnDisk.with({scheme: "vscode-resource"});
+
+        // Set resource path
+        const extPath = vscode.extensions.getExtension("maziac.asm-code-lens")!.extensionPath as string;
+        const resourcePath = vscode.Uri.file(extPath);
+        this.vscodeResPath = panel.webview.asWebviewUri(resourcePath).toString();
 
         panel.webview.html = this.getWebviewContentLocal(pageUri.fsPath, cssUri.toString(), logoUri.toString());
     }
@@ -79,6 +86,7 @@ export class WhatsNewManager {
 
     protected getWebviewContentLocal(htmlFile: string, cssUrl: string, logoUrl: string): string {
         return WhatsNewPageBuilder.newBuilder(htmlFile)
+            .updateResourcePath(this.vscodeResPath)
             .updateExtensionDisplayName(this.extension.packageJSON.displayName)
             .updateExtensionName(this.extensionName)
             .updateExtensionVersion(this.extension.packageJSON.version)

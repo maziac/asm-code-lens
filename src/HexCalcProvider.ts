@@ -77,7 +77,7 @@ let hexPrefix = "${hexPrefix}";
 
 
 	/**
-	 * Opens a webview with dontaion information.
+	 * Opens a webview with donation information.
 	 */
 	protected openDonateWebView() {
 		// Create vscode panel view

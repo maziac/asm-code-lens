@@ -11,9 +11,17 @@ import {setGrepGlobPatterns} from './grep';
 import {WhatsNewContentProvider} from './whatsnew/whatsnewprovider';
 import {AsmCodeLensWhatsNewMgr} from './whatsnew/asmcodelenswhatsnewmanager';
 import {HexCalcProvider} from './HexCalcProvider';
+import {WhatsNew} from './WhatsNewView';
 
 export function activate(context: vscode.ExtensionContext) {
 
+    // Check version and show 'What's new' if necessary.
+    const mjrMnrChanged = WhatsNew.updateVersion(context);
+    if (mjrMnrChanged) {
+        // Major or minor version changed so show the whatsnew page.
+        new WhatsNew();
+    }
+/*
     // Register the "Whatsnew" provider
     const whatsnewProvider=new WhatsNewContentProvider();
     const viewer=new AsmCodeLensWhatsNewMgr(context);
@@ -22,15 +30,16 @@ export function activate(context: vscode.ExtensionContext) {
         viewer.showPage();
     // Register the additional command to view the "Whats' New" page.
     context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => viewer.showPage()));
+*/
 
     // Register the hex calculator webviews
-    const providerExplorer = new HexCalcProvider();
+    hexCalcExplorerProvider = new HexCalcProvider();
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider("asm-code-lens.calcview-explorer", providerExplorer, {webviewOptions: {retainContextWhenHidden: true}})
+        vscode.window.registerWebviewViewProvider("asm-code-lens.calcview-explorer", hexCalcExplorerProvider, {webviewOptions: {retainContextWhenHidden: true}})
     );
-    const providerDebug = new HexCalcProvider();
+    hexCalcDebugProvider = new HexCalcProvider();
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider("asm-code-lens.calcview-debug", providerDebug, {webviewOptions: {retainContextWhenHidden: true}})
+        vscode.window.registerWebviewViewProvider("asm-code-lens.calcview-debug", hexCalcDebugProvider, {webviewOptions: {retainContextWhenHidden: true}})
     );
 
     // Enable logging.

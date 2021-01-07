@@ -14,19 +14,15 @@ export class WhatsNewContentProvider implements ContentProvider {
 		changeLog.push(...[
 			{
 				kind: ChangeLogKind.NEW, detail: {
-					message: `<b>Outline view added.</b>`
+					message: `<b>Hexadecimal Calculator for sidebar added.
+					<img src="assets/hexcalculator.gif"></img>
+					<img src="../assets/hexcalculator.gif"></img>
+					<img src="../../assets/hexcalculator.gif"></img>
+					<img src="../../../assets/hexcalculator.gif"></img>
+					<img src="../../../../assets/hexcalculator.gif"></img>
+					</b>`
 				}
-			},
-			{
-				kind: ChangeLogKind.NEW, detail: {
-					message: `Syntax highlighting for "// ... " style comments`
-				},
-			},
-			{
-				kind: ChangeLogKind.CHANGED, detail: {
-					message: `Various fixes to completion, hovering, goto etc.`
-				}
-			},
+			}
 		]);
 		return changeLog;
 	}
