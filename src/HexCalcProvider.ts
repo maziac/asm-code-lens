@@ -64,8 +64,7 @@ let hexPrefix = "${hexPrefix}";
 		// Set button
 		if (!donated) {
 			mainHtml = mainHtml.replace('<!--${donate}-->', `
-		<button color="lightyellow" style="float:right;background-color:yellow" onclick="donateClicked()">Donate...</button>
-					`);
+		<button class="button-donate" style="float:right" onclick="donateClicked()">Donate...</button>`);
 		}
 
 		// Add a Reload and Copy button for debugging
