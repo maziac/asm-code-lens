@@ -5,8 +5,6 @@
 // See here https://github.com/microsoft/TypeScript/issues/14351
 export = 0;
 
-import {basename} from "path";
-
 declare let acquireVsCodeApi: any;
 declare let document: any;
 declare let hexPrefix: string;	// Prefix for hex values (e.g. "0x").

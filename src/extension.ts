@@ -10,8 +10,12 @@ import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNew} from './WhatsNewView';
+import {PackageInfo} from './pakageinfo';
 
 export function activate(context: vscode.ExtensionContext) {
+
+    // Save the extension path
+    PackageInfo.setExtensionPath(context.extensionPath);
 
     // Check version and show 'What's new' if necessary.
     const mjrMnrChanged = WhatsNew.updateVersion(context);

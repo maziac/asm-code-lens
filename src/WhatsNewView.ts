@@ -2,12 +2,10 @@ import * as vscode from 'vscode';
 import * as semver from 'semver';
 import * as path from 'path';
 import {readFileSync} from 'fs';
+import {PackageInfo} from './pakageinfo';
 
 
 export class WhatsNew {
-	// The extension name.
-	protected static extensionName = "maziac.asm-code-lens";
-
 	/// A panel (containing the webview).
 	protected vscodePanel: vscode.WebviewPanel;
 
@@ -18,12 +16,10 @@ export class WhatsNew {
 	 * @return true if version was updated. false if version major/monr are equal.
 	 */
 	public static updateVersion(context: vscode.ExtensionContext): boolean {
-		// Load data from extension manifest
-		const extension = vscode.extensions.getExtension(WhatsNew.extensionName)!;
-
-		const versionId = WhatsNew.extensionName + '.version';
+		// Load data from extension storage
+		const versionId = PackageInfo.extensionPath+ '.version';
 		const previousExtensionVersion = context.globalState.get<string>(versionId)!;
-		const currentVersion = extension.packageJSON.version;
+		const currentVersion = PackageInfo.extension.packageJSON.version;
 		if (previousExtensionVersion) {
 			const differs: semver.ReleaseType | null = semver.diff(currentVersion, previousExtensionVersion);
 
@@ -66,8 +62,7 @@ export class WhatsNew {
 		if (!this.vscodePanel.webview)
 			return;
 		// Add the html styles etc.
-		const extension = vscode.extensions.getExtension(WhatsNew.extensionName)!;
-		const extPath = extension.extensionPath;
+		const extPath = PackageInfo.extension.extensionPath;
 		const mainHtmlFile = path.join(extPath, 'html/whatsnew.html');
 		let html = readFileSync(mainHtmlFile).toString();
 
@@ -77,22 +72,22 @@ export class WhatsNew {
 		html = html.replace('${vscodeResPath}', vscodeResPath);
 
 		// Exchange extension name
-		html = html.replace(/\${extensionName}/g, WhatsNew.extensionName);
+		html = html.replace(/\${extensionName}/g, PackageInfo.extensionName);
 
 		// Exchange extension name
-		html = html.replace(/\${extensionVersion}/g, extension.packageJSON.version);
+		html = html.replace(/\${extensionVersion}/g, PackageInfo.extension.packageJSON.version);
 
 		// Exchange display name
-		html = html.replace(/\${extensionDisplayName}/g, extension.packageJSON.displayName);
+		html = html.replace(/\${extensionDisplayName}/g, PackageInfo.extension.packageJSON.displayName);
 
 		// Exchange repository
-		html = html.replace(/\${repositoryUrl}/g, extension.packageJSON.repository.url);
+		html = html.replace(/\${repositoryUrl}/g, PackageInfo.extension.packageJSON.repository.url);
 
 		// Exchange repository
-		html = html.replace(/\${repositoryIssues}/g, extension.packageJSON.bugs.url);
+		html = html.replace(/\${repositoryIssues}/g, PackageInfo.extension.packageJSON.bugs.url);
 
 		// Exchange repository
-		html = html.replace(/\${repositoryHomepage}/g, extension.packageJSON.repository.url);
+		html = html.replace(/\${repositoryHomepage}/g, PackageInfo.extension.packageJSON.repository.url);
 
 		// Exchange changelog
 		const changeLogFile = path.join(extPath, 'html/whatsnew_changelog.html');

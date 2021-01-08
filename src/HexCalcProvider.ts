@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import {readFileSync} from 'fs';
+import {PackageInfo} from './pakageinfo';
 
 
 export class HexCalcProvider implements vscode.WebviewViewProvider {
 	// The webview is stored here.
 	protected webview: vscode.Webview;
+
 
 	/**
 	 * Called by vscode.
@@ -14,12 +16,8 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 		// Store webview
 		this.webview = webviewView.webview;
 
-		// Options
-		this.webview.options = {
-			// Allow scripts in the webview
-			enableScripts: true,
-		};
-
+		// Allow scripts in the webview
+		this.webview.options = {enableScripts: true};
 
 		// Handle messages from the webview
 		this.webview.onDidReceiveMessage(message => {
@@ -41,8 +39,9 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 	public setMainHtml() {
 		if (!this.webview)
 			return;
+
 		// Add the html styles etc.
-		const extPath = vscode.extensions.getExtension("maziac.asm-code-lens")!.extensionPath as string;
+		const extPath = PackageInfo.extensionPath;
 		const mainHtmlFile = path.join(extPath, 'html/main.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
 		// Exchange local path
@@ -55,8 +54,7 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 		let hexPrefix = configuration.get<string>('hexCalculator.hexPrefix');
 		// Add to initialization
 		mainHtml = mainHtml.replace('//${init}', `
-let hexPrefix = "${hexPrefix}";
-`
+let hexPrefix = "${hexPrefix}";`
 		);
 
 		// Get donated state
@@ -81,14 +79,30 @@ let hexPrefix = "${hexPrefix}";
 	protected openDonateWebView() {
 		// Create vscode panel view
 		const vscodePanel = vscode.window.createWebviewPanel('', '', {preserveFocus: true, viewColumn: vscode.ViewColumn.Nine});
+		vscodePanel.title = 'Donate...';
 		// Read the file
-		const extPath = vscode.extensions.getExtension("maziac.asm-code-lens")!.extensionPath as string;
+		const extPath = PackageInfo.extensionPath;
 		const htmlFile = path.join(extPath, 'html/donate.html');
 		let html = readFileSync(htmlFile).toString();
 		// Exchange local path
 		const resourcePath = vscode.Uri.file(extPath);
 		const vscodeResPath = vscodePanel.webview.asWebviewUri(resourcePath).toString();
 		html = html.replace('${vscodeResPath}', vscodeResPath);
+
+		// Handle messages from the webview
+		vscodePanel.webview.options = {enableScripts: true};
+		vscodePanel.webview.onDidReceiveMessage(message => {
+			switch (message.command) {
+				case 'showExtension':
+					// Switch to Extension Manager
+					vscode.commands.executeCommand("workbench.extensions.search", PackageInfo.publisher)
+					// And select the given extension
+					const extensionName = PackageInfo.publisher + '.' + message.data;
+					vscode.commands.executeCommand("extension.open", extensionName);
+					break;
+			}
+		});
+
 		// Set html
 		vscodePanel.webview.html = html;
 	}
