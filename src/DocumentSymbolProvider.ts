@@ -7,12 +7,12 @@ import { stripComment } from './grep';
 /**
  * ReferenceProvider for assembly language.
  */
-export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider { 
+export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
     /**
      * Called by vscode to provide symbol information for the given document.
      * I.e. returns all albels of a document.
-     * 
+     *
      * @param document The document in which the command was invoked.
      * @param token A cancellation token.
      * @return An array of document highlights or a thenable that resolves to such. The lack of a result can be
@@ -167,7 +167,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                         // It's something else than code
                         for (const elem of lastSymbols) {
                             elem.kind=kind;
-                            elem.detail=match[1]+' '+match[2].trimRight();
+                            elem.detail=match![1]+' '+match![2].trimRight();
                         }match
                         defaultSymbolKind=kind;
                     }

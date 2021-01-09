@@ -9,7 +9,7 @@ import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
 import {HexCalcProvider} from './HexCalcProvider';
-import {WhatsNew} from './WhatsNewView';
+import {WhatsNewView} from './WhatsNewView';
 import {PackageInfo} from './pakageinfo';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -18,10 +18,10 @@ export function activate(context: vscode.ExtensionContext) {
     PackageInfo.setExtensionPath(context.extensionPath);
 
     // Check version and show 'What's new' if necessary.
-    const mjrMnrChanged = WhatsNew.updateVersion(context);
+    const mjrMnrChanged = WhatsNewView.updateVersion(context);
     if (mjrMnrChanged) {
         // Major or minor version changed so show the whatsnew page.
-        new WhatsNew();
+        new WhatsNewView();
     }
 
     // Register the hex calculator webviews

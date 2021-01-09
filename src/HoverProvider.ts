@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel } from './grep';
-import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
+import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord } from './regexes';
 import * as fs from 'fs';
-import * as path from 'path';
+//import * as path from 'path';
 
 
 /**
@@ -14,14 +14,14 @@ export class HoverProvider implements vscode.HoverProvider {
      * Called from vscode if the user hovers over a word.
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
-     * @param options 
-     * @param token 
+     * @param options
+     * @param token
      */
     public provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Hover> {
         return this.search(document, position);
     }
 
-    
+
     /**
      * Does a search for a word. I.e. finds all references of the word.
      * @param document The document that contains the word.
@@ -69,7 +69,7 @@ export class HoverProvider implements vscode.HoverProvider {
                             const filePath = loc.uri.fsPath;
                             const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
                             const lines = linesData.split('\n');
- 
+
                             // Now find all comments above the found line
                             const prevHoverTextArrayLength=hoverTexts.length;
                             const text=lines[lineNr];
@@ -87,15 +87,15 @@ export class HoverProvider implements vscode.HoverProvider {
                                 // Add text
                                 const textMatch=new vscode.MarkdownString();
                                 textMatch.appendText(match[1]);
-                                hoverTexts.unshift(textMatch);     
+                                hoverTexts.unshift(textMatch);
                                 // Next
                                 startLine --;
                             }
 
                             // Separate several entries
                             if(prevHoverTextArrayLength != hoverTexts.length)
-                                hoverTexts.unshift(new vscode.MarkdownString('============')); 
-                            
+                                hoverTexts.unshift(new vscode.MarkdownString('============'));
+
                             // Call next
                             f(index+1);
                         }
@@ -103,8 +103,8 @@ export class HoverProvider implements vscode.HoverProvider {
                             // End of processing.
                             // Check if 0 entries
                             if(hoverTexts.length == 0)
-                                return resolve(undefined);  // Nothing found
-                            
+                                return resolve(undefined as any);  // Nothing found
+
                             // Remove first ('============');
                             hoverTexts.splice(0,1);
 
@@ -116,7 +116,7 @@ export class HoverProvider implements vscode.HoverProvider {
 
                     // Loop all found entries.
                     f(0);
-                    
+
                 });
             });
 

@@ -1,4 +1,3 @@
-'use strict';
 import * as vscode from 'vscode';
 import { grep, grepTextDocumentMultiple, reduceLocations } from './grep';
 import { regexLabelColon, regexLabelWithoutColon, regexAnyReferenceForWord } from './regexes';
@@ -40,10 +39,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * It searches the given document for symbols (strings which ends with ":")
      * and creates a code lens for each.
      * @param document The document to check.
-     * @param token 
+     * @param token
      */
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.CodeLens[]> { // oder Promise<CodeLens[]>
-    
+
         return new Promise<vscode.CodeLens[]>((resolve, reject) => {
             // Find all "some.thing:" (labels) in the document
             const searchRegex = regexLabelColon();
@@ -68,7 +67,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 const trimmedMatchedText = matchedText.trim();
                 const startPos = new vscode.Position(lineNr, colStart);
                 const endPos = new vscode.Position(lineNr, colEnd);
-                const range = new vscode.Range(startPos, endPos); 
+                const range = new vscode.Range(startPos, endPos);
                 const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
                 // Store
                 codeLenses.push(codeLense);
@@ -84,7 +83,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * The symbol (matchedText) is searched and the count of references is
      * presented with the text "n references".
      * @param codeLens An AsmCodeLens object which also includes the symbol and the document.
-     * @param token 
+     * @param token
      */
     public resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Thenable<vscode.CodeLens> {
         return new Promise<vscode.CodeLens>((resolve, reject) => {
@@ -116,11 +115,11 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                             reducedLocations //reference locations
                         ]
                     };
-                    return resolve(codeLens); 
+                    return resolve(codeLens);
                 });
             });
 
         });
     }
-    
+
 }

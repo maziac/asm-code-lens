@@ -1,12 +1,11 @@
-'use strict';
 import * as vscode from 'vscode';
 //import * as assert from 'assert';
-import { grep, grepTextDocument, FileMatch, grepMultiple, reduceLocations, grepGlobInclude, grepGlobExclude } from './grep';
+import { grep, FileMatch, grepMultiple, reduceLocations, grepGlobInclude, grepGlobExclude } from './grep';
 import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro, regexAnyReferenceForWord } from './regexes';
 //import { Location } from 'vscode';
 //import { CodeLensProvider } from './CodeLensProvider';
 
-var grepit = require('grepit');
+//var grepit = require('grepit');
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -17,7 +16,7 @@ let output = vscode.window.createOutputChannel("ASM Code Lens");
  * Static user command functions.
  * - findLabelsWithNoReference: Searches all labels and shows the ones that are not referenced.
  */
-export class Commands { 
+export class Commands {
 
     /**
      * Searches all labels and shows the ones that are not referenced.
@@ -42,13 +41,13 @@ export class Commands {
     protected static async findLabels(locLabels) {
         output.appendLine("Unreferenced labels:");
         output.show(true);
-    
+
         try {
             await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude)
-            .then(async uris => {
+            .then(async (/*uris*/) => {
                 try {
-                    const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
-                    uris.unshift(undefined);
+                    //const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+                    //uris.unshift(undefined);
 
                     let labelsCount = locLabels.length;
                     let unrefLabels = 0;
@@ -97,13 +96,13 @@ export class Commands {
                 catch(e) {
                     console.log("Error: ", e);
                 }
-            });   
+            });
         }
         catch(e) {
             console.log("Error: ", e);
-        }        
+        }
         // Check if any label is unreferenced
-        if(locLabels.length == 0) 
+        if(locLabels.length == 0)
             output.appendLine("None.");
     }
 

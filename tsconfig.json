@@ -2,15 +2,16 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "outDir": "out",
-        "lib": [
-            "es6"
-        ],
+        "noImplicitAny": false,
+        "removeComments": false,
+        "noUnusedLocals": true,
+        "noImplicitThis": true,
+        "inlineSourceMap": false,
         "sourceMap": true,
-        "rootDir": "."
-    },
-    "exclude": [
-        "node_modules",
-        ".vscode-test"
-    ]
+        "outDir": "./out",
+        "preserveConstEnums": true,
+        "strictNullChecks": true,
+        "noUnusedParameters": false,
+        "allowJs": true
+    }
 }

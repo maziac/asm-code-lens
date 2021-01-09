@@ -2,13 +2,12 @@
 
 import * as assert from 'assert';
 import * as re from '../src/regexes';
-import { AssertionError } from 'assert';
 //import * as path from 'path';
 //const fs = require('fs-extra');
 
 
 suite('RegExes', () => {
-    
+
     suite('Simple regexes', () => {
 
         function checkResultsMatch(regex: RegExp, insOuts: (string|boolean)[]) {
@@ -149,7 +148,7 @@ suite('RegExes', () => {
                 "sounkkkd", "snd", true,
                 ];
 
-            try{ 
+            try{
                 // Check the test
                 const count = insOuts.length;
                 const div = 3;  // Line divider
@@ -157,7 +156,7 @@ suite('RegExes', () => {
                 for(let i=0; i<count; i+=div) {
                     const input = insOuts[i] as string;
                     const searchWordRaw = insOuts[i+1] as string;
-                    
+
                     // To be tested function:
                     const searchWord = re.regexPrepareFuzzy(searchWordRaw);
 
@@ -200,7 +199,7 @@ suite('RegExes', () => {
                         assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Line " + (i/div));
                         assert.equal(label, foundLabel, "'" + label + "' == '" + foundLabel + "', Line " + (i/div));
                     }
-                    else 
+                    else
                         assert.equal(label, '', "'" + label + "' == '', Line " + (i/div));
                 }
             }
@@ -223,7 +222,7 @@ suite('RegExes', () => {
                 "label.init: ", "", "label.init",
                 "label._init:", "", "label._init",
                 "label ", "", "",
-                
+
                 "label", "", "",
                 "  label2:", "  ", "label2",
                 "  label2: ", "  ", "label2",
@@ -319,7 +318,7 @@ suite('RegExes', () => {
                 "_LabelA_0123456789", "_LabelA_0123456789:", true, "",
                 "label", "xxx.label:", true, "",
                 "label", "_xxx.label:", true, "",
-                "label", "0xxx.label:", false, "",   
+                "label", "0xxx.label:", false, "",
                 "label", ".label:", false, "",
                 "label", "label.xxx:", false, "",
                 "label", "yyy.label.xxx:", false, "",
@@ -429,7 +428,7 @@ suite('RegExes', () => {
                 "label", "  jr nz,init.label.l3", true, "  jr nz,init.",
                 "label", "  jr nz,init.label", true, "  jr nz,init.",
                 "label", "  ld a,(init.label)", true, "  ld a,(init.",
-                
+
                 "label", "  ld a,(ix+init.label)", true, "  ld a,(ix+init.",
                 "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
@@ -464,7 +463,7 @@ suite('RegExes', () => {
                             const prefix = insOuts[i++] as string;
                             const result = regex.exec(input);
                             assert.notEqual(result, undefined, "No match was found although a match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "' (" + m + ")");
-                            const foundPrefix = result[1];
+                            const foundPrefix = result![1];
                             assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + lineNumber + " (" + m + ")");
                         }
                     }
@@ -492,7 +491,7 @@ suite('RegExes', () => {
                 "label", "  jr nz,init.label.l3", 1, "  jr nz,init.",
                 "label", "  jr nz,init.label", 1, "  jr nz,init.",
                 "label", "  ld a,(init.label)", 1, "  ld a,(init.",
-                
+
                 "label", "  ld a,(ix+init.label)", 1, "  ld a,(ix+init.",
                 "label", "  ld a,(ix-init.label)", 1, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", 1, "  ld a,(5+init.",
@@ -507,9 +506,9 @@ suite('RegExes', () => {
     });
 
 
-  
 
-    
+
+
 
     suite('RegEx with search-word middle, ignore case', () => {
 
@@ -521,7 +520,7 @@ suite('RegExes', () => {
                 "label", "label:;", true, "",
                 "label", "  label:", true, "  ",
                 "label", "   label: ", true, "   ",
-                
+
                 "label", " label:;", true, " ",
                 "label", "label", false, "",
                 "label", "label ", false, "",
@@ -531,7 +530,7 @@ suite('RegExes', () => {
                 "_LabelA_0123456789", "_LabelA_0123456789:", true, "",
                 "label", "xxx.label:", true, "xxx.",
                 "label", "_xxx.label:", true, "_xxx.",
-                "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a nmber.  
+                "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a nmber.
                 "label", ".label:", true, ".",
 
                 "label", "label.xxx:", true, "",
@@ -581,7 +580,7 @@ suite('RegExes', () => {
                 "label", "xlabel", false, "",
                 "label", "labely", true, "",
                 "label", "xxx.xlabel", false, "",
-                
+
                 "label", "xlabel.yyy", false, "",
                 "label", "label:", false, "",
                 "label", "label: ", false, "",
@@ -669,7 +668,7 @@ suite('RegExes', () => {
                 "label", "  jr nz,init.label.l3", true, "  jr nz,init.",
                 "label", "  jr nz,init.label", true, "  jr nz,init.",
                 "label", "  ld a,(init.label)", true, "  ld a,(init.",
-                
+
                 "label", "  ld a,(ix+init.label)", true, "  ld a,(ix+init.",
                 "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
@@ -704,7 +703,7 @@ suite('RegExes', () => {
                             const prefix = insOuts[i++] as string;
                             const result = regex.exec(input);
                             assert.notEqual(result, undefined, "No match was found although a match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "' (" + m + ")");
-                            const foundPrefix = result[1];
+                            const foundPrefix = result![1];
                             assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + lineNumber + " (" + m + ")");
                         }
                     }
@@ -732,7 +731,7 @@ suite('RegExes', () => {
                 "label", "  jr nz,init.label.l3", 1, "  jr nz,init.",
                 "label", "  jr nz,init.label", 1, "  jr nz,init.",
                 "label", "  ld a,(init.label)", 1, "  ld a,(init.",
-                
+
                 "label", "  ld a,(ix+init.label)", 1, "  ld a,(ix+init.",
                 "label", "  ld a,(ix-init.label)", 1, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", 1, "  ld a,(5+init.",

@@ -5,6 +5,7 @@
 // See here https://github.com/microsoft/TypeScript/issues/14351
 export = 0;
 
+
 declare let acquireVsCodeApi: any;
 declare let document: any;
 declare let hexPrefix: string;	// Prefix for hex values (e.g. "0x").
@@ -71,6 +72,7 @@ function clearCalculator() {
  * @param obj The input element.
  * @param event The keypress event.
  */
+// @ts-ignore
 function keypress(obj, event, numberBase) {
 	let text = obj.value.trim();
 
@@ -154,6 +156,7 @@ function keypress(obj, event, numberBase) {
 /**
  * Send message that donate button has been clicked.
  */
+// @ts-ignore
 function donateClicked() {
 	vscode.postMessage({
 		command: 'donateClicked'

@@ -1,8 +1,7 @@
-'use strict';
 import * as vscode from 'vscode';
-import { grepMultiple, reduceLocations, getCompleteLabel, GrepLocation, getModule, getNonLocalLabel, removeDuplicates } from './grep';
-import { CodeLensProvider } from './CodeLensProvider';
-import { stringify } from 'querystring';
+import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
+//import { CodeLensProvider } from './CodeLensProvider';
+//import { stringify } from 'querystring';
 import { regexPrepareFuzzy } from './regexes';
 import { regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
 
@@ -13,7 +12,7 @@ const completions = [
     // Z80 registers
     'a', 'b', 'c', 'd', 'e', 'h', 'l',
     'af', 'bc', 'de', 'hl', 'ix', 'iy', 'sp',
-    'ixl', 'ixh', 'iyl', 'iyh', 
+    'ixl', 'ixh', 'iyl', 'iyh',
 
     // Z80 instructions
 	'adc',  'add',  'and',  'bit',  'call', 'ccf',  'cp',   'cpd',
@@ -27,7 +26,7 @@ const completions = [
     'sll',  'swap', 'sra',  'srl',  'sub',  'xor',
 
     // Z80N instructions
-    'ldix', 'ldws', 'ldirx', 'lddx', 'lddrx', 'ldpirx', 
+    'ldix', 'ldws', 'ldirx', 'lddx', 'lddrx', 'ldpirx',
     'outinb', 'mul', 'swapnib', 'mirror', 'nextreg',
     'pixeldn', 'pixelad', 'setae', 'test',
     'bsla', 'bsra', 'bsrl', 'bsrf', 'brlc',
@@ -70,12 +69,12 @@ const completions = [
 /**
  * CompletionItemProvider for assembly language.
  */
-export class CompletionProposalsProvider implements vscode.CompletionItemProvider { 
+export class CompletionProposalsProvider implements vscode.CompletionItemProvider {
     /**
      * Called from vscode if the user selects "Find all references".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
-     * @param token 
+     * @param token
      */
     public provideCompletionItems(
 		document: vscode.TextDocument,
@@ -115,7 +114,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             // Get the module at the line of the searched word.
             const row = position.line;
             const moduleLabel = getModule(lines, row);
-            
+
             // Get the range of the whole input label.
             // Otherwise vscode takes only the part after the last dot.
             const lineContents = lines[row];
@@ -124,7 +123,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             const end = start + label.length;
             const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, end));
             //console.log('Completions for: '+ label);
-   
+
             // Get the first non-local label
             let nonLocalLabel;  // Only used for local labels
             if(label.startsWith('.')) {
@@ -188,13 +187,13 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                             // change shown text
                             item.label = '['+text.substr(0,k)+'] '+part;
                         }
-                        
+
                         proposals.set(item.label as string, item);
                     }
-                    
+
                     // Create list from map
                     const propList = Array.from(proposals.values());
-                
+
 
                     // Check if word includes a dot
                     let allCompletions;

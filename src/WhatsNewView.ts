@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import * as semver from 'semver';
 import * as path from 'path';
 import {readFileSync} from 'fs';
 import {PackageInfo} from './pakageinfo';
+import {Version} from './version';
 
 
-export class WhatsNew {
+export class WhatsNewView {
 	/// A panel (containing the webview).
 	protected vscodePanel: vscode.WebviewPanel;
 
@@ -21,11 +21,8 @@ export class WhatsNew {
 		const previousExtensionVersion = context.globalState.get<string>(versionId)!;
 		const currentVersion = PackageInfo.extension.packageJSON.version;
 		if (previousExtensionVersion) {
-			const differs: semver.ReleaseType | null = semver.diff(currentVersion, previousExtensionVersion);
-
-			// Only "patch" should be suppressed
-			if (!differs || differs === "patch") {
-				return true; // TODO: Remove
+			if(Version.isNewVersion(currentVersion, previousExtensionVersion)) {
+			return true; // TODO: Remove
 				//return false;	// Versions do not differ
 			}
 		}

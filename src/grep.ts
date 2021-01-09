@@ -22,7 +22,7 @@ export interface FileMatch {
 
 
 /**
- * This extends the vscode location object by 
+ * This extends the vscode location object by
  * the match object.
  * Used in 'findLabelsWithNoReference'.
  */
@@ -35,7 +35,7 @@ export class GrepLocation extends vscode.Location {
 
     /// The label (symbol).
     label: string;
-    
+
     /// The full label (with module).
     moduleLabel: string;
 
@@ -72,9 +72,9 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
 
 
 /**
- * Checks the list of 'docs' for a given 'filePath' and returns the corresponding 
+ * Checks the list of 'docs' for a given 'filePath' and returns the corresponding
  * text document.
- * @param filePath 
+ * @param filePath
  * @param docs The list of text documents. Obtained with vscode.workspace.textDocuments.filter(doc => doc.isDirty)
  * @returns The vscode.TextDocument or undefined if not found.
  */
@@ -109,24 +109,24 @@ export let grepGlobExclude;
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
- * @param regex The regular expression to search for, 
+ * @param regex The regular expression to search for,
  * @returns An array of the vscode locations of the found expressions.
  */
 export async function grep(regex: RegExp): Promise<GrepLocation[]> {
     const readQueue = new PQueue();
     //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
-   
+
     assert(grepGlobInclude);
     try {
         await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude)
         .then(async uris => {
             const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
-    
+
             for(const uri of uris) {
                 // get fileName
                 const fileName = uri.fsPath;
-            
+
                 await readQueue.add(async () => {
                     const filePath = fileName;
 
@@ -148,7 +148,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                         // Check file on disk
                         let fileMatches = allMatches.get(fileName);
                         let lastIndex = 0;
-                
+
                         const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
                         const lines = linesData.split('\n');
 
@@ -162,9 +162,9 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                             const lineMatches: Array<FileMatch> = [];
                             do {
                                 const match = regex.exec(lineContents);
-                                if(!match) 
+                                if(!match)
                                     break;
-                            
+
                                 // Found: get start and end
                                 let start = match.index;
                                 for(let j=1; j<match.length; j++) {
@@ -182,7 +182,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                                     fileMatches = [];
                                     allMatches.set(fileName, fileMatches);
                                 }
-                    
+
                                 // Reverse order (useful if names should be replaced later on)
                                 lineMatches.unshift({
                                     filePath,
@@ -198,7 +198,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
                             if(fileMatches)
                                 fileMatches.push(...lineMatches);
                         }
-            
+
                         lastIndex += len;
                     }
                 });
@@ -224,10 +224,10 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
             const endPos = new vscode.Position(lineNr, colEnd);
             const loc = new GrepLocation(vscode.Uri.file(file), new vscode.Range(startPos, endPos), match);
             // store
-            locations.push(loc);                       
+            locations.push(loc);
         }
     }
- 
+
     return locations;
 }
 
@@ -241,7 +241,7 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
  */
 export async function grepMultiple(regexes: RegExp[]): Promise<GrepLocation[]> {
     let allLocations: Array<GrepLocation> = [];
-    
+
     // grep all regex
     for(const regex of regexes) {
         await grep(regex)
@@ -283,7 +283,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
             const match = regex.exec(lineContents);
             if(!match)
                 break;
-            
+
             // Found: get start and end
             let start = match.index;
             for(let j=1; j<match.length; j++) {
@@ -299,7 +299,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
 
             // Store found result
             matches.push({
-                filePath: undefined,
+                filePath: undefined as any,
                 line,  // line number (starts at 0)
                 start,  // start column
                 end,    // end column
@@ -321,7 +321,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
  */
 export function grepTextDocumentMultiple(doc: vscode.TextDocument, regexes: RegExp[]): FileMatch[] {
     const allMatches: FileMatch[] = [];
-    
+
     // grep all regex
     for(const regex of regexes) {
         // grep doc
@@ -358,7 +358,7 @@ export function getLastLabelPart(label: string): string {
  * characters are in the right order.
  * E.g. this would match: 'sound.initialize'.
  * @param label  E.g. 'explosion.init' or 'check_all'
- * @return E.g. 'explosion.\\w*i\\w*n\\w*i\\w*t\\w*'or 
+ * @return E.g. 'explosion.\\w*i\\w*n\\w*i\\w*t\\w*'or
  * '\\w*c\\w*h\\w*e\\w*c\\w*k\\w*_\\w*a\\w*l\\w*l\\w*'
  */
 export function getRegExFromLabel(label: string): RegExp {
@@ -377,11 +377,11 @@ export function getRegExFromLabel(label: string): RegExp {
         lastPart = label.substr(k+1);
     }
 
-    // Change last part 
+    // Change last part
     const lastRegexStr = regexPrepareFuzzy(lastPart) + '\\w*';
     let regexStr = prefix.replace(/(\.)/g,'\\.');  // Make sure to convert . to \. for regular expression.
     regexStr += lastRegexStr;
-    
+
     // Return
     const regex = new RegExp(regexStr, 'i');
     return regex;
@@ -399,7 +399,7 @@ function concatenateModuleAndLabel(module: string, label: string): string {
         return label;
     if(module.length == 0)
         return label;
-        
+
     const mLabel = module + '.' + label;
     return mLabel;
 }
@@ -439,7 +439,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
         const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
         lines = linesData.split('\n');
     }
-    
+
     // 1. Get original label
     const line = lines[row];
     let {label, preString} = getCompleteLabel(line, clmn);
@@ -472,7 +472,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  * 1. Get the module-label (=searchLabel).
  * 2. Get the module-labels for each found location and the corresponding file.
  * 3. 'searchLabel' is compared with all labels.
- * 4. If 'searchLabel' is not equal to the direct label and not equal to the 
+ * 4. If 'searchLabel' is not equal to the direct label and not equal to the
  *    concatenated label it is removed from 'locations'
  * @param locations An array with found locations of grepped labels.
  * @param document The document of the original label.
@@ -484,7 +484,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
 export async function reduceLocations(locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
     // For item completion:
-    let regexLabel; 
+    let regexLabel;
     let regexModuleLabel;
 
     // 1. Get module label
@@ -508,7 +508,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
 
     // 2. Get the module-labels for each found location and the corresponding file.
     let i = redLocs.length;
-    let removedSameLine = -1;
+    //let removedSameLine = -1;
     while(i--) {    // loop backwards
         // get fileName
         const loc = redLocs[i];
@@ -520,9 +520,9 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
             && pos.line == position.line
             && fileName == fileName) {
             // Remove also this location
-            redLocs.splice(i,1); 
+            redLocs.splice(i,1);
             // Remember
-            removedSameLine = i;
+            //removedSameLine = i;
             continue;
         }
 
@@ -545,9 +545,9 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
                 || regexModuleLabel.exec(mLabel.moduleLabel)
                 || regexLabel.exec(mLabel.moduleLabel)
                 || regexModuleLabel.exec(mLabel.label))
-                    return;                      
+                    return;
             }
-            // 4. If 'searchLabel' is not equal to the direct label and not equal to the 
+            // 4. If 'searchLabel' is not equal to the direct label and not equal to the
             //    concatenated label it is removed from 'locations'
             redLocs.splice(i,1);  // delete
         });
@@ -574,7 +574,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
 
 
 /**
- * Searches 'lines' from 'index' to 0 and returns the 
+ * Searches 'lines' from 'index' to 0 and returns the
  * first non local label.
  * @param lines An array of strings containing the complete text.
  * @param index The starting line (the line where the label was found.
@@ -600,8 +600,8 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
 
     // Out of bounds check
     if(!match)
-        return undefined;
-    
+        return undefined as any;
+
     // Return
     const label = match[1];
     return label;
@@ -623,7 +623,7 @@ export function getModule(lines: Array<string>, len: number): string {
     const modules: Array<string> = [];
     for (let row=0; row<len; row++) {
         const lineContents = lines[row];
-        
+
         // MODULE
         const matchModule = regexModule.exec(lineContents);
         if(matchModule) {
@@ -652,7 +652,7 @@ export function getModule(lines: Array<string>, len: number): string {
  * function returns the complete label.
  * @param lineContents The text of the line.
  * @param startIndex The index into the label.
- * @returns {label, preString} The found label and the part of the string that 
+ * @returns {label, preString} The found label and the part of the string that
  * is found before 'label'.
  */
 export function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
@@ -668,7 +668,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number): {lab
             break;
     }
     // k points now after the label
-    
+
     // Find start of label.
     let i;
     for(i = startIndex-1; i>=0; i--) {
@@ -699,7 +699,7 @@ export function stripComment(text: string) {
     if(i >= 0)
         return text.substr(0, i);   // strip comment
     // No comment
-    return text;    
+    return text;
 }
 
 
@@ -707,7 +707,7 @@ export function stripComment(text: string) {
 /**
  * Prints out all found locations.
  * @param locs The locations.
- * 
+ *
  */
 export function dbgPrintLocations(locs: GrepLocation[]) {
     for(let loc of locs) {

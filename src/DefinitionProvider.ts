@@ -1,7 +1,6 @@
-'use strict';
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
-import { resolve } from 'path';
+//import { resolve } from 'path';
 import { regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
 
 
@@ -10,13 +9,13 @@ import { regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, re
  * DefinitionProvider for assembly language.
  * Called from vscode e.g. for "Goto definition".
  */
-export class DefinitionProvider implements vscode.DefinitionProvider { 
+export class DefinitionProvider implements vscode.DefinitionProvider {
     /**
      * Called from vscode if the used selects "Goto definition".
      * @param document The current document.
      * @param position The position of the word for which the definition should be found.
-     * @param options 
-     * @param token 
+     * @param options
+     * @param token
      */
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
         // Check for 'include "..."'
@@ -32,7 +31,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         }
     }
 
-    
+
     /**
      * Searches the files that math the 'relPath' path.
      * @param relPath E.g. 'util/zxspectrum.inc'
@@ -49,8 +48,8 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
                 for(const uri of uris) {
                     const loc = new vscode.Location(uri, range);
                     locations.push(loc);
-                }    
-                resolve(locations);             
+                }
+                resolve(locations);
             });
         });
     }

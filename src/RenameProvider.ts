@@ -14,8 +14,8 @@ export class RenameProvider implements vscode.RenameProvider {
      * Called from vscode if the user selects "Rename symbol".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
-     * @param options 
-     * @param token 
+     * @param options
+     * @param token
      */
     public provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Thenable<vscode.WorkspaceEdit> {
         return new Promise<vscode.WorkspaceEdit>((resolve,reject) => {
@@ -23,7 +23,7 @@ export class RenameProvider implements vscode.RenameProvider {
         });
     }
 
-    
+
     /**
      * Searches for oldName in all files and replaces it with newName.
      * @param oldName The name to replace.
@@ -54,7 +54,7 @@ export class RenameProvider implements vscode.RenameProvider {
                     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
                     const fileMap = new Map<string, Array<vscode.Range>>()
                     for(const loc of reducedLocations) {
-                        // Check if doc is not open  
+                        // Check if doc is not open
                         const fsPath = loc.uri.fsPath;
                         const foundDoc = getTextDocument(fsPath, docs);
                         if(foundDoc) {
@@ -76,7 +76,7 @@ export class RenameProvider implements vscode.RenameProvider {
                             locs.push(loc.range);
                         }
                     }
-                    
+
                     // Change files on disk.
                     for(const [fsPath, changes] of fileMap) {
                         this.renameInFile(fsPath, changes, newName);
@@ -96,7 +96,7 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param newName The new name.
      */
     protected async renameInFile(filePath: string, changes: Array<vscode.Range>, newName: string) {
-        const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+        //const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
 
         // Read and exchange
         const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
@@ -109,7 +109,7 @@ export class RenameProvider implements vscode.RenameProvider {
             const clmn = range.start.character;
             const clmnEnd = range.end.character;
             const line = lines[row];
-            
+
             // Skip include lines
             const match = regex.exec(line);
             if(match)
