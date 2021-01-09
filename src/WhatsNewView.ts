@@ -18,20 +18,16 @@ export class WhatsNewView {
 	public static updateVersion(context: vscode.ExtensionContext): boolean {
 		// Load data from extension storage
 		const versionId = PackageInfo.extensionPath+ '.version';
-		const previousExtensionVersion = context.globalState.get<string>(versionId)!;
+		const previousVersion = context.globalState.get<string>(versionId)!;
 		const currentVersion = PackageInfo.extension.packageJSON.version;
-		if (previousExtensionVersion) {
-			if(Version.isNewVersion(currentVersion, previousExtensionVersion)) {
-			return true; // TODO: Remove
-				//return false;	// Versions do not differ
-			}
-		}
 
 		// Update version: "major", "minor"
-		context.globalState.update(versionId, currentVersion);
+		if(currentVersion != previousVersion)
+			context.globalState.update(versionId, currentVersion);
 
-		// Versions differ
-		return true;
+		// Compare
+		const isNewer = Version.isNewVersion(currentVersion, previousVersion);
+		return isNewer;
 	}
 
 
