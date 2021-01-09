@@ -2,12 +2,25 @@
 
 If you like ASM-Code-Lens please consider supporting it.
 
-<div style="background-color:yellow">
-<a class="donate-button" title="Become a sponsor on Github" href="https://github.com/sponsors/maziac"
+<div>
+<a   href="https://github.com/sponsors/maziac"
 		target="_blank">Become a Sponsor</a>
-<a class="donate-button title="Donate via PayPal"
-		href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url"
-		target="_blank">Donate via PayPal</a>
+<a
+style="
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 0.8em;
+  letter-spacing: 0.25em;
+  margin: 1em;
+  padding: 1em;
+  text-transform: uppercase;
+  background-color: Goldenrod;
+  border: 01px solid lightgray;
+  color: black;
+  font-weight: 600;"
+href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url"
+target="_blank">Donate via PayPal</a>
 </div>
 
 # ASM Code Lens
