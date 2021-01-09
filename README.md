@@ -96,7 +96,7 @@ vscode turns the normal hovers off if in debug mode. To make them visible press 
 
 ASM-Code-Lens is licensed under the [MIT license](https://github.com/maziac/dezog/blob/master/LICENSE.txt).
 
-This extension made use of code from 2 other packages:
+This extension made use of 3 other packages:
 - [find all references](https://github.com/gayanhewa/vscode-find-all-references) by gayanhewa, MIT License
 - [grob](https://www.npmjs.com/package/grob) by jamiebuilds, MIT License
 - [vscode-whats-new](https://github.com/alefragnani/vscode-whats-new) project from Alessandro Fragnani aka [alefragni](https://github.com/alefragnani), MIT License
