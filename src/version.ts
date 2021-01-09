@@ -26,10 +26,24 @@ export class Version {
 			if (pv.length < 2)
 				return true;	// Wrong format
 
+			// Check values
+			const cmjr = parseInt(cv[0]);
+			if (isNaN(cmjr))
+				return false;
+			const cmnr = parseInt(cv[1]);
+			if (isNaN(cmnr))
+				return false;
+			const pmjr = parseInt(pv[0]);
+			if (isNaN(pmjr))
+				return true;
+			const pmnr = parseInt(pv[1]);
+			if (isNaN(pmnr))
+				return true;
+
 			// Compare
-			if (parseInt(cv[0]) > parseInt(pv[0]))
+			if (cmjr > pmjr)
 				return true;	// Major number is bigger
-			if (parseInt(cv[1]) > parseInt(pv[1]))
+			if (cmnr > pmnr)
 				return true;	// Minor number is bigger
 			// Nor major nor minor number is bigger
 			return false;
