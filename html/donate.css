@@ -26,9 +26,11 @@
   text-decoration: none;
   text-transform: uppercase;
   user-select: none;
-  white-space: nowrap; }
+  white-space: nowrap;
+}
   .button:focus {
-    outline: none; }
+    outline: none;
+  }
 
 .button--flat-primary {
   background-color: var(--vscode-button-background);
@@ -37,12 +39,12 @@
   font-weight: 600;
   transition: background-color 250ms, border-color 250ms, color 250ms;
 }
-  .button--flat-primary:hover {
+.button--flat-primary:hover {
     background-color: white;
     border-color: white;
     color: black !important;
 }
-  .preload .button--flat-primary {
+.preload .button--flat-primary {
     transition-duration: 0s !important;
 }
 
