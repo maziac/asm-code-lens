@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.6.3
+- Fixed 'Illegal argument' error.
+
 # 1.6.2
 - Regression fixed: Issue #30: Goto definition to local label not working
 - Regression fixed: what's new command.
