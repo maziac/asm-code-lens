@@ -2,11 +2,11 @@
 
 If you like ASM-Code-Lens please consider supporting it.
 
-<a href="https://github.com/sponsors/maziac">
+<a href="https://github.com/sponsors/maziac" title="Github sponsor">
 	<img src="assets/button_donate_sp.png" />
 </a>
 &nbsp;&nbsp;
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url">
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url"	title="PayPal">
 	<img src="assets/button_donate_pp.png" />
 </a>
 
