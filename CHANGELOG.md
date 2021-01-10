@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.6.1
+- Fixed: missing manifest.
+
 # 1.6.0
 - Added a hex calculator for the sidebar.
 
