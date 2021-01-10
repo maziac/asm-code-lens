@@ -319,7 +319,7 @@ suite('RegExes', () => {
                 "label", "xxx.label:", true, "",
                 "label", "_xxx.label:", true, "",
                 "label", "0xxx.label:", false, "",
-                "label", ".label:", false, "",
+                //"label", ".label:", false, "",    // Required for issue #30: Goto definition to local label not working
                 "label", "label.xxx:", false, "",
                 "label", "yyy.label.xxx:", false, "",
                 "label", "xlabel:", false, "",
@@ -351,7 +351,7 @@ suite('RegExes', () => {
                 "label", "xxx.label", true, "",
                 "label", "_xxx.label", true, "",
                 "label", "0xxx.label", false, "",
-                "label", ".label", false, "",
+                //"label", ".label", false, "",   // Required for issue #30: Goto definition to local label not working
                 "label", "label.xxx", false, "",
                 "label", "yyy.label.xxx", false, "",
                 "label", "xlabel", false, "",

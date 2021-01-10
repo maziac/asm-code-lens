@@ -23,6 +23,9 @@ export function activate(context: vscode.ExtensionContext) {
         // Major or minor version changed so show the whatsnew page.
         new WhatsNewView();
     }
+    // Register the additional command to view the "Whats' New" page.
+    context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => new WhatsNewView()));
+
 
     // Register the hex calculator webviews
     hexCalcExplorerProvider = new HexCalcProvider();

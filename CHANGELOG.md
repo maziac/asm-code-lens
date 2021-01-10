@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.6.2
+- Regression fixed: Issue #30: Goto definition to local label not working
+- Regression fixed: what's new command.
+
 # 1.6.1
 - Fixed: missing manifest.
 
@@ -9,6 +13,7 @@
 # 1.5.9
 - Added syntax highlighting for SLDOPT sjasmplus keyword thanks to kborowinski.
 - Fixed sjasmplus OUTEND highlighting thanks to kborowinski.
+
 # 1.5.8
 - Fixed #46: Syntax highlighting: clash of Z80 vs. x86
 - Added syntax highlighting for DeZog WPMEM, LOGPOINT and ASSERTION.
