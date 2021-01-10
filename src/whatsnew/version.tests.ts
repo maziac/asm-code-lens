@@ -1,9 +1,5 @@
-
-
 import * as assert from 'assert';
-import {Version} from '../src/version';
-//import * as path from 'path';
-//const fs = require('fs-extra');
+import {Version} from './version';
 
 
 suite('Version', () => {
@@ -29,6 +25,8 @@ suite('Version', () => {
 
         test('undefined/wrong', () => {
             // prev version
+            assert.ok(Version.isNewVersion('1.2.0', '0.0.0'));
+            assert.ok(Version.isNewVersion('1.2.0', ''));
             assert.ok(Version.isNewVersion('1.2.0', undefined as any));
             assert.ok(Version.isNewVersion('1.2.0', '1.'));
 

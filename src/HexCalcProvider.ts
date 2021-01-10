@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import {readFileSync} from 'fs';
-import {PackageInfo} from './pakageinfo';
+import {PackageInfo} from './whatsnew/packageinfo';
 
 
 export class HexCalcProvider implements vscode.WebviewViewProvider {

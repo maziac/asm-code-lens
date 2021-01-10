@@ -9,8 +9,8 @@ import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
 import {HexCalcProvider} from './HexCalcProvider';
-import {WhatsNewView} from './WhatsNewView';
-import {PackageInfo} from './pakageinfo';
+import {WhatsNewView} from './whatsnew/whatsnewview';
+import {PackageInfo} from './whatsnew/packageinfo';
 
 export function activate(context: vscode.ExtensionContext) {
 
