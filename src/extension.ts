@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
  * Reads the confguration.
  */
 function configure(context: vscode.ExtensionContext, event?) {
-    const settings = vscode.workspace.getConfiguration('asm-code-lens');
+    const settings = vscode.workspace.getConfiguration('asm-code-lens', null);
 
     // Check for the hex calculator params
     if (event) {

@@ -42,7 +42,7 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 
 		// Add the html styles etc.
 		const extPath = PackageInfo.extensionPath;
-		const mainHtmlFile = path.join(extPath, 'html/main.html');
+		const mainHtmlFile = path.join(extPath, 'html/hexcalc.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
 		// Exchange local path
 		const resourcePath = vscode.Uri.file(extPath);
@@ -50,7 +50,7 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
 
 		// Get hex prefix
-		const configuration = vscode.workspace.getConfiguration('asm-code-lens');
+		const configuration = vscode.workspace.getConfiguration('asm-code-lens', null);
 		let hexPrefix = configuration.get<string>('hexCalculator.hexPrefix');
 		// Add to initialization
 		mainHtml = mainHtml.replace('//${init}', `
