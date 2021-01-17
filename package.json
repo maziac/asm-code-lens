@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.6.4",
+    "version": "1.6.5",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -42,7 +42,9 @@
                 {
                     "type": "webview",
                     "id": "asm-code-lens.calcview-explorer",
-                    "name": "HexaDecimal Calculator",
+                    "name": "Hexadecimal Calculator",
+                    "icon": "assets/hexcalc_icon.svg",
+                    "contextualTitle": "Hex Calculator",
                     "when": "config.asm-code-lens.hexCalculator.showInExplorer"
                 }
             ],
@@ -50,7 +52,9 @@
                 {
                     "type": "webview",
                     "id": "asm-code-lens.calcview-debug",
-                    "name": "HexaDecimal Calculator",
+                    "name": "Hexadecimal Calculator",
+                    "icon": "assets/hexcalc_icon.svg",
+                    "contextualTitle": "Hex Calculator",
                     "when": "config.asm-code-lens.hexCalculator.showInDebug"
                 }
             ]
