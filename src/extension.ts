@@ -92,13 +92,6 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
             }
         }
     }
-    if(event) {
-        if(event.affectsConfiguration('asm-code-lens.comments.lineCommentPrefix')) {
-            const commentPrefix = settings.get<string>("comments.lineCommentPrefix");
-            
-            vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: commentPrefix}});
-        }
-    }
 
     // Set search paths.
     setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
@@ -214,6 +207,12 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
             regDocumentSymbolProvider.dispose();
             regDocumentSymbolProvider=undefined;
         }
+    }
+
+    // Comment configuration
+    if(settings.comments.lineCommentPrefix) {
+        const commentPrefix = settings.get<string>("comments.lineCommentPrefix");
+        vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: commentPrefix}});
     }
 }
 

@@ -136,6 +136,12 @@
                     "type": "boolean",
                     "scope": "resource",
                     "default": false
+                },
+                "asm-code-lens.comments.lineCommentPrefix": {
+                    "description": "Configure what prefix you want for line comments",
+                    "type": "string",
+                    "scope": "resource",
+                    "default": ";"
                 }
             }
         },
