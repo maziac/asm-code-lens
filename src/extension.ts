@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 /**
  * Reads the confguration.
  */
-function configure(context: vscode.ExtensionContext, event?) {
+function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
     const settings = vscode.workspace.getConfiguration('asm-code-lens', null);
 
     // Check for the hex calculator params
@@ -90,6 +90,13 @@ function configure(context: vscode.ExtensionContext, event?) {
                 regRenameProvider.dispose();
                 regRenameProvider = undefined;
             }
+        }
+    }
+    if(event) {
+        if(event.affectsConfiguration('asm-code-lens.comments.lineCommentPrefix')) {
+            const commentPrefix = settings.get<string>("comments.lineCommentPrefix");
+            
+            vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: commentPrefix}});
         }
     }
 
