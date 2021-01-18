@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.6.6
+- Added support for changing the line comment prefix to use with VS Code keybindings: Toggle/Add Line Comment. (asm-code-lens.comments.lineCommentPrefix)
+
 # 1.6.5
 - Icon for hex calculator added.
 - Hex calculator added to test pane.
