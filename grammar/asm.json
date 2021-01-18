@@ -52,6 +52,11 @@
 					"name": "comment.line_slash.asm",
 					"begin": "//",
 					"end": "\\n"
+				},
+				{
+					"name": "comment.line_hashtag.asm",
+					"begin": "#",
+					"end": "\\n"
 				}
 			]
 		},
