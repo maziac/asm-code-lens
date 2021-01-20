@@ -137,8 +137,8 @@
                     "scope": "resource",
                     "default": false
                 },
-                "asm-code-lens.comments.lineCommentPrefix": {
-                    "description": "Configure what prefix you want for line comments",
+                "asm-code-lens.comments.toggleLineCommentPrefix": {
+                    "description": "Configure the prefix used when toggling the line comment.",
                     "type": "string",
                     "scope": "resource",
                     "default": ";"

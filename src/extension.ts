@@ -209,12 +209,11 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         }
     }
 
-    // Comment configuration
-    if(settings.comments.lineCommentPrefix) {
-        const commentPrefix = settings.get<string>("comments.lineCommentPrefix");
-        vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: commentPrefix}});
-    }
+    // Toggle line Comment configuration
+    const toggleCommentPrefix = settings.get<string>("comments.toggleLineCommentPrefix") || ';';
+    vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: toggleCommentPrefix}});
 }
+
 
 let hexCalcExplorerProvider;
 let hexCalcDebugProvider;
