@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.6.5",
+    "version": "1.6.6",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -136,6 +136,12 @@
                     "type": "boolean",
                     "scope": "resource",
                     "default": false
+                },
+                "asm-code-lens.comments.lineCommentPrefix": {
+                    "description": "Configure what prefix you want for line comments",
+                    "type": "string",
+                    "scope": "resource",
+                    "default": ";"
                 }
             }
         },
