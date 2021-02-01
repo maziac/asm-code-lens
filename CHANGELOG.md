@@ -1,6 +1,6 @@
 # Changelog
 
-# 1.6.5
+# 1.7.0
 - Icon for hex calculator added.
 - PR from chrijbel: Added support for changing the line comment prefix to use with VS Code keybindings: Toggle/Add Line Comment.
 
