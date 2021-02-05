@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.7.1
+- Solved issue #54: Using "# " as comment instead of "#".
+
 # 1.7.0
 - Icon for hex calculator added.
 - PR from chrijbel: Added support for changing the line comment prefix to use with VS Code keybindings: Toggle/Add Line Comment.

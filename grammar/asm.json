@@ -55,7 +55,7 @@
 				},
 				{
 					"name": "comment.line_hashtag.asm",
-					"begin": "#",
+					"begin": "#\\s",
 					"end": "\\n"
 				}
 			]
