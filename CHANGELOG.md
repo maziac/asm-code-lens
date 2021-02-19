@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.7.2
+- Internal refactoring.
+
 # 1.7.1
 - Solved issue #54: Using "# " as comment instead of "#".
 

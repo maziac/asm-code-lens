@@ -41,7 +41,7 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 			return;
 
 		// Add the html styles etc.
-		const extPath = PackageInfo.extensionPath;
+		const extPath = PackageInfo.extension.extensionPath;
 		const mainHtmlFile = path.join(extPath, 'html/hexcalc.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
 		// Exchange local path
@@ -81,7 +81,7 @@ let hexPrefix = "${hexPrefix}";`
 		const vscodePanel = vscode.window.createWebviewPanel('', '', {preserveFocus: true, viewColumn: vscode.ViewColumn.Nine});
 		vscodePanel.title = 'Donate...';
 		// Read the file
-		const extPath = PackageInfo.extensionPath;
+		const extPath = PackageInfo.extension.extensionPath;
 		const htmlFile = path.join(extPath, 'html/donate.html');
 		let html = readFileSync(htmlFile).toString();
 		// Exchange local path
@@ -95,9 +95,9 @@ let hexPrefix = "${hexPrefix}";`
 			switch (message.command) {
 				case 'showExtension':
 					// Switch to Extension Manager
-					vscode.commands.executeCommand("workbench.extensions.search", PackageInfo.publisher)
+					vscode.commands.executeCommand("workbench.extensions.search", PackageInfo.extension.packageJSON.publisher)
 					// And select the given extension
-					const extensionName = PackageInfo.publisher + '.' + message.data;
+					const extensionName = PackageInfo.extension.packageJSON.publisher + '.' + message.data;
 					vscode.commands.executeCommand("extension.open", extensionName);
 					break;
 			}

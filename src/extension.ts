@@ -11,11 +11,15 @@ import {setGrepGlobPatterns} from './grep';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
+import {GlobalStorage} from './globalstorage';
 
 export function activate(context: vscode.ExtensionContext) {
 
-    // Save the extension path
-    PackageInfo.setExtensionPath(context.extensionPath);
+    // Init package info
+    PackageInfo.Init(context);
+
+    // Init global storage
+    GlobalStorage.Init(context);
 
     // Check version and show 'What's new' if necessary.
     const mjrMnrChanged = WhatsNewView.updateVersion(context);
