@@ -137,8 +137,9 @@ export function regexStructForWord(searchWord: string): RegExp {
  *  1 = preceding characters before 'searchWord'.
  * Used by DefinitionProvider, HoverProvider.
  */
-export function regexCA65DirectiveForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s*\\.(struct|enum|proc|scope|macro|define)\\s+)' + searchWord + '\\b', 'i');
+export function regexCA65DirectiveForWord(searchWord: string, partialWord: boolean = false): RegExp {
+    const end = partialWord ? "[\\w\\.]*\\b" : "\\b";
+    return new RegExp(`^(\\s*\\.(struct|enum|proc|scope|macro|define)\\s+)${searchWord}${end}`, 'i');
 }
 
 /**

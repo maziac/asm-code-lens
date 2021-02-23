@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
 //import { CodeLensProvider } from './CodeLensProvider';
 //import { stringify } from 'querystring';
-import { regexPrepareFuzzy } from './regexes';
+import { regexCA65DirectiveForWord, regexPrepareFuzzy } from './regexes';
 import { regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
 
 
@@ -142,9 +142,11 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             const searchsJasmModule = regexEveryModuleForWord(searchWord);
             // Find all sjasmplus MACROs in the document
             const searchsJasmMacro = regexEveryMacroForWord(searchWord);
+            // Find all CA65 directives in the document
+            const searchCA65 = regexCA65DirectiveForWord(searchWord, true);
 
 
-            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro])
+            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchCA65])
             //grepMultiple([searchNormal])
             .then(locations => {
                 // Reduce the found locations.
