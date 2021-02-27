@@ -4,6 +4,7 @@ import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocal
 //import { stringify } from 'querystring';
 import { regexCA65DirectiveForWord, regexPrepareFuzzy } from './regexes';
 import { regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
+import {PackageInfo} from './whatsnew/packageinfo';
 
 
 /// All additional completions like Z80 instructions and assembler
@@ -82,7 +83,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 		token: vscode.CancellationToken
 	): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
         // Get required length
-        const settings = vscode.workspace.getConfiguration('asm-code-lens', null);
+        const settings = PackageInfo.getConfiguration();
         let requiredLen = settings.completionsRequiredLength;
         if(requiredLen == undefined || requiredLen < 1)
             requiredLen = 1;
@@ -141,12 +142,19 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             // Find all sjasmplus MODULEs in the document
             const searchsJasmModule = regexEveryModuleForWord(searchWord);
             // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = regexEveryMacroForWord(searchWord);
-            // Find all CA65 directives in the document
-            const searchCA65 = regexCA65DirectiveForWord(searchWord, true);
+             const searchsJasmMacro = regexEveryMacroForWord(searchWord);
 
+             // Put all searches in one array
+             const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
 
-            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchCA65])
+             // Find all CA65 directives in the document
+             const settings = PackageInfo.getConfiguration();
+             if (settings.enableCA65) {
+                 const searchCA65 = regexCA65DirectiveForWord(searchWord, true);
+                 searchRegexes.push(searchCA65);
+             }
+
+             grepMultiple(searchRegexes)
             //grepMultiple([searchNormal])
             .then(locations => {
                 // Reduce the found locations.

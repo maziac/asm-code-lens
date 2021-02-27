@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel } from './grep';
 import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexCA65DirectiveForWord } from './regexes';
 import * as fs from 'fs';
+import {PackageInfo} from './whatsnew/packageinfo';
 //import * as path from 'path';
 
 
@@ -50,10 +51,18 @@ export class HoverProvider implements vscode.HoverProvider {
             const searchsJasmModule = regexModuleForWord(searchWord);
             // Find all sjasmplus MACROs in the document
             const searchsJasmMacro = regexMacroForWord(searchWord);
-            // Find all CA65 directives in the document
-            const searchCA65 = regexCA65DirectiveForWord(searchWord);
 
-            grepMultiple([searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro, searchCA65])
+            // Put all searches in one array
+            const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
+
+            // Find all CA65 directives in the document
+            const settings = PackageInfo.getConfiguration();
+            if (settings.enableCA65) {
+                const searchCA65 = regexCA65DirectiveForWord(searchWord);
+                searchRegexes.push(searchCA65);
+            }
+
+            grepMultiple(searchRegexes)
 //            grepMultiple([searchSjasmLabel])
             .then(locations => {
                 // Reduce the found locations.
