@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.7.2",
+    "version": "1.8.0",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -26,7 +26,7 @@
     },
     "engines": {
         "vscode": "^1.52.0",
-        "node": "^7.9.0"
+        "node": "^14.15.4"
     },
     "icon": "assets/icon.png",
     "categories": [
@@ -142,6 +142,12 @@
                     "type": "string",
                     "scope": "resource",
                     "default": ";"
+                },
+                "asm-code-lens.enableCA65": {
+                    "description": "Enable support for special CA65-assembler syntax.",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": false
                 }
             }
         },
