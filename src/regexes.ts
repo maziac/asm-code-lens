@@ -131,6 +131,16 @@ export function regexStructForWord(searchWord: string): RegExp {
 }
 
 
+/**
+ * Searches for a CA65-style directive that contains the given word.
+ * Capture groups:
+ *  1 = preceding characters before 'searchWord'.
+ * Used by DefinitionProvider, HoverProvider.
+ */
+export function regexCA65DirectiveForWord(searchWord: string, partialWord: boolean = false): RegExp {
+    const end = partialWord ? "[\\w\\.]*\\b" : "\\b";
+    return new RegExp(`^(\\s*\\.(struct|enum|proc|scope|macro|define)\\s+)${searchWord}${end}`, 'i');
+}
 
 /**
  * Searches any reference for a given word (label).

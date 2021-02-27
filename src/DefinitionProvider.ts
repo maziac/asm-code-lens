@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
 //import { resolve } from 'path';
-import { regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord } from './regexes';
+import { regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord, regexCA65DirectiveForWord } from './regexes';
 
 
 
@@ -75,8 +75,10 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             const searchSjasmMacro = regexMacroForWord(searchWord);
             // Find all sjasmplus STRUCTs in the document
             const searchSjasmStruct = regexStructForWord(searchWord);
+            // Find all CA65 directives in the document
+            const searchCA65 = regexCA65DirectiveForWord(searchWord);
 
-            grepMultiple([searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct])
+            grepMultiple([searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct, searchCA65])
             //grepMultiple([searchSjasmMacro])
             .then(locations => {
                 reduceLocations(locations, document.fileName, position)
