@@ -240,18 +240,17 @@ export async function grep(regex: RegExp, rootFolder: string = ""): Promise<Grep
  * terminated by a ':' and for labels that start on 1rst column.
  * Simply calls 'grep' multiple times.
  * @param regexes Array of regexes.
+ * @param rootfolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
  * @return An array with all regex search results.
  */
-export async function grepMultiple(regexes: RegExp[]): Promise<GrepLocation[]> {
+export async function grepMultiple(regexes: RegExp[], rootFolder: string = ""): Promise<GrepLocation[]> { // TODO: remove default rootfolder
     let allLocations: Array<GrepLocation> = [];
 
     // grep all regex
     for(const regex of regexes) {
-        await grep(regex)
-        .then(locations => {
-            // Add found locations
-            allLocations.push(...locations);
-        });
+        const locations = await grep(regex, rootFolder);
+        // Add found locations
+        allLocations.push(...locations);
     }
 
     // Remove double entries

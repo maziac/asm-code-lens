@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { grepMultiple, reduceLocations } from './grep';
 //import { resolve } from 'path';
 import {regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord} from './regexes';
@@ -10,6 +11,19 @@ import {regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, reg
  * Called from vscode e.g. for "Goto definition".
  */
 export class DefinitionProvider implements vscode.DefinitionProvider {
+    protected rootFolder: string;   // The root folder of the project.
+
+
+    /**
+     * Constructor.
+     * @param rootFolder Stores the root folder for multiroot projects.
+     */
+    constructor(rootFolder: string) {
+        // Store
+        this.rootFolder = rootFolder + path.sep;
+    }
+
+
     /**
      * Called from vscode if the used selects "Goto definition".
      * @param document The current document.
@@ -17,17 +31,21 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @param options
      * @param token
      */
-    public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
+    public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Location[]> {
+        // First check for right path
+        const docPath = document.uri.fsPath;
+        if (docPath.indexOf(this.rootFolder) < 0)
+            return []; // Path is wrong.
         // Check for 'include "..."'
         const lineContents = document.lineAt(position.line).text;
         const match = regexInclude().exec(lineContents);
-        if(match) {
+        if (match) {
             // INCLUDE found
-            return this.getInclude(match[1]);
+            return await this.getInclude(match[1]);
         }
         else {
             // Normal definition
-            return this.search(document, position);
+            return await this.search(document, position);
         }
     }
 
@@ -38,20 +56,16 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @returns A promise to an array with locations. Normally there is only one entry to the array.
      * Points to the first line of the file.
      */
-    protected getInclude(relPath: string): Thenable<vscode.Location[]> {
-        return new Promise<vscode.Location[]>((resolve, reject) => {
-            vscode.workspace.findFiles('**/'+relPath, null)
-            .then(uris => {
-                const locations: vscode.Location[] = [];
-                const pos = new vscode.Position(0, 0);
-                const range = new vscode.Range(pos, pos);
-                for(const uri of uris) {
-                    const loc = new vscode.Location(uri, range);
-                    locations.push(loc);
-                }
-                resolve(locations);
-            });
-        });
+    protected async getInclude(relPath: string): Promise<vscode.Location[]> {
+        const uris = await vscode.workspace.findFiles(this.rootFolder + '**/' + relPath, null);
+        const locations: vscode.Location[] = [];
+        const pos = new vscode.Position(0, 0);
+        const range = new vscode.Range(pos, pos);
+        for (const uri of uris) {
+            const loc = new vscode.Location(uri, range);
+            locations.push(loc);
+        }
+        return locations;
     }
 
 
@@ -61,36 +75,26 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @param position The word position.
      * @returns A promise to an array with locations. Normally there is only one entry to the array.
      */
-    protected search(document, position): Thenable<vscode.Location[]>
-    {
-        return new Promise<vscode.Location[]>((resolve, reject) => {
-            const searchWord = document.getText(document.getWordRangeAtPosition(position)); //, /[a-z0-9_.]+/i));
-            // Find all "something:" (labels) in the document
-            const searchNormal = regexLabelColonForWord(searchWord);
-            // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
-            // Find all sjasmplus MODULEs in the document
-            const searchSjasmModule = regexModuleForWord(searchWord);
-            // Find all sjasmplus MACROs in the document
-            const searchSjasmMacro = regexMacroForWord(searchWord);
-            // Find all sjasmplus STRUCTs in the document
-            const searchSjasmStruct = regexStructForWord(searchWord);
+    protected async search(document, position): Promise<vscode.Location[]> {
+        const searchWord = document.getText(document.getWordRangeAtPosition(position)); //, /[a-z0-9_.]+/i));
+        // Find all "something:" (labels) in the document
+        const searchNormal = regexLabelColonForWord(searchWord);
+        // Find all sjasmplus labels without ":" in the document
+        const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
+        // Find all sjasmplus MODULEs in the document
+        const searchSjasmModule = regexModuleForWord(searchWord);
+        // Find all sjasmplus MACROs in the document
+        const searchSjasmMacro = regexMacroForWord(searchWord);
+        // Find all sjasmplus STRUCTs in the document
+        const searchSjasmStruct = regexStructForWord(searchWord);
 
-            // Put all searches in one array
-            const searchRegexes = [searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct];
+        // Put all searches in one array
+        const searchRegexes = [searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct];
 
-            grepMultiple(searchRegexes)
-            //grepMultiple([searchSjasmMacro])
-            .then(locations => {
-                reduceLocations(locations, document.fileName, position)
-                .then(reducedLocations => {
-                    // There should be only one location.
-                    // Anyhow return the whole array.
-                    resolve(reducedLocations);
-                });
-            });
-        });
-
+        const locations = await grepMultiple(searchRegexes, this.rootFolder);
+        const reducedLocations = reduceLocations(locations, document.fileName, position);
+        // There should be only one location.
+        // Anyhow return the whole array.
+        return reducedLocations;
     }
-
 }

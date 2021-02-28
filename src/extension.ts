@@ -13,6 +13,7 @@ import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
 
+
 export function activate(context: vscode.ExtensionContext) {
 
     // Init package info
@@ -151,19 +152,20 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         }
     }
 
-    if(settings.enableGotoDefinition) {
-        if(!regDefinitionProvider) {
-            // Register all workspaces
-            regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider());
-            context.subscriptions.push(regDefinitionProvider);
+    if (settings.enableGotoDefinition) {
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider(rootFolder));
+            regDefinitionProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if(regDefinitionProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regDefinitionProvider.dispose();
-            regDefinitionProvider = undefined;
+            regDefinitionProviders.get(rootFolder)!.dispose();
         }
+        regDefinitionProviders.clear();
     }
 
     if (settings.enableFindAllReferences) {
@@ -224,7 +226,7 @@ let hexCalcDebugProvider;
 let regCodeLensProviders = new Map<string, vscode.Disposable>();
 let regHoverProvider;
 let regCompletionProposalsProvider;
-let regDefinitionProvider;
+let regDefinitionProviders = new Map<string, vscode.Disposable>();
 let regReferenceProviders = new Map<string, vscode.Disposable>();
 let regRenameProviders = new Map<string, vscode.Disposable>();
 let regDocumentSymbolProvider;

@@ -1,7 +1,7 @@
 # Changelog
 
-# 1.7.3
-- Refactoring.
+# 1.8.0
+- Multiroot workspaces support.
 
 # 1.7.2
 - Internal refactoring.
