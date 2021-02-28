@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel } from './grep';
-import { regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexCA65DirectiveForWord } from './regexes';
+import {regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord} from './regexes';
 import * as fs from 'fs';
-import {PackageInfo} from './whatsnew/packageinfo';
-//import * as path from 'path';
 
 
 /**
@@ -54,13 +52,6 @@ export class HoverProvider implements vscode.HoverProvider {
 
             // Put all searches in one array
             const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
-
-            // Find all CA65 directives in the document
-            const settings = PackageInfo.getConfiguration();
-            if (settings.enableCA65) {
-                const searchCA65 = regexCA65DirectiveForWord(searchWord);
-                searchRegexes.push(searchCA65);
-            }
 
             grepMultiple(searchRegexes)
 //            grepMultiple([searchSjasmLabel])

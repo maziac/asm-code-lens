@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
 //import { resolve } from 'path';
-import { regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord, regexCA65DirectiveForWord } from './regexes';
-import {PackageInfo} from './whatsnew/packageinfo';
+import {regexInclude, regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord, regexStructForWord} from './regexes';
 
 
 
@@ -79,13 +78,6 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
 
             // Put all searches in one array
             const searchRegexes = [searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct];
-
-            // Find all CA65 directives in the document
-            const settings = PackageInfo.getConfiguration();
-            if (settings.enableCA65) {
-                const searchCA65 = regexCA65DirectiveForWord(searchWord);
-                searchRegexes.push(searchCA65);
-            }
 
             grepMultiple(searchRegexes)
             //grepMultiple([searchSjasmMacro])

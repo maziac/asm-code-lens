@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
 //import { CodeLensProvider } from './CodeLensProvider';
 //import { stringify } from 'querystring';
-import { regexCA65DirectiveForWord, regexPrepareFuzzy } from './regexes';
+import { regexPrepareFuzzy } from './regexes';
 import { regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
@@ -146,13 +146,6 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 
              // Put all searches in one array
              const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
-
-             // Find all CA65 directives in the document
-             const settings = PackageInfo.getConfiguration();
-             if (settings.enableCA65) {
-                 const searchCA65 = regexCA65DirectiveForWord(searchWord, true);
-                 searchRegexes.push(searchCA65);
-             }
 
              grepMultiple(searchRegexes)
             //grepMultiple([searchNormal])

@@ -1,7 +1,7 @@
 # Changelog
 
-# 1.8.0
-- Support for CA65-assembler syntax thanks to mwpenny (you need to set "enableCA65" in the settings).
+# 1.7.3
+- Refactoring.
 
 # 1.7.2
 - Internal refactoring.
