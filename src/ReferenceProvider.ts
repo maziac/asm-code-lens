@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { grep, reduceLocations } from './grep';
 import { regexAnyReferenceForWord } from './regexes';
 
@@ -7,38 +8,49 @@ import { regexAnyReferenceForWord } from './regexes';
 /**
  * ReferenceProvider for assembly language.
  */
-export class ReferenceProvider implements vscode.ReferenceProvider { 
+export class ReferenceProvider implements vscode.ReferenceProvider {
+    protected rootFolder: string;   // The root folder of the project.
+
+
+    /**
+     * Constructor.
+     * @param rootFolder Stores the root folder for multiroot projects.
+     */
+    constructor(rootFolder: string) {
+        // Store
+        this.rootFolder = rootFolder + path.sep;
+    }
+
+
     /**
      * Called from vscode if the user selects "Find all references".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
-     * @param options 
-     * @param token 
+     * @param options
+     * @param token
      */
-    public provideReferences(document: vscode.TextDocument, position: vscode.Position, options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Thenable<vscode.Location[]> {
-        return this.search(document, position);
-        }
+    public async provideReferences(document: vscode.TextDocument, position: vscode.Position, options: {includeDeclaration: boolean}, token: vscode.CancellationToken): Promise<vscode.Location[]> {
+        // First check for right path
+        const docPath = document.uri.fsPath;
+        if (docPath.indexOf(this.rootFolder) < 0)
+                return [];   // Skip because path belongs to different project
+        // Path is from right project -> search
+        return await this.search(document, position);
+    }
 
-    
+
     /**
      * Does a search for a word. I.e. finds all references of the word.
      * @param document The document that contains the word.
      * @param position The word position.
      */
-    protected search(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.Location[]>
-    {
-        return new Promise<vscode.Location[]>((resolve, reject) => {
-            const searchWord = document.getText(document.getWordRangeAtPosition(position));
-            const searchRegex = regexAnyReferenceForWord(searchWord);
+    protected async search(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Location[]> {
+        const searchWord = document.getText(document.getWordRangeAtPosition(position));
+        const searchRegex = regexAnyReferenceForWord(searchWord);
 
-            grep(searchRegex)
-            .then(locations => {
-                reduceLocations(locations, document.fileName, position)
-                .then(reducedLocations => {
-                    return resolve(reducedLocations);
-                });
-            });
-        });
+        const locations = await grep(searchRegex, this.rootFolder);
+        const reducedLocations = await reduceLocations(locations, document.fileName, position)
+        return reducedLocations;
     }
 
 }

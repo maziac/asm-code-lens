@@ -62,6 +62,9 @@ export function activate(context: vscode.ExtensionContext) {
 function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
     const settings = PackageInfo.getConfiguration();
 
+    // Get all workspace folders
+    const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath);
+
     // Check for the hex calculator params
     if (event) {
         if (event.affectsConfiguration('asm-code-lens.hexCalculator.hexPrefix')
@@ -79,21 +82,16 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         if(event.affectsConfiguration('asm-code-lens.includeFiles')
             || event.affectsConfiguration('asm-code-lens.excludeFiles')) {
             // Restart provider if running:
-            if(regCodeLensProvider) {
+            // CodeLens
+            for (const rootFolder of wsFolders) {
                 // Deregister
-                regCodeLensProvider.dispose();
-                regCodeLensProvider = undefined;
+                regCodeLensProviders.get(rootFolder)!.dispose();
+                regReferenceProviders.get(rootFolder)!.dispose();
+                regRenameProviders.get(rootFolder)!.dispose();
             }
-            if(regReferenceProvider) {
-                // Deregister
-                regReferenceProvider.dispose();
-                regReferenceProvider = undefined;
-            }
-            if(regRenameProvider) {
-                // Deregister
-                regRenameProvider.dispose();
-                regRenameProvider = undefined;
-            }
+            regCodeLensProviders.clear();
+            regReferenceProviders.clear();
+            regRenameProviders.clear();
         }
     }
 
@@ -107,18 +105,19 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
     // Code Lenses
     if(settings.enableCodeLenses) {
-        if(!regCodeLensProvider) {
-            // Register
-            regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider());
-            context.subscriptions.push(regCodeLensProvider);
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(rootFolder));
+            regCodeLensProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if(regCodeLensProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regCodeLensProvider.dispose();
-            regCodeLensProvider = undefined;
+            regCodeLensProviders.get(rootFolder)!.dispose();
         }
+        regCodeLensProviders.clear();
     }
 
     if(settings.enableHovering) {
@@ -154,7 +153,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
     if(settings.enableGotoDefinition) {
         if(!regDefinitionProvider) {
-            // Register
+            // Register all workspaces
             regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider());
             context.subscriptions.push(regDefinitionProvider);
         }
@@ -167,35 +166,36 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         }
     }
 
-    if(settings.enableFindAllReferences) {
-        if(!regReferenceProvider) {
-            // Register
-            //vscode.languages.registerReferenceProvider(ASM_LANGUAGE, new ReferenceProvider())
-            regReferenceProvider = vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider());
-            context.subscriptions.push(regReferenceProvider);
+    if (settings.enableFindAllReferences) {
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider(rootFolder));
+            regReferenceProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if(regReferenceProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regReferenceProvider.dispose();
-            regReferenceProvider = undefined;
+            regReferenceProviders.get(rootFolder)!.dispose();
         }
+        regReferenceProviders.clear();
     }
 
     if (settings.enableRenaming) {
-        if (!regRenameProvider) {
-            // Register
-            regRenameProvider=vscode.languages.registerRenameProvider(asmFiles, new RenameProvider());
-            context.subscriptions.push(regRenameProvider);
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerRenameProvider(asmFiles, new RenameProvider(rootFolder));
+            regRenameProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if (regRenameProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regRenameProvider.dispose();
-            regRenameProvider=undefined;
+            regRenameProviders.get(rootFolder)!.dispose();
         }
+        regRenameProviders.clear();
     }
 
     if (settings.enableOutlineView) {
@@ -221,12 +221,12 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
 let hexCalcExplorerProvider;
 let hexCalcDebugProvider;
-let regCodeLensProvider;
+let regCodeLensProviders = new Map<string, vscode.Disposable>();
 let regHoverProvider;
 let regCompletionProposalsProvider;
 let regDefinitionProvider;
-let regReferenceProvider;
-let regRenameProvider;
+let regReferenceProviders = new Map<string, vscode.Disposable>();
+let regRenameProviders = new Map<string, vscode.Disposable>();
 let regDocumentSymbolProvider;
 
 

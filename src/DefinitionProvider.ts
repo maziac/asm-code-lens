@@ -33,7 +33,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
 
 
     /**
-     * Searches the files that math the 'relPath' path.
+     * Searches the files that match the 'relPath' path.
      * @param relPath E.g. 'util/zxspectrum.inc'
      * @returns A promise to an array with locations. Normally there is only one entry to the array.
      * Points to the first line of the file.

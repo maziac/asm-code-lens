@@ -109,10 +109,11 @@ export let grepGlobExclude;
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
- * @param regex The regular expression to search for,
+ * @param regex The regular expression to search for.
+ * @param rootfolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(regex: RegExp): Promise<GrepLocation[]> {
+export async function grep(regex: RegExp, rootFolder: string = ""): Promise<GrepLocation[]> { // TODO: Remove default rootfolder
     const readQueue = new PQueue();
     //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
@@ -126,6 +127,8 @@ export async function grep(regex: RegExp): Promise<GrepLocation[]> {
             for(const uri of uris) {
                 // get fileName
                 const fileName = uri.fsPath;
+                if (fileName.indexOf(rootFolder) < 0)
+                    continue;   // Skip because path belongs to different project
 
                 await readQueue.add(async () => {
                     const filePath = fileName;

@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { grep, grepTextDocumentMultiple, reduceLocations } from './grep';
 import { regexLabelColon, regexLabelWithoutColon, regexAnyReferenceForWord } from './regexes';
-//import * as fs from 'fs';
-//import * as path from 'path';
-//import { ReferenceProvider } from './ReferenceProvider';
 
 
 /**
@@ -32,6 +30,18 @@ class AsmCodeLens extends vscode.CodeLens {
  * CodeLensProvider for assembly language.
  */
 export class CodeLensProvider implements vscode.CodeLensProvider {
+    protected rootFolder: string;   // The root folder of the project.
+
+
+    /**
+     * Constructor.
+     * @param rootFolder Stores the root folder for multiroot projects.
+     */
+    constructor(rootFolder: string) {
+        // Store
+        this.rootFolder = rootFolder + path.sep;
+    }
+
 
     /**
      * Called from vscode to provide the code lenses.
@@ -41,28 +51,29 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param document The document to check.
      * @param token
      */
-    public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.CodeLens[]> { // oder Promise<CodeLens[]>
+    public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
+        const codeLenses = new Array<vscode.CodeLens>();
+        // First check for right path
+        const docPath = document.uri.fsPath;
+        if (docPath.indexOf(this.rootFolder) >= 0) {
+            // Path is right.
 
-        return new Promise<vscode.CodeLens[]>((resolve, reject) => {
             // Find all "some.thing:" (labels) in the document
             const searchRegex = regexLabelColon();
             // Find all sjasmplus labels without ":" in the document
             const searchRegex2 = regexLabelWithoutColon();
             const matches = grepTextDocumentMultiple(document, [searchRegex, searchRegex2]);
-            //const matches = grepTextDocumentMultiple(document, [searchRegex2]);
-            // Loop all matches and create code lenses
-            const codeLenses = new Array<vscode.CodeLens>();
-
-            for(const fmatch of matches) {
+             // Loop all matches and create code lenses
+            for (const fmatch of matches) {
                 // Create codeLens
                 const lineNr = fmatch.line;
                 const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
                 let colEnd = fmatch.end;
                 const lineContents = document.lineAt(lineNr).text;
-                let matchedText = lineContents.substr(colStart, colEnd-colStart);
-                if(matchedText.endsWith(':')) {
-                    colEnd --;
-                    matchedText = matchedText.substr(0, matchedText.length-1);
+                let matchedText = lineContents.substr(colStart, colEnd - colStart);
+                if (matchedText.endsWith(':')) {
+                    colEnd--;
+                    matchedText = matchedText.substr(0, matchedText.length - 1);
                 }
                 const trimmedMatchedText = matchedText.trim();
                 const startPos = new vscode.Position(lineNr, colStart);
@@ -72,9 +83,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 // Store
                 codeLenses.push(codeLense);
             }
+        }
 
-            return resolve(codeLenses);
-        });
+        return codeLenses;
     }
 
 
@@ -85,41 +96,34 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param codeLens An AsmCodeLens object which also includes the symbol and the document.
      * @param token
      */
-    public resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Thenable<vscode.CodeLens> {
-        return new Promise<vscode.CodeLens>((resolve, reject) => {
-            // search the references
-            const searchWord = codeLens.symbol;
-            const searchRegex = regexAnyReferenceForWord(searchWord);
+    public async resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Promise<vscode.CodeLens> {
+        // Search the references
+        const searchWord = codeLens.symbol;
+        const searchRegex = regexAnyReferenceForWord(searchWord);
 
-            const doc = codeLens.document;
-            const pos = codeLens.range.start;
-            //const line = pos.line;
+        const doc = codeLens.document;
+        const pos = codeLens.range.start;
+        //const line = pos.line;
 
-            grep(searchRegex)
-            .then(locations => {
-                // Remove any locations because of module information (dot notation)
-                reduceLocations(locations, doc.fileName, pos)
-                .then(reducedLocations => {
-                    // create title
-                    const count = reducedLocations.length;
-                    let title = count + ' reference';
-                    if(count != 1)
-                        title += 's';
-                    // Add command to show the references (like in "find all references")
-                    codeLens.command = {
-                        title: title,
-                        command: 'editor.action.showReferences',
-                        arguments: [
-                            doc.uri, // uri
-                            pos, // position
-                            reducedLocations //reference locations
-                        ]
-                    };
-                    return resolve(codeLens);
-                });
-            });
-
-        });
+        const locations = await grep(searchRegex, this.rootFolder);
+        // Remove any locations because of module information (dot notation)
+        const reducedLocations = await reduceLocations(locations, doc.fileName, pos)
+        // create title
+        const count = reducedLocations.length;
+        let title = count + ' reference';
+        if (count != 1)
+            title += 's';
+        // Add command to show the references (like in "find all references")
+        codeLens.command = {
+            title: title,
+            command: 'editor.action.showReferences',
+            arguments: [
+                doc.uri, // uri
+                pos, // position
+                reducedLocations //reference locations
+            ]
+        };
+        return codeLens;
     }
 
 }
