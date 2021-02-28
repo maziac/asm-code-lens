@@ -121,19 +121,20 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         regCodeLensProviders.clear();
     }
 
-    if(settings.enableHovering) {
-        if(!regHoverProvider) {
-            // Register
-            regHoverProvider = vscode.languages.registerHoverProvider(asmFiles, new HoverProvider());
-            context.subscriptions.push(regHoverProvider);
+    if (settings.enableHovering) {
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerHoverProvider(asmFiles, new HoverProvider(rootFolder));
+            regHoverProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if(regHoverProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regHoverProvider.dispose();
-            regHoverProvider = undefined;
+            regHoverProviders.get(rootFolder)!.dispose();
         }
+        regHoverProviders.clear();
     }
 
     if(settings.enableCompletions) {
@@ -224,7 +225,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 let hexCalcExplorerProvider;
 let hexCalcDebugProvider;
 let regCodeLensProviders = new Map<string, vscode.Disposable>();
-let regHoverProvider;
+let regHoverProviders = new Map<string, vscode.Disposable>();
 let regCompletionProposalsProvider;
 let regDefinitionProviders = new Map<string, vscode.Disposable>();
 let regReferenceProviders = new Map<string, vscode.Disposable>();

@@ -92,7 +92,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         const searchRegexes = [searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro, searchSjasmStruct];
 
         const locations = await grepMultiple(searchRegexes, this.rootFolder);
-        const reducedLocations = reduceLocations(locations, document.fileName, position);
+        const reducedLocations = await reduceLocations(locations, document.fileName, position);
         // There should be only one location.
         // Anyhow return the whole array.
         return reducedLocations;
