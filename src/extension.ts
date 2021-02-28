@@ -202,18 +202,19 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     }
 
     if (settings.enableOutlineView) {
-        if (!regDocumentSymbolProvider) {
-            // Register
-            regDocumentSymbolProvider=vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider());
-            context.subscriptions.push(regDocumentSymbolProvider);
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider(rootFolder));
+            regDocumentSymbolProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if (regDocumentSymbolProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regDocumentSymbolProvider.dispose();
-            regDocumentSymbolProvider=undefined;
+            regDocumentSymbolProviders.get(rootFolder)!.dispose();
         }
+        regDocumentSymbolProviders.clear();
     }
 
     // Toggle line Comment configuration
@@ -230,7 +231,7 @@ let regCompletionProposalsProviders = new Map<string, vscode.Disposable>();
 let regDefinitionProviders = new Map<string, vscode.Disposable>();
 let regReferenceProviders = new Map<string, vscode.Disposable>();
 let regRenameProviders = new Map<string, vscode.Disposable>();
-let regDocumentSymbolProvider;
+let regDocumentSymbolProviders = new Map<string, vscode.Disposable>();
 
 
 
