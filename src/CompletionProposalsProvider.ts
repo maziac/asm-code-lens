@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
 //import { CodeLensProvider } from './CodeLensProvider';
 //import { stringify } from 'querystring';
@@ -71,35 +72,49 @@ const completions = [
  * CompletionItemProvider for assembly language.
  */
 export class CompletionProposalsProvider implements vscode.CompletionItemProvider {
+    protected rootFolder: string;   // The root folder of the project.
+
+
+    /**
+     * Constructor.
+     * @param rootFolder Stores the root folder for multiroot projects.
+     */
+    constructor(rootFolder: string) {
+        // Store
+        this.rootFolder = rootFolder + path.sep;
+    }
+
+
     /**
      * Called from vscode if the user selects "Find all references".
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
      * @param token
      */
-    public provideCompletionItems(
-		document: vscode.TextDocument,
-		position: vscode.Position,
-		token: vscode.CancellationToken
-	): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
+    public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList>> {
+        // First check for right path
+        const docPath = document.uri.fsPath;
+        if (docPath.indexOf(this.rootFolder) < 0)
+            return undefined as any; // Path is wrong.
+
         // Get required length
         const settings = PackageInfo.getConfiguration();
         let requiredLen = settings.completionsRequiredLength;
-        if(requiredLen == undefined || requiredLen < 1)
+        if (requiredLen == undefined || requiredLen < 1)
             requiredLen = 1;
 
         const line = document.lineAt(position).text;
         const {label} = getCompleteLabel(line, position.character);
         //console.log('provideCompletionItems:', label);
         let len = label.length;
-        if(label.startsWith('.'))
-            len --; // Require one more character for local labels.
-        if(len < requiredLen)
+        if (label.startsWith('.'))
+            len--; // Require one more character for local labels.
+        if (len < requiredLen)
             return new vscode.CompletionList([new vscode.CompletionItem(' ')], false);  // A space is required, otherwise vscode will not ask again for completion items.
 
         // Search proposals
         return this.propose(document, position);
-     }
+    }
 
 
     /**
@@ -107,134 +122,126 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
      * @param document The document that contains the word.
      * @param position The word position.
      */
-    protected propose(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.CompletionList>
-    {
-         return new Promise<vscode.CompletionList>((resolve, reject) => {
-            // Get all lines
-            const lines = document.getText().split('\n');
-            // Get the module at the line of the searched word.
-            const row = position.line;
-            const moduleLabel = getModule(lines, row);
+    protected async propose(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionList> {
+        // Get all lines
+        const lines = document.getText().split('\n');
+        // Get the module at the line of the searched word.
+        const row = position.line;
+        const moduleLabel = getModule(lines, row);
 
-            // Get the range of the whole input label.
-            // Otherwise vscode takes only the part after the last dot.
-            const lineContents = lines[row];
-            const {label, preString} = getCompleteLabel(lineContents, position.character);
-            const start = preString.length;
-            const end = start + label.length;
-            const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, end));
-            //console.log('Completions for: '+ label);
+        // Get the range of the whole input label.
+        // Otherwise vscode takes only the part after the last dot.
+        const lineContents = lines[row];
+        const {label, preString} = getCompleteLabel(lineContents, position.character);
+        const start = preString.length;
+        const end = start + label.length;
+        const range = new vscode.Range(new vscode.Position(row, start), new vscode.Position(row, end));
+        //console.log('Completions for: '+ label);
 
-            // Get the first non-local label
-            let nonLocalLabel;  // Only used for local labels
-            if(label.startsWith('.')) {
-                nonLocalLabel = getNonLocalLabel(lines, row);
+        // Get the first non-local label
+        let nonLocalLabel;  // Only used for local labels
+        if (label.startsWith('.')) {
+            nonLocalLabel = getNonLocalLabel(lines, row);
+        }
+
+        // Search
+        let searchWord = document.getText(document.getWordRangeAtPosition(position));
+        searchWord = regexPrepareFuzzy(searchWord);
+
+        // Find all "something:" (labels) in the document
+        const searchNormal = regexEveryLabelColonForWord(searchWord);
+        // Find all sjasmplus labels without ":" in the document
+        const searchSjasmLabel = regexEveryLabelWithoutColonForWord(searchWord);
+        // Find all sjasmplus MODULEs in the document
+        const searchsJasmModule = regexEveryModuleForWord(searchWord);
+        // Find all sjasmplus MACROs in the document
+        const searchsJasmMacro = regexEveryMacroForWord(searchWord);
+
+        // Put all searches in one array
+        const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
+
+        const locations = await grepMultiple(searchRegexes, this.rootFolder);
+        // Reduce the found locations.
+        const reducedLocations = await reduceLocations(locations, document.fileName, position, true, false);
+        // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
+        const proposals = new Map<string, vscode.CompletionItem>();
+
+        // Go through all found locations
+        for (const loc of reducedLocations) {
+            const text = loc.moduleLabel;
+            //console.log('');
+            //console.log('Proposal:', text);
+            const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
+            item.filterText = text;
+            item.range = range;
+
+            // Check for local label
+            if (nonLocalLabel) {
+                // A previous non-local label was searched (and found), so label is local.
+                item.filterText = label;
+                // Change insert text
+                let k = moduleLabel.length;
+                if (k > 0)
+                    k++;    // For the dot '.'
+                k += nonLocalLabel.length;
+                let part = text.substr(k);
+                item.insertText = part;
+                // change shown text
+                item.label = part;
+                // And filter text
+                item.filterText = part;
+            }
+            // Maybe make the label local to current module.
+            else if (text.startsWith(moduleLabel + '.')) {
+                // Change insert text
+                const k = moduleLabel.length + 1;
+                let part = text.substr(k);
+                item.insertText = part;
+                // change shown text
+                item.label = '[' + text.substr(0, k) + '] ' + part;
             }
 
-            // Search
-            let searchWord = document.getText(document.getWordRangeAtPosition(position));
-            searchWord = regexPrepareFuzzy(searchWord);
+            proposals.set(item.label as string, item);
+        }
 
-            // Find all "something:" (labels) in the document
-            const searchNormal = regexEveryLabelColonForWord(searchWord);
-            // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = regexEveryLabelWithoutColonForWord(searchWord);
-            // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = regexEveryModuleForWord(searchWord);
-            // Find all sjasmplus MACROs in the document
-             const searchsJasmMacro = regexEveryMacroForWord(searchWord);
-
-             // Put all searches in one array
-             const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
-
-             grepMultiple(searchRegexes)
-            //grepMultiple([searchNormal])
-            .then(locations => {
-                // Reduce the found locations.
-                reduceLocations(locations, document.fileName, position, true, false)
-                .then(reducedLocations => {
-                    // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
-                    const proposals = new Map<string, vscode.CompletionItem>();
-
-                    // Go through all found locations
-                    for(const loc of reducedLocations) {
-                        const text = loc.moduleLabel;
-                        //console.log('');
-                        //console.log('Proposal:', text);
-                        const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
-                        item.filterText = text;
-                        item.range = range;
-
-                        // Check for local label
-                        if(nonLocalLabel) {
-                            // A previous non-local label was searched (and found), so label is local.
-                            item.filterText = label;
-                            // Change insert text
-                            let k=moduleLabel.length;
-                            if (k>0)
-                                k++;    // For the dot '.'
-                            k+=nonLocalLabel.length;
-                            let part = text.substr(k);
-                            item.insertText = part;
-                            // change shown text
-                            item.label = part;
-                            // And filter text
-                            item.filterText = part;
-                        }
-                        // Maybe make the label local to current module.
-                        else if(text.startsWith(moduleLabel+'.')) {
-                            // Change insert text
-                            const k = moduleLabel.length + 1;
-                            let part = text.substr(k);
-                            item.insertText = part;
-                            // change shown text
-                            item.label = '['+text.substr(0,k)+'] '+part;
-                        }
-
-                        proposals.set(item.label as string, item);
-                    }
-
-                    // Create list from map
-                    const propList = Array.from(proposals.values());
+        // Create list from map
+        const propList = Array.from(proposals.values());
 
 
-                    // Check if word includes a dot
-                    let allCompletions;
-                    let k = label.lastIndexOf('.');
-                    if(k < 0) {
-                        // No dot.
-                        // Check if word starts with a capital letter
-                        const upperCase = (label[0] == label[0].toUpperCase());
-                        // Add the instruction proposals
-                        let i = 0;
-                        allCompletions = completions.map(text => {
-                            if(upperCase)
-                                text = text.toUpperCase();
-                            const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
-                            item.sortText = i.toString(); // To make sure they are shown at first.
-                            i ++;
-                            item.range = range;
-                            return item;
-                        });
-                        // Add grepped words
-                        allCompletions.push(...propList);
-                    }
-                    else {
-                        // Simply use grepped list.
-                        allCompletions = propList;
-                    }
-
-                    // Return.
-                    // false: In fact the 'false' means that the list is not incomplete,
-                    // i.e. it is complete. vscode will not call completion
-                    // anymore if not something bigger chances.
-                    // So, in fact only for the first character the completion list
-                    // is build. vscode filters this list on its own.
-                    const completionList = new vscode.CompletionList(allCompletions, false);
-                    resolve(completionList);
-                });
+        // Check if word includes a dot
+        let allCompletions;
+        let k = label.lastIndexOf('.');
+        if (k < 0) {
+            // No dot.
+            // Check if word starts with a capital letter
+            const upperCase = (label[0] == label[0].toUpperCase());
+            // Add the instruction proposals
+            let i = 0;
+            allCompletions = completions.map(text => {
+                if (upperCase)
+                    text = text.toUpperCase();
+                const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);
+                item.sortText = i.toString(); // To make sure they are shown at first.
+                i++;
+                item.range = range;
+                return item;
             });
-        });
+            // Add grepped words
+            allCompletions.push(...propList);
+        }
+        else {
+            // Simply use grepped list.
+            allCompletions = propList;
+        }
+
+        // Return.
+        // false: In fact the 'false' means that the list is not incomplete,
+        // i.e. it is complete. vscode will not call completion
+        // anymore if not something bigger chances.
+        // So, in fact only for the first character the completion list
+        // is build. vscode filters this list on its own.
+        const completionList = new vscode.CompletionList(allCompletions, false);
+        return completionList;
     }
 
 }

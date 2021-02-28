@@ -137,20 +137,20 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         regHoverProviders.clear();
     }
 
-    if(settings.enableCompletions) {
-        if(!regCompletionProposalsProvider) {
-            // Register
-            regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider());
-            context.subscriptions.push(regCompletionProposalsProvider);
-
+    if (settings.enableCompletions) {
+        // Register
+        for (const rootFolder of wsFolders) {
+            const provider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider(rootFolder));
+            regCompletionProposalsProviders.set(rootFolder, provider);
+            context.subscriptions.push(provider);
         }
     }
     else {
-        if(regCompletionProposalsProvider) {
+        for (const rootFolder of wsFolders) {
             // Deregister
-            regCompletionProposalsProvider.dispose();
-            regCompletionProposalsProvider = undefined;
+            regCompletionProposalsProviders.get(rootFolder)!.dispose();
         }
+        regCompletionProposalsProviders.clear();
     }
 
     if (settings.enableGotoDefinition) {
@@ -226,7 +226,7 @@ let hexCalcExplorerProvider;
 let hexCalcDebugProvider;
 let regCodeLensProviders = new Map<string, vscode.Disposable>();
 let regHoverProviders = new Map<string, vscode.Disposable>();
-let regCompletionProposalsProvider;
+let regCompletionProposalsProviders = new Map<string, vscode.Disposable>();
 let regDefinitionProviders = new Map<string, vscode.Disposable>();
 let regReferenceProviders = new Map<string, vscode.Disposable>();
 let regRenameProviders = new Map<string, vscode.Disposable>();
