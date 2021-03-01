@@ -5,6 +5,11 @@ const {default: PQueue} = require('p-queue');
 import { regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct } from './regexes';
 
 
+// Is set on start and whenver the settings change.
+// It holds all prefixes (like ';' and '//') that are used as comment prefixes.
+let commentPrefixes: Array<string>;
+
+
 export interface FileMatch {
     /// The file path of the match:
     filePath: string,
@@ -110,10 +115,10 @@ export let grepGlobExclude;
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
  * @param regex The regular expression to search for.
- * @param rootfolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
+ * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(regex: RegExp, rootFolder: string = ""): Promise<GrepLocation[]> { // TODO: Remove default rootfolder
+export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocation[]> {
     const readQueue = new PQueue();
     //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
@@ -240,10 +245,10 @@ export async function grep(regex: RegExp, rootFolder: string = ""): Promise<Grep
  * terminated by a ':' and for labels that start on 1rst column.
  * Simply calls 'grep' multiple times.
  * @param regexes Array of regexes.
- * @param rootfolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
+ * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
  * @return An array with all regex search results.
  */
-export async function grepMultiple(regexes: RegExp[], rootFolder: string = ""): Promise<GrepLocation[]> { // TODO: remove default rootfolder
+export async function grepMultiple(regexes: RegExp[], rootFolder: string): Promise<GrepLocation[]> {
     let allLocations: Array<GrepLocation> = [];
 
     // grep all regex
@@ -660,7 +665,7 @@ export function getModule(lines: Array<string>, len: number): string {
 export function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
     const regexEnd = /[\w]/;
     // Find end of label.
-    const len = lineContents.length;    // TODO: length of undefined
+    const len = lineContents.length;    // REMARK: This can lead to error: "length of undefined"
     let k: number;
     for(k = startIndex; k<len; k++) {
         const s = lineContents.charAt(k);
@@ -692,13 +697,30 @@ export function getCompleteLabel(lineContents: string, startIndex: number): {lab
 
 
 /**
+ * Sets the characters used as comments.
+ * @param prefix Text from togglecommentPrefix.
+ */
+export function setCustomCommentPrefix(prefix: string) {
+    const commentsSet = new Set<string>([';', '//']);
+    if(prefix)
+        commentsSet.add(prefix);
+    commentPrefixes = Array.from(commentsSet);
+}
+
+/**
  * Strips the comment (;) from the text and returns it.
  * @param text Text with comment.
  * @returns string before the first ";"
  */
 export function stripComment(text: string) {
-    const i = text.indexOf(';');
-    if(i >= 0)
+    let i = Number.MAX_SAFE_INTEGER;
+    for (const commentPrefix of commentPrefixes) {
+        const k = text.indexOf(commentPrefix);
+        if (k >= 0 && k < i) {
+            i = k;
+        }
+    }
+    if (i != Number.MAX_SAFE_INTEGER)
         return text.substr(0, i);   // strip comment
     // No comment
     return text;

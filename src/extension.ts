@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import {ReferenceProvider} from './ReferenceProvider';
 import {DefinitionProvider} from './DefinitionProvider';
 import {HoverProvider} from './HoverProvider';
@@ -7,7 +8,7 @@ import {RenameProvider} from './RenameProvider';
 import {DocumentSymbolProvider} from './DocumentSymbolProvider';
 import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
-import {setGrepGlobPatterns} from './grep';
+import {setCustomCommentPrefix, setGrepGlobPatterns} from './grep';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
@@ -52,13 +53,17 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register command once.
     vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
-        Commands.findLabelsWithNoReference();
+        // Get all workspace folders
+        const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath);
+        // Find the labels for all projects
+        for (const rootFolder of wsFolders)
+            Commands.findLabelsWithNoReference(rootFolder+path.sep);
     });
 }
 
 
 /**
- * Reads the confguration.
+ * Reads the configuration.
  */
 function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
     const settings = PackageInfo.getConfiguration();
@@ -220,6 +225,8 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // Toggle line Comment configuration
     const toggleCommentPrefix = settings.get<string>("comments.toggleLineCommentPrefix") || ';';
     vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: toggleCommentPrefix}});
+    // Store
+    setCustomCommentPrefix(toggleCommentPrefix);
 }
 
 
