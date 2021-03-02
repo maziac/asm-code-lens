@@ -122,91 +122,89 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
 
     assert(grepGlobInclude);
     try {
-        await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude)
-        .then(async uris => {
+        const uris = await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude);
             const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
 
-            for(const uri of uris) {
-                // get fileName
-                const fileName = uri.fsPath;
-                if (fileName.indexOf(rootFolder) < 0)
-                    continue;   // Skip because path belongs to different project
+        for (const uri of uris) {
+            // get fileName
+            const fileName = uri.fsPath;
+            if (fileName.indexOf(rootFolder) < 0)
+                continue;   // Skip because path belongs to different project
 
-                // Check if file is opened in editor
-                const filePath = fileName;
-                let foundDoc = getTextDocument(filePath, docs);
+            // Check if file is opened in editor
+            const filePath = fileName;
+            let foundDoc = getTextDocument(filePath, docs);
 
-                // Check if file on disk is checked or in vscode
-                if (foundDoc) {
-                    // Check file in vscode
-                    const fileMatches = grepTextDocument(foundDoc, regex);
-                    // Add filename to matches
-                    for (const match of fileMatches) {
-                        match.filePath = fileName;
-                    }
-                    // Store
-                    allMatches.set(fileName, fileMatches);
+            // Check if file on disk is checked or in vscode
+            if (foundDoc) {
+                // Check file in vscode
+                const fileMatches = grepTextDocument(foundDoc, regex);
+                // Add filename to matches
+                for (const match of fileMatches) {
+                    match.filePath = fileName;
                 }
-                else {
-                    // Check file on disk
-                    let fileMatches = allMatches.get(fileName);
-                    let lastIndex = 0;
-
-                    // Read
-                    const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-                    const lines = linesData.split('\n');
-
-                    const len = lines.length;
-                    for (let index = 0; index < len; index++) {
-                        const lineContents = stripComment(lines[index]);
-                        if (lineContents.length == 0)
-                            continue;
-                        const line = lastIndex + index;
-                        regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
-                        const lineMatches: Array<FileMatch> = [];
-                        do {
-                            const match = regex.exec(lineContents);
-                            if (!match)
-                                break;
-
-                            // Found: get start and end
-                            let start = match.index;
-                            for (let j = 1; j < match.length; j++) {
-                                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                                if (match[j]) {
-                                    // Note: an optional group might be undefined
-                                    const i = match[j].length;
-                                    start += i;
-                                }
-                            }
-                            const end = match.index + match[0].length;
-
-                            // Make sure that the map entry exists.
-                            if (!fileMatches) {
-                                fileMatches = [];
-                                allMatches.set(fileName, fileMatches);
-                            }
-
-                            // Reverse order (useful if names should be replaced later on)
-                            lineMatches.unshift({
-                                filePath,
-                                line,
-                                start,
-                                end,
-                                lineContents,
-                                match
-                            });
-                        } while (regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
-
-                        // Put in global array.
-                        if (fileMatches)
-                            fileMatches.push(...lineMatches);
-                    }
-
-                    lastIndex += len;
-                }
+                // Store
+                allMatches.set(fileName, fileMatches);
             }
-        });
+            else {
+                // Check file on disk
+                let fileMatches = allMatches.get(fileName);
+                let lastIndex = 0;
+
+                // Read
+                const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+                const lines = linesData.split('\n');
+
+                const len = lines.length;
+                for (let index = 0; index < len; index++) {
+                    const lineContents = stripComment(lines[index]);
+                    if (lineContents.length == 0)
+                        continue;
+                    const line = lastIndex + index;
+                    regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
+                    const lineMatches: Array<FileMatch> = [];
+                    do {
+                        const match = regex.exec(lineContents);
+                        if (!match)
+                            break;
+
+                        // Found: get start and end
+                        let start = match.index;
+                        for (let j = 1; j < match.length; j++) {
+                            // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+                            if (match[j]) {
+                                // Note: an optional group might be undefined
+                                const i = match[j].length;
+                                start += i;
+                            }
+                        }
+                        const end = match.index + match[0].length;
+
+                        // Make sure that the map entry exists.
+                        if (!fileMatches) {
+                            fileMatches = [];
+                            allMatches.set(fileName, fileMatches);
+                        }
+
+                        // Reverse order (useful if names should be replaced later on)
+                        lineMatches.unshift({
+                            filePath,
+                            line,
+                            start,
+                            end,
+                            lineContents,
+                            match
+                        });
+                    } while (regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+
+                    // Put in global array.
+                    if (fileMatches)
+                        fileMatches.push(...lineMatches);
+                }
+
+                lastIndex += len;
+            }
+        }
     }
     catch(e) {
         console.log("Error: ", e);
@@ -421,7 +419,7 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * @param documents All dirty vscode.TextDocuments.
  * @returns { label, module.label }
  */
-export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>, regexEnd = /[\w\.]/): Promise<{label: string, moduleLabel: string}> {
+export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
     // Get line/column
     const row = pos.line;
     const clmn = pos.character;

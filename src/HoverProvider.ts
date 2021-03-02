@@ -46,95 +46,83 @@ export class HoverProvider implements vscode.HoverProvider {
      * @return A promise with a vscode.Hover object.
      */
     protected async search(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover> {
-        return new Promise<vscode.Hover>(async (resolve, reject) => {
-            // Check for local label
-            const regexEnd = /\w/;
-            const lineContents = document.lineAt(position.line).text;
-            const {label} = getCompleteLabel(lineContents, position.character, regexEnd);
-            //console.log("provideHover", this.rootFolder, document.uri.fsPath, "'" + label + "'");
-            if (label.startsWith('.')) {
-                const hover = new vscode.Hover('');
-                resolve(hover);
+        // Check for local label
+        const regexEnd = /\w/;
+        const lineContents = document.lineAt(position.line).text;
+        const {label} = getCompleteLabel(lineContents, position.character, regexEnd);
+        //console.log("provideHover", this.rootFolder, document.uri.fsPath, "'" + label + "'");
+        if (label.startsWith('.')) {
+            return new vscode.Hover('');
+        }
+
+        // It is a non local label
+        const range = document.getWordRangeAtPosition(position);
+        const searchWord = document.getText(range);
+        // Find all "something:" (labels) in the document
+        const searchNormal = regexLabelColonForWord(searchWord);
+        // Find all sjasmplus labels without ":" in the document
+        const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
+        // Find all sjasmplus MODULEs in the document
+        const searchsJasmModule = regexModuleForWord(searchWord);
+        // Find all sjasmplus MACROs in the document
+        const searchsJasmMacro = regexMacroForWord(searchWord);
+
+        // Put all searches in one array
+        const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
+
+        const locations = await grepMultiple(searchRegexes, this.rootFolder);
+        // Reduce the found locations.
+        const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
+        // Now read the comment lines above the document.
+        // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
+        const hoverTexts = new Array<vscode.MarkdownString>();
+        // Check for end
+        for (let index = 0; index < reducedLocations.length; index++) {
+            // Not end.
+            const loc = reducedLocations[index];
+            const lineNr = loc.range.start.line;
+            const filePath = loc.uri.fsPath;
+            const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+            const lines = linesData.split('\n');
+
+            // Now find all comments above the found line
+            const prevHoverTextArrayLength = hoverTexts.length;
+            const text = lines[lineNr];
+            const textMd = new vscode.MarkdownString();
+            textMd.appendText(text);
+            if (text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >= 0) // REMARK: This can lead to error: "indexOf of undefined"
+                hoverTexts.unshift(textMd);
+            let startLine = lineNr - 1;
+            while (startLine >= 0) {
+                // Check if line starts with ";"
+                const line = lines[startLine];
+                const match = /^\s*;(.*)/.exec(line);
+                if (!match)
+                    break;
+                // Add text
+                const textMatch = new vscode.MarkdownString();
+                textMatch.appendText(match[1]);
+                hoverTexts.unshift(textMatch);
+                // Next
+                startLine--;
             }
 
-            // It is a non local label
-            const range = document.getWordRangeAtPosition(position);
-            const searchWord = document.getText(range);
-            // Find all "something:" (labels) in the document
-            const searchNormal = regexLabelColonForWord(searchWord);
-            // Find all sjasmplus labels without ":" in the document
-            const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
-            // Find all sjasmplus MODULEs in the document
-            const searchsJasmModule = regexModuleForWord(searchWord);
-            // Find all sjasmplus MACROs in the document
-            const searchsJasmMacro = regexMacroForWord(searchWord);
+            // Separate several entries
+            if (prevHoverTextArrayLength != hoverTexts.length)
+                hoverTexts.unshift(new vscode.MarkdownString('============'));
+        }
 
-            // Put all searches in one array
-            const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
+        // End of processing.
+        // Check if 0 entries
+        if (hoverTexts.length == 0)
+            return undefined as any;  // Nothing found
 
-            const locations = await grepMultiple(searchRegexes, this.rootFolder);
-            // Reduce the found locations.
-            const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
-            // Now read the comment lines above the document.
-            // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
-            const hoverTexts = new Array<vscode.MarkdownString>();
-            const f = (index: number) => {
-                // Check for end
-                if (index < reducedLocations.length) {
-                    // Not end.
-                    const loc = reducedLocations[index];
-                    const lineNr = loc.range.start.line;
-                    const filePath = loc.uri.fsPath;
-                    const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-                    const lines = linesData.split('\n');
+        // Remove first ('============');
+        hoverTexts.splice(0, 1);
 
-                    // Now find all comments above the found line
-                    const prevHoverTextArrayLength = hoverTexts.length;
-                    const text = lines[lineNr];
-                    const textMd = new vscode.MarkdownString();
-                    textMd.appendText(text);
-                    if (text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >= 0) // REMARK: This can lead to error: "indexOf of undefined"
-                        hoverTexts.unshift(textMd);
-                    let startLine = lineNr - 1;
-                    while (startLine >= 0) {
-                        // Check if line starts with ";"
-                        const line = lines[startLine];
-                        const match = /^\s*;(.*)/.exec(line);
-                        if (!match)
-                            break;
-                        // Add text
-                        const textMatch = new vscode.MarkdownString();
-                        textMatch.appendText(match[1]);
-                        hoverTexts.unshift(textMatch);
-                        // Next
-                        startLine--;
-                    }
-
-                    // Separate several entries
-                    if (prevHoverTextArrayLength != hoverTexts.length)
-                        hoverTexts.unshift(new vscode.MarkdownString('============'));
-
-                    // Call next
-                    f(index + 1);
-                }
-                else {
-                    // End of processing.
-                    // Check if 0 entries
-                    if (hoverTexts.length == 0)
-                        return resolve(undefined as any);  // Nothing found
-
-                    // Remove first ('============');
-                    hoverTexts.splice(0, 1);
-
-                    // return
-                    const hover = new vscode.Hover(hoverTexts);
-                    resolve(hover);
-                }
-            };
-
-            // Loop all found entries.
-            f(0);
-        });
+        // return
+        const hover = new vscode.Hover(hoverTexts);
+        return hover;
     }
 
 }
