@@ -166,9 +166,23 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
         const proposals = new Map<string, vscode.CompletionItem>();
 
+        // Get number of dots
+        //const dotCount = label.split('.').length-1;
+
         // Go through all found locations
         for (const loc of reducedLocations) {
             const text = loc.moduleLabel;
+            /*
+            Alternative implementation that only proposes completion up to the next dot:
+            const fullText = loc.moduleLabel;
+            // Reduce text to match number of columns
+            const textArr = fullText.split('.');
+            let text = textArr[0];
+            for (let i = 1; i <= dotCount; i++) {
+                text += '.' + textArr[i];
+            }
+            */
+
             //console.log('');
             //console.log('Proposal:', text);
             const item = new vscode.CompletionItem(text, vscode.CompletionItemKind.Function);

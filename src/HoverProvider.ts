@@ -48,8 +48,9 @@ export class HoverProvider implements vscode.HoverProvider {
     protected async search(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover> {
         return new Promise<vscode.Hover>(async (resolve, reject) => {
             // Check for local label
+            const regexEnd = /\w/;
             const lineContents = document.lineAt(position.line).text;
-            const {label} = getCompleteLabel(lineContents, position.character);
+            const {label} = getCompleteLabel(lineContents, position.character, regexEnd);
             //console.log("provideHover", this.rootFolder, document.uri.fsPath, "'" + label + "'");
             if (label.startsWith('.')) {
                 const hover = new vscode.Hover('');
@@ -73,7 +74,7 @@ export class HoverProvider implements vscode.HoverProvider {
 
             const locations = await grepMultiple(searchRegexes, this.rootFolder);
             // Reduce the found locations.
-            const reducedLocations = await reduceLocations(locations, document.fileName, position, false);
+            const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
             // Now read the comment lines above the document.
             // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
             const hoverTexts = new Array<vscode.MarkdownString>();
@@ -92,7 +93,7 @@ export class HoverProvider implements vscode.HoverProvider {
                     const text = lines[lineNr];
                     const textMd = new vscode.MarkdownString();
                     textMd.appendText(text);
-                    if (text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >= 0)  // TODO: indexOf of undefined
+                    if (text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >= 0) // REMARK: This can lead to error: "indexOf of undefined"
                         hoverTexts.unshift(textMd);
                     let startLine = lineNr - 1;
                     while (startLine >= 0) {

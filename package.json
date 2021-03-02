@@ -153,10 +153,25 @@
             },
             {
                 "command": "asm-code-lens.find-labels-with-no-reference",
-                "title": "Find labels with no reference",
+                "title": "Find Labels with no Reference",
                 "category": "asm-code-lens"
             }
         ],
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "resourceLangId == asm-collection",
+                    "command": "asm-code-lens.find-labels-with-no-reference",
+                    "group": "0_navigation@10"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "asm-code-lens.find-labels-with-no-reference",
+                    "when": "false"
+                }
+            ]
+        },
         "languages": [
             {
                 "id": "asm-collection",
@@ -215,7 +230,6 @@
         "fs-extra": "^8.1.0",
         "grepit": "^1.0.0",
         "jsonc-parser": "^3.0.0",
-        "p-queue": "^6.6.2",
         "ts-node": "^8.10.2"
     },
     "devDependencies": {

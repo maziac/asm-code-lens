@@ -1,11 +1,7 @@
 import * as vscode from 'vscode';
-//import * as assert from 'assert';
-import { grep, FileMatch, grepMultiple, reduceLocations, grepGlobInclude, grepGlobExclude } from './grep';
+import * as path from 'path';
+import { grep, FileMatch, grepMultiple, reduceLocations  } from './grep';
 import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro, regexAnyReferenceForWord } from './regexes';
-//import { Location } from 'vscode';
-//import { CodeLensProvider } from './CodeLensProvider';
-
-//var grepit = require('grepit');
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -20,15 +16,16 @@ export class Commands {
 
     /**
      * Searches all labels and shows the ones that are not referenced.
+     * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
      */
-    public static findLabelsWithNoReference() {
-        grepMultiple([regexLabelColon(), regexLabelWithoutColon()])
-        .then(locations => {
-            //dbgPrintLocations(locations);
-            // locations is a GrepLocation array that contains all found labels.
-            // Convert this to an array of labels.
-            this.findLabels(locations);
-        });
+    public static async findLabelsWithNoReference(rootFolder: string): Promise<void> {
+        // Get all label definition (locations)
+        const labelLocations = await grepMultiple([regexLabelColon(), regexLabelWithoutColon()], rootFolder);
+
+        //dbgPrintLocations(locations);
+        // locations is a GrepLocation array that contains all found labels.
+        // Convert this to an array of labels.
+        this.findLabels(labelLocations, rootFolder);
     }
 
 
@@ -37,72 +34,61 @@ export class Commands {
      * Finds all labels without reference.
      * I.e. prints out all labels in 'locLabels' which are note referenced somewhere.
      * @param locLabels A list of GrepLocations.
+     * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
      */
-    protected static async findLabels(locLabels) {
-        output.appendLine("Unreferenced labels:");
+    protected static async findLabels(locLabels, rootFolder: string): Promise<void> {
+        const baseName = path.basename(rootFolder);
+        output.appendLine("Unreferenced labels, " + baseName + ":");
         output.show(true);
 
         try {
-            await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude)
-            .then(async (/*uris*/) => {
-                try {
-                    //const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
-                    //uris.unshift(undefined);
-
-                    let labelsCount = locLabels.length;
-                    let unrefLabels = 0;
-                    const regexEqu = regexLabelEquOrMacro();
-                    for(const locLabel of locLabels) {
-                        // Skip all EQU and MACRO
-                        const fm: FileMatch = locLabel.fileMatch;
-                        regexEqu.lastIndex = fm.match[1].length;
-                        const matchEqu = regexEqu.exec(fm.lineContents);
-                        if(matchEqu) {
-                            labelsCount --;
-                            // output.appendLine("labelCount="+labelsCount);
-                            if(labelsCount == 0)
-                                output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's':'') + ".");
-                            continue;
-                        }
-
-                        // Get label
-                        const label = fm.match[2];
-                        const searchLabel = label.replace(/\./, '\\.');
-                        const pos = new vscode.Position(fm.line, fm.start);
-                        const fileName = fm.filePath;
-
-                        // And search for references
-                        const regex = regexAnyReferenceForWord(searchLabel);grep(regex)
-                        .then(locations => {
-                            // Remove any locations because of module information (dot notation)
-                            reduceLocations(locations, fileName, pos)
-                            .then(reducedLocations => {
-                                // Check count
-                                const count = reducedLocations.length;
-                                if(count == 0) {
-                                    // No reference
-                                    unrefLabels ++;
-                                    output.appendLine(label + ", " + fileName + ":" + (pos.line+1));
-                                }
-                                // Check for last search
-                                labelsCount --;
-                                // output.appendLine("labelCount="+labelsCount);
-                                if(labelsCount == 0)
-                                    output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's':'') + ".");
-                            });
-                        });
-                    }
+            let labelsCount = locLabels.length;
+            let unrefLabels = 0;
+            const regexEqu = regexLabelEquOrMacro();
+            for (const locLabel of locLabels) {
+                // Skip all EQU and MACRO
+                const fm: FileMatch = locLabel.fileMatch;
+                regexEqu.lastIndex = fm.match[1].length;
+                const matchEqu = regexEqu.exec(fm.lineContents);
+                if (matchEqu) {
+                    labelsCount--;
+                    // output.appendLine("labelCount="+labelsCount);
+                    if (labelsCount == 0)
+                        output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's' : '') + ".");
+                    continue;
                 }
-                catch(e) {
-                    console.log("Error: ", e);
+
+                // Get label
+                const label = fm.match[2];
+                const searchLabel = label.replace(/\./, '\\.');
+                const pos = new vscode.Position(fm.line, fm.start);
+                const fileName = fm.filePath;
+
+                // And search for references
+                const regex = regexAnyReferenceForWord(searchLabel);
+                const locations = await grep(regex, rootFolder);
+                // Remove any locations because of module information (dot notation)
+                const reducedLocations = await reduceLocations(locations, fileName, pos);
+                // Check count
+                const count = reducedLocations.length;
+                if (count == 0) {
+                    // No reference
+                    unrefLabels++;
+                    output.appendLine(label + ", " + fileName + ":" + (pos.line + 1));
                 }
-            });
+                // Check for last search
+                labelsCount--;
+                // output.appendLine("labelCount="+labelsCount);
+                if (labelsCount == 0)
+                    output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's' : '') + ".");
+            }
         }
-        catch(e) {
+        catch (e) {
             console.log("Error: ", e);
         }
+
         // Check if any label is unreferenced
-        if(locLabels.length == 0)
+        if (locLabels.length == 0)
             output.appendLine("None.");
     }
 

@@ -15,6 +15,7 @@ import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
 
 
+
 export function activate(context: vscode.ExtensionContext) {
 
     // Init package info
@@ -53,11 +54,19 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register command once.
     vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
+        // Get current text editor to get current project/root folder.
+        const editorPath = vscode.window.activeTextEditor?.document.uri.fsPath || '';
         // Get all workspace folders
         const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath);
-        // Find the labels for all projects
-        for (const rootFolder of wsFolders)
-            Commands.findLabelsWithNoReference(rootFolder+path.sep);
+        // Check in which workspace folder the path is included
+        for (const rootFolder of wsFolders) {
+            if (editorPath.indexOf(rootFolder) >= 0) {
+                // Found. Find labels
+                Commands.findLabelsWithNoReference(rootFolder + path.sep);
+                // Stop loop
+                break;
+            }
+        }
     });
 }
 

@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs';
-const {default: PQueue} = require('p-queue');
 import { regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct } from './regexes';
 
 
@@ -39,10 +38,10 @@ export class GrepLocation extends vscode.Location {
     public symbol: string;
 
     /// The label (symbol).
-    label: string;
+    public label: string;
 
     /// The full label (with module).
-    moduleLabel: string;
+    public moduleLabel: string;
 
     /**
      * Creates a new location object.
@@ -119,8 +118,6 @@ export let grepGlobExclude;
  * @returns An array of the vscode locations of the found expressions.
  */
 export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocation[]> {
-    const readQueue = new PQueue();
-    //const fileStream = fastGlob.stream(globs, {cwd: cwd} );
     const allMatches = new Map();
 
     assert(grepGlobInclude);
@@ -135,81 +132,79 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
                 if (fileName.indexOf(rootFolder) < 0)
                     continue;   // Skip because path belongs to different project
 
-                await readQueue.add(async () => {
-                    const filePath = fileName;
+                // Check if file is opened in editor
+                const filePath = fileName;
+                let foundDoc = getTextDocument(filePath, docs);
 
-                    // Check if file is opened in editor
-                    let foundDoc = getTextDocument(filePath, docs);
-
-                    // Check if file on disk is checked or in vscode
-                    if(foundDoc) {
-                        // Check file in vscode
-                        const fileMatches = grepTextDocument(foundDoc, regex);
-                        // Add filename to matches
-                        for(const match of fileMatches) {
-                            match.filePath = fileName;
-                        }
-                        // Store
-                        allMatches.set(fileName, fileMatches);
+                // Check if file on disk is checked or in vscode
+                if (foundDoc) {
+                    // Check file in vscode
+                    const fileMatches = grepTextDocument(foundDoc, regex);
+                    // Add filename to matches
+                    for (const match of fileMatches) {
+                        match.filePath = fileName;
                     }
-                    else {
-                        // Check file on disk
-                        let fileMatches = allMatches.get(fileName);
-                        let lastIndex = 0;
+                    // Store
+                    allMatches.set(fileName, fileMatches);
+                }
+                else {
+                    // Check file on disk
+                    let fileMatches = allMatches.get(fileName);
+                    let lastIndex = 0;
 
-                        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-                        const lines = linesData.split('\n');
+                    // Read
+                    const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+                    const lines = linesData.split('\n');
 
-                        const len = lines.length;
-                        for (let index = 0; index < len; index++) {
-                            const lineContents = stripComment(lines[index]);
-                            if(lineContents.length == 0)
-                                continue;
-                            const line = lastIndex + index;
-                            regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
-                            const lineMatches: Array<FileMatch> = [];
-                            do {
-                                const match = regex.exec(lineContents);
-                                if(!match)
-                                    break;
+                    const len = lines.length;
+                    for (let index = 0; index < len; index++) {
+                        const lineContents = stripComment(lines[index]);
+                        if (lineContents.length == 0)
+                            continue;
+                        const line = lastIndex + index;
+                        regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
+                        const lineMatches: Array<FileMatch> = [];
+                        do {
+                            const match = regex.exec(lineContents);
+                            if (!match)
+                                break;
 
-                                // Found: get start and end
-                                let start = match.index;
-                                for(let j=1; j<match.length; j++) {
-                                    // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                                    if(match[j]) {
-                                        // Note: an optional group might be undefined
-                                        const i = match[j].length;
-                                        start += i;
-                                    }
+                            // Found: get start and end
+                            let start = match.index;
+                            for (let j = 1; j < match.length; j++) {
+                                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+                                if (match[j]) {
+                                    // Note: an optional group might be undefined
+                                    const i = match[j].length;
+                                    start += i;
                                 }
-                                const end = match.index + match[0].length;
+                            }
+                            const end = match.index + match[0].length;
 
-                                // Make sure that the map entry exists.
-                                if (!fileMatches) {
-                                    fileMatches = [];
-                                    allMatches.set(fileName, fileMatches);
-                                }
+                            // Make sure that the map entry exists.
+                            if (!fileMatches) {
+                                fileMatches = [];
+                                allMatches.set(fileName, fileMatches);
+                            }
 
-                                // Reverse order (useful if names should be replaced later on)
-                                lineMatches.unshift({
-                                    filePath,
-                                    line,
-                                    start,
-                                    end,
-                                    lineContents,
-                                    match
-                                });
-                            } while(regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+                            // Reverse order (useful if names should be replaced later on)
+                            lineMatches.unshift({
+                                filePath,
+                                line,
+                                start,
+                                end,
+                                lineContents,
+                                match
+                            });
+                        } while (regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
 
-                            // Put in global array.
-                            if(fileMatches)
-                                fileMatches.push(...lineMatches);
-                        }
-
-                        lastIndex += len;
+                        // Put in global array.
+                        if (fileMatches)
+                            fileMatches.push(...lineMatches);
                     }
-                });
+
+                    lastIndex += len;
+                }
             }
         });
     }
@@ -426,7 +421,7 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * @param documents All dirty vscode.TextDocuments.
  * @returns { label, module.label }
  */
-export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>): Promise<{label: string, moduleLabel: string}> {
+export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>, regexEnd = /[\w\.]/): Promise<{label: string, moduleLabel: string}> {
     // Get line/column
     const row = pos.line;
     const clmn = pos.character;
@@ -449,7 +444,7 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
 
     // 1. Get original label
     const line = lines[row];
-    let {label, preString} = getCompleteLabel(line, clmn);
+    let {label, preString} = getCompleteLabel(line, clmn, regexEnd);
 
     // 2. If local label: The document is parsed from position to begin for a non-local label.
     if(label.startsWith('.')) {
@@ -488,18 +483,14 @@ export async function getLabelAndModuleLabel(fileName: string, pos: vscode.Posit
  * @param checkFullName true (default) = During label check the full name is checked. false (e.g.
  * for CompletionProvider) = It is checked with 'startsWith'.
  */
-export async function reduceLocations(locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true): Promise<GrepLocation[]> {
+export async function reduceLocations(locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+    // 1. Get module label
+    const searchLabel = await getLabelAndModuleLabel(docFileName, position, docs, regexEnd);
+
     // For item completion:
     let regexLabel;
     let regexModuleLabel;
-
-    // 1. Get module label
-    let searchLabel;
-    await getLabelAndModuleLabel(docFileName, position, docs)
-    .then(mLabel => {
-        searchLabel = mLabel;
-    });
 
     // Check if we care about upper/lower case.
     if(!checkFullName) {
@@ -516,48 +507,46 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
     // 2. Get the module-labels for each found location and the corresponding file.
     let i = redLocs.length;
     //let removedSameLine = -1;
-    while(i--) {    // loop backwards
+    while (i--) {    // loop backwards
         // get fileName
         const loc = redLocs[i];
         const fileName = loc.uri.fsPath;
         const pos = loc.range.start;
 
         // Check if same location as searchLabel.
-        if(removeOwnLocation
+        if (removeOwnLocation
             && pos.line == position.line
             && fileName == fileName) {
             // Remove also this location
-            redLocs.splice(i,1);
+            redLocs.splice(i, 1);
             // Remember
             //removedSameLine = i;
             continue;
         }
 
-        await getLabelAndModuleLabel(fileName, pos, docs)
-        .then(mLabel => {
-            // Assign to location
-            loc.label = mLabel.label;
-            loc.moduleLabel = mLabel.moduleLabel;
-            // 3. 'searchLabel' is compared with all labels.
-            if(checkFullName) {
-                if(mLabel.label == searchLabel.label
-                    || mLabel.moduleLabel == searchLabel.moduleLabel
-                    || mLabel.moduleLabel == searchLabel.label
-                    || mLabel.label == searchLabel.moduleLabel)
-                    return; // Please note: the test is ambiguous. There might be situations were this is wrong.
-            }
-            else {
-                // Compare regular expressions to catch also scrambled input.
-                if(regexLabel.exec(mLabel.label)
+        const mLabel = await getLabelAndModuleLabel(fileName, pos, docs, regexEnd);
+        // Assign to location
+        loc.label = mLabel.label;
+        loc.moduleLabel = mLabel.moduleLabel;
+        // 3. 'searchLabel' is compared with all labels.
+        if (checkFullName) {
+            if (mLabel.label == searchLabel.label
+                || mLabel.moduleLabel == searchLabel.moduleLabel
+                || mLabel.moduleLabel == searchLabel.label
+                || mLabel.label == searchLabel.moduleLabel)
+                continue; // Please note: the test is ambiguous. There might be situations were this is wrong.
+        }
+        else {
+            // Compare regular expressions to catch also scrambled input.
+            if (regexLabel.exec(mLabel.label)
                 || regexModuleLabel.exec(mLabel.moduleLabel)
                 || regexLabel.exec(mLabel.moduleLabel)
                 || regexModuleLabel.exec(mLabel.label))
-                    return;
-            }
-            // 4. If 'searchLabel' is not equal to the direct label and not equal to the
-            //    concatenated label it is removed from 'locations'
-            redLocs.splice(i,1);  // delete
-        });
+                continue;
+        }
+        // 4. If 'searchLabel' is not equal to the direct label and not equal to the
+        //    concatenated label it is removed from 'locations'
+        redLocs.splice(i, 1);  // delete
     }
 
     // Return.
@@ -659,11 +648,12 @@ export function getModule(lines: Array<string>, len: number): string {
  * function returns the complete label.
  * @param lineContents The text of the line.
  * @param startIndex The index into the label.
+ * @param regexEnd Defaults to /[\w\.]/ . I.e. the label is returned with all subparts.
+ * Note: The HoverProvider might use /\w/ so that the sub parts are not returned.
  * @returns {label, preString} The found label and the part of the string that
  * is found before 'label'.
  */
-export function getCompleteLabel(lineContents: string, startIndex: number): {label: string, preString: string} {
-    const regexEnd = /[\w]/;
+export function getCompleteLabel(lineContents: string, startIndex: number, regexEnd = /[\w\.]/): {label: string, preString: string} {
     // Find end of label.
     const len = lineContents.length;    // REMARK: This can lead to error: "length of undefined"
     let k: number;
@@ -706,6 +696,7 @@ export function setCustomCommentPrefix(prefix: string) {
         commentsSet.add(prefix);
     commentPrefixes = Array.from(commentsSet);
 }
+
 
 /**
  * Strips the comment (;) from the text and returns it.
