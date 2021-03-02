@@ -196,11 +196,11 @@ suite('RegExes', () => {
                     if(result) {
                         const foundPrefix = result[1];
                         const foundLabel = result[2];
-                        assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Line " + (i/div));
-                        assert.equal(label, foundLabel, "'" + label + "' == '" + foundLabel + "', Line " + (i/div));
+                        assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i/div));
+                        assert.equal(label, foundLabel, "Label: '" + label + "' == '" + foundLabel + "', Line " + (i/div));
                     }
                     else
-                        assert.equal(label, '', "'" + label + "' == '', Line " + (i/div));
+                        assert.equal(label, '', "Label (b):'" + label + "' == '', Line " + (i/div));
                 }
             }
             catch(e) {

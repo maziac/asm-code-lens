@@ -24,7 +24,7 @@ export function regexLabelColon(): RegExp {
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelWithoutColon(): RegExp {
-    return /^()([a-z_][\w\.]*)\s/i;
+    return /^()([a-z_][\w\.]*)(?:\s|$)/i;
     //return /^()([a-z_][\w\.]*)\b(?![:\.])/i;
 }
 
