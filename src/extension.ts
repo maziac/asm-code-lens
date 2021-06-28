@@ -92,23 +92,26 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         }
     }
 
-    // Check if grep paths have changed
-    if(event) {
-        if(event.affectsConfiguration('asm-code-lens.includeFiles')
-            || event.affectsConfiguration('asm-code-lens.excludeFiles')) {
-            // Restart provider if running:
-            // CodeLens
-            for (const rootFolder of wsFolders) {
-                // Deregister
-                regCodeLensProviders.get(rootFolder)!.dispose();
-                regReferenceProviders.get(rootFolder)!.dispose();
-                regRenameProviders.get(rootFolder)!.dispose();
-            }
-            regCodeLensProviders.clear();
-            regReferenceProviders.clear();
-            regRenameProviders.clear();
-        }
+    // Dispose (remove) all providers
+    for (const rootFolder of wsFolders) {
+        // Deregister
+        removeProvider(regCodeLensProviders.get(rootFolder), context);
+        removeProvider(regHoverProviders.get(rootFolder), context);
+        removeProvider(regCompletionProposalsProviders.get(rootFolder), context);
+        removeProvider(regDefinitionProviders.get(rootFolder), context);
+        removeProvider(regReferenceProviders.get(rootFolder), context);
+        removeProvider(regRenameProviders.get(rootFolder), context);
+        removeProvider(regDocumentSymbolProviders.get(rootFolder), context);
+
     }
+    regCodeLensProviders.clear();
+    regHoverProviders.clear();
+    regCompletionProposalsProviders.clear();
+    regDefinitionProviders.clear();
+    regReferenceProviders.clear();
+    regRenameProviders.clear();
+    regDocumentSymbolProviders.clear();
+
 
     // Set search paths.
     setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
@@ -118,124 +121,79 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // If the identifier is missing it also don't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
     const asmFiles: vscode.DocumentSelector = {scheme: "file", pattern: settings.includeFiles};
 
-    // Code Lenses
-    if(settings.enableCodeLenses) {
-        // Register
-        for (const rootFolder of wsFolders) {
+    // Multiroot: do for all root folders:
+    for (const rootFolder of wsFolders) {
+
+        // Code Lenses
+        if (settings.enableCodeLenses) {
+            // Register
             const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(rootFolder));
             regCodeLensProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
-    }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regCodeLensProviders.get(rootFolder)!.dispose();
-        }
-        regCodeLensProviders.clear();
-    }
 
-    if (settings.enableHovering) {
-        // Register
-        for (const rootFolder of wsFolders) {
+        if (settings.enableHovering) {
+            // Register
             const provider = vscode.languages.registerHoverProvider(asmFiles, new HoverProvider(rootFolder));
             regHoverProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
-    }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regHoverProviders.get(rootFolder)!.dispose();
-        }
-        regHoverProviders.clear();
-    }
 
-    if (settings.enableCompletions) {
-        // Register
-        for (const rootFolder of wsFolders) {
+        if (settings.enableCompletions) {
+            // Register
             const provider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider(rootFolder));
             regCompletionProposalsProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
-    }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regCompletionProposalsProviders.get(rootFolder)!.dispose();
-        }
-        regCompletionProposalsProviders.clear();
-    }
 
-    if (settings.enableGotoDefinition) {
-        // Register
-        for (const rootFolder of wsFolders) {
+        if (settings.enableGotoDefinition) {
+            // Register
             const provider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider(rootFolder));
             regDefinitionProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
-    }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regDefinitionProviders.get(rootFolder)!.dispose();
-        }
-        regDefinitionProviders.clear();
-    }
 
-    if (settings.enableFindAllReferences) {
-        // Register
-        for (const rootFolder of wsFolders) {
+        if (settings.enableFindAllReferences) {
+            // Register
             const provider = vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider(rootFolder));
             regReferenceProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
-    }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regReferenceProviders.get(rootFolder)!.dispose();
-        }
-        regReferenceProviders.clear();
-    }
 
-    if (settings.enableRenaming) {
-        // Register
-        for (const rootFolder of wsFolders) {
+        if (settings.enableRenaming) {
+            // Register
             const provider = vscode.languages.registerRenameProvider(asmFiles, new RenameProvider(rootFolder));
             regRenameProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
-    }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regRenameProviders.get(rootFolder)!.dispose();
-        }
-        regRenameProviders.clear();
-    }
 
-    if (settings.enableOutlineView) {
-        // Register
-        for (const rootFolder of wsFolders) {
+        if (settings.enableOutlineView) {
+            // Register
             const provider = vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider(rootFolder));
             regDocumentSymbolProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
     }
-    else {
-        for (const rootFolder of wsFolders) {
-            // Deregister
-            regDocumentSymbolProviders.get(rootFolder)!.dispose();
-        }
-        regDocumentSymbolProviders.clear();
-    }
+
 
     // Toggle line Comment configuration
     const toggleCommentPrefix = settings.get<string>("comments.toggleLineCommentPrefix") || ';';
     vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: toggleCommentPrefix}});
     // Store
     setCustomCommentPrefix(toggleCommentPrefix);
+}
+
+
+/**
+ * Removes a provider.
+ * Disposes it and removes it from subscription list.
+ */
+function removeProvider(pv: vscode.Disposable|undefined, context: vscode.ExtensionContext) {
+    if (pv) {
+        pv.dispose();
+        const i = context.subscriptions.indexOf(pv);
+        context.subscriptions.splice(i, 1);
+    }
 }
 
 
