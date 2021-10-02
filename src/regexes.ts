@@ -2,6 +2,7 @@
 /**
  * Checks for a label with a colon, e.g.
  * "label:", " label:" or "init.label_1:".
+ * Also "@label:".
  * But not ".label:".
  * Capture groups:
  *  1 = preceding spaces
@@ -9,7 +10,7 @@
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelColon(): RegExp {
-    return /(^\s*)\b([a-z_][\w\.]*):/i;
+    return /(^\s*@?)\b([a-z_][\w\.]*):/i;
 }
 
 
@@ -17,6 +18,7 @@ export function regexLabelColon(): RegExp {
  * Checks for a label without a colon, i.e. a
  * label used by sjasmplus.
  * E.g. "label" or "init.label_1".
+ * Also "@label".
  * But not ".label".
  * Capture groups:
  *  1 = ''
@@ -24,7 +26,7 @@ export function regexLabelColon(): RegExp {
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelWithoutColon(): RegExp {
-    return /^()([a-z_][\w\.]*)(?:\s|$)/i;
+    return /^(@?)([a-z_][\w\.]*)(?:\s|$)/i;
     //return /^()([a-z_][\w\.]*)\b(?![:\.])/i;
 }
 
