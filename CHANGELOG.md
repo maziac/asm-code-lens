@@ -1,5 +1,7 @@
 # Changelog
 
+# 1.8.2
+
 # 1.8.1
 - Fixed: When the settings were changed the providers (e.g. CodeLens) were registered multiple times.
 
