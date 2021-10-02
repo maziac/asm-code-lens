@@ -1,6 +1,7 @@
 # Changelog
 
 # 1.8.2
+- .z80 added to defaults. I.e. it will be syntax highlighted automatically. But you need to update the preferences 'asm-code-lens.includeFiles' with 'z80' manually for advanced features like references.
 
 # 1.8.1
 - Fixed: When the settings were changed the providers (e.g. CodeLens) were registered multiple times.

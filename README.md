@@ -37,8 +37,8 @@ Install through Visual Studio Code Marketplace.
 The extension is called "ASM Code Lens".
 
 It supports the following assembler file suffixes by default:
-.asm, .s, .inc, .a80.
-Others are configurable.
+.asm, .s, .inc, .a80, .list, .lis, .z80.
+Others are configurable. (Configuration not possible for syntax highlighting.)
 
 
 ## Hexadecimal Calculator

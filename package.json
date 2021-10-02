@@ -106,7 +106,7 @@
                 "asm-code-lens.includeFiles": {
                     "type": "string",
                     "default": "**/*.{asm,inc,s,a80}",
-                    "description": "Choose what files to include e.g '**/*.{asm,inc,s,a80}'. If your assembler sources suffix is different then you can change it here."
+                    "description": "Choose what files to include e.g '**/*.{asm,inc,s,a80,z80}'. If your assembler sources suffix is different then you can change it here."
                 },
                 "asm-code-lens.excludeFiles": {
                     "type": "string",
@@ -179,6 +179,7 @@
                     ".list",
                     ".lis",
                     ".a80",
+                    ".z80",
                     ".asm",
                     ".inc",
                     ".s"
