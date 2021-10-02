@@ -57,7 +57,8 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * Points to the first line of the file.
      */
     protected async getInclude(relPath: string): Promise<vscode.Location[]> {
-        const uris = await vscode.workspace.findFiles(this.rootFolder + '**/' + relPath, null);
+        const filePattern = new vscode.RelativePattern(this.rootFolder, '**/' + relPath);
+        const uris = await vscode.workspace.findFiles(filePattern, null);
         const locations: vscode.Location[] = [];
         const pos = new vscode.Position(0, 0);
         const range = new vscode.Range(pos, pos);
