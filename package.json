@@ -33,7 +33,7 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "*"
+        "onLanguage:asm-collection"
     ],
     "main": "./out/src/extension",
     "contributes": {
