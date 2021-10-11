@@ -33,7 +33,13 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "*"
+        "workspaceContains:**/.list",
+        "workspaceContains:**/.lis",
+        "workspaceContains:**/.a80",
+        "workspaceContains:**/.z80",
+        "workspaceContains:**/.asm",
+        "workspaceContains:**/.inc",
+        "workspaceContains:**/.s"
     ],
     "main": "./out/src/extension",
     "contributes": {
