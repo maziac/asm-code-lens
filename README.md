@@ -20,12 +20,11 @@ It provides support for:
 - Assembler syntax highlighting.
 - Completions: While you type completions are proposed based on the labels in your asm files.
 - "Find all references": through a right mouse click in your assembler source file. It will come up with all found references in the other files.
-- Hovering: When hovering over  symbol it shows the comments for the symbol.
+- Hovering: When hovering over a symbol it shows the comments for the symbol.
 - Outline view: View your labels (code, data, constants) in the outline view.
 - Rename symbols.
 - Code Lens: Above symbols it shows the number of references. You can click it to get to the references.
-- Command: asm-codspec
-e-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
+- Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
 - Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and many other assemblers that use a standard notation for labels (e.g. "label:").
 
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
