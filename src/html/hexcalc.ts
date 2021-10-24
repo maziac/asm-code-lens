@@ -31,13 +31,18 @@ const hexInput = document.getElementById("hex_input");
  */
 function getHexString(value: number) {
 	let digitCount;
+	let sign = '';
+	if (value < 0) {
+		sign = '-';
+		value = -value;
+	}
 	if (value > 0xFFFF)
 		digitCount = 8;
 	else if (value > 0xFF)
 		digitCount = 4;
 	else
 		digitCount = 2;
-	const hex = hexPrefix + value.toString(16).toUpperCase().padStart(digitCount, '0');
+	const hex = sign + hexPrefix + value.toString(16).toUpperCase().padStart(digitCount, '0');
 	return hex;
 }
 
@@ -68,9 +73,10 @@ function clearCalculator() {
 
 
 /**
- * Called for a keypress on the decimal input.
+ * Called for a keypress on the decimal or hex input.
  * @param obj The input element.
  * @param event The keypress event.
+ * @param numberBase 10 for decimal input, 16 for hex input.
  */
 // @ts-ignore
 function keypress(obj, event, numberBase) {

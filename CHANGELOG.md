@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.8.4
+- Fixed negative number formatting in hex number in hex calculator.
+
 # 1.8.3
 - Fixed: 'Goto definition' for include files.
 
