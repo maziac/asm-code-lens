@@ -62,7 +62,7 @@ let hexPrefix = "${hexPrefix}";`
 		// Set button
 		if (!donated) {
 			mainHtml = mainHtml.replace('<!--${donate}-->', `
-		<button class="button-donate" style="float:right" onclick="donateClicked()">Donate...</button>`);
+		<button class="button-donate" style="float:right" onclick="donateClicked()">Donate...<div style="float:right;font-size:50%">ASM Code Lens</div></button>`);
 		}
 
 		// Add a Reload and Copy button for debugging
