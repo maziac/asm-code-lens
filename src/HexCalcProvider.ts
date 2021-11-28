@@ -17,11 +17,13 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 		this.webview = webviewView.webview;
 
 		// Allow scripts in the webview
-		this.webview.options = {enableScripts: true};
+		this.webview.options = {
+			enableScripts: true
+		};
 
 		// Handle messages from the webview
 		this.webview.onDidReceiveMessage(message => {
-			switch (message.command) {
+			switch (message.command) {	// NOSONAR
 				case 'donateClicked':
 					this.openDonateWebView();
 					break;
@@ -42,12 +44,12 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 
 		// Add the html styles etc.
 		const extPath = PackageInfo.extension.extensionPath;
-		const mainHtmlFile = path.join(extPath, 'html/hexcalc.html');
+		const mainHtmlFile = path.join(extPath, 'html', 'hexcalc.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
 		// Exchange local path
 		const resourcePath = vscode.Uri.file(extPath);
 		const vscodeResPath = this.webview.asWebviewUri(resourcePath).toString();
-		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
+		mainHtml = mainHtml.replace(/\${vscodeResPath}/g, vscodeResPath);
 
 		// Get hex prefix
 		const configuration = PackageInfo.getConfiguration();
@@ -92,7 +94,7 @@ let hexPrefix = "${hexPrefix}";`
 		// Handle messages from the webview
 		vscodePanel.webview.options = {enableScripts: true};
 		vscodePanel.webview.onDidReceiveMessage(message => {
-			switch (message.command) {
+			switch (message.command) {	// NOSONAR
 				case 'showExtension':
 					// Switch to Extension Manager
 					vscode.commands.executeCommand("workbench.extensions.search", PackageInfo.extension.packageJSON.publisher)
