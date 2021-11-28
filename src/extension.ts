@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
     const mjrMnrChanged = WhatsNewView.updateVersion(context);
     if (mjrMnrChanged) {
         // Major or minor version changed so show the whatsnew page.
-        new WhatsNewView();
+        new WhatsNewView(); // NOSONAR
     }
     // Register the additional command to view the "Whats' New" page.
     context.subscriptions.push(vscode.commands.registerCommand("asm-code-lens.whatsNew", () => new WhatsNewView()));
@@ -211,5 +211,7 @@ let regDocumentSymbolProviders = new Map<string, vscode.Disposable>();
 
 
 // this method is called when your extension is deactivated
+/*
 export function deactivate() {
 }
+*/
