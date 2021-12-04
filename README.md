@@ -80,18 +80,48 @@ You can use it simply by adding this to your tasks.json:
 ~~~
 
 
-# Hovers in Debug Mode
+## Hovers in Debug Mode
 
 vscode turns the normal hovers off if in debug mode. To make them visible press the "ALT" key while hovering.
 
 
-## Known Issues
+## Syntax highlighting in Markdown code blocks
+
+Assembler syntax highlighting can also be used within Markdown documents.
+Just add ```asm``` to your code blocks.
+
+Here is an example:
+```
+# Mainloop
+
+The following code is the main loop of the program:
+
+~~~asm
+main_loop:
+    ; fill line with color
+    ld hl,(fill_colors_ptr)
+    ld a,(hl)
+    call fill_bckg_line
+
+    ; next line
+    call inc_fill_colors_ptr
+
+    jr main_loop
+~~~
+```
+
+Which results in the following highlighting:
+![](assets/md_code_blocks.jpg)
+
+
+
+# Known Issues
 
 - [CodeLens lifetime #57227](https://github.com/Microsoft/vscode/issues/57227): Updates of the CodeLens is not working optimal. At the moment it is necessary to reload or save the file to update the CodeLens info.
 - This extension doesn't use a structured approach but just looks at all asm files without hierarchy. This means that sjasmplus MODULE definitions are only taken into account if they are used within the same file.
 
 
-## License and Acknowledgements
+# License and Acknowledgements
 
 ASM-Code-Lens is licensed under the [MIT license](https://github.com/maziac/dezog/blob/master/LICENSE.txt).
 
@@ -104,3 +134,8 @@ I also included the grammar for syntax highlighting from Martin Bórik's vscode 
 I.e. I copied the files language.configuration.json and z80-macroasm.tmLanguage.json. The z80-macroasm-vscode extension itself was forked from Imanol Barriuso's vscode extension [z80asm-vscode](https://github.com/Imanolea/z80asm-vscode). MIT license, copyright (c) 2016 Imanol Barriuso (Imanolea).
 
 Many thanks to the authors.
+
+I also would like to thank these authors for contributions:
+- [kborowinski](https://github.com/kborowinski) for PRs regarding sjasmplus ([#20](https://github.com/maziac/asm-code-lens/pull/20), [#21](https://github.com/maziac/asm-code-lens/pull/21), [#22](https://github.com/maziac/asm-code-lens/pull/22), [#44](https://github.com/maziac/asm-code-lens/pull/44), [#47](https://github.com/maziac/asm-code-lens/pull/47), [#50](https://github.com/maziac/asm-code-lens/pull/50)).
+- [chrijbel](https://github.com/chribjel) for PR [Added support for changing the line comment prefix](https://github.com/maziac/asm-code-lens/pull/53).
+- [64kramsystem](https://github.com/64kramsystem) for PR [Add syntax highlight to Markdown code blocks](https://github.com/maziac/asm-code-lens/pull/65).
