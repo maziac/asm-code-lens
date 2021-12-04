@@ -188,6 +188,9 @@
                     "Assembler file"
                 ],
                 "configuration": "./language-configuration.json"
+            },
+            {
+              "id": "asm-markdown-codeblock"
             }
         ],
         "grammars": [
@@ -195,6 +198,14 @@
                 "language": "asm-collection",
                 "scopeName": "source.asm",
                 "path": "./grammar/asm.json"
+            },
+            {
+                "language": "asm-markdown-codeblock",
+                "scopeName": "markdown.asm.codeblock",
+                "path": "./grammar/asm_markdown_codeblock.json",
+                "injectTo": [
+                    "text.html.markdown"
+                ]
             }
         ],
         "problemMatchers": [
