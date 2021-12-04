@@ -1,6 +1,6 @@
 # Changelog
 
-# 1.8.5
+# 1.9.0
 - Added PR #65: Add syntax highlight to Markdown code blocks
 
 # 1.8.4
