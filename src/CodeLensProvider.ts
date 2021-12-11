@@ -30,16 +30,32 @@ class AsmCodeLens extends vscode.CodeLens {
  * CodeLensProvider for assembly language.
  */
 export class CodeLensProvider implements vscode.CodeLensProvider {
-    protected rootFolder: string;   // The root folder of the project.
+     // The root folder of the project.
+    protected rootFolder: string;
+
+    // true if labels with colons should be searched.
+    protected labelsWithColons: boolean;
+
+    //  true if labels without colons should be searched.
+    protected labelsWithoutColons: boolean;
+
+    // A list of strings with words to exclude from the found labels list.
+    protected excludeFromLabels: string[]
 
 
     /**
      * Constructor.
      * @param rootFolder Stores the root folder for multiroot projects.
+     * @param labelsWithColons true if labels with colons should be searched.
+     * @param labelsWithoutColons true if labels without colons should be searched.
+     * @param excludeFromLabels A list of strings with words to exclude from the found labels list.
      */
-    constructor(rootFolder: string) {
+    constructor(rootFolder: string, labelsWithColons: boolean, labelsWithoutColons: boolean, excludeFromLabels: string[]) {
         // Store
         this.rootFolder = rootFolder + path.sep;
+        this.labelsWithColons = labelsWithColons;
+        this.labelsWithoutColons = labelsWithoutColons;
+        this.excludeFromLabels = excludeFromLabels;
     }
 
 
@@ -52,37 +68,46 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token
      */
     public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
-        const codeLenses = new Array<vscode.CodeLens>();
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.rootFolder) >= 0) {
-            // Path is right.
+        if (docPath.indexOf(this.rootFolder) < 0)
+            return [];
 
-            // Find all "some.thing:" (labels) in the document
+
+
+        // Find all code lenses
+        const codeLenses: Array<vscode.CodeLens> = [];
+        const regexes: RegExp[] = [];
+        // Find all "some.thing:" (labels) in the document
+        if (this.labelsWithColons) {
             const searchRegex = regexLabelColon();
-            // Find all sjasmplus labels without ":" in the document
+            regexes.push(searchRegex);
+        }
+        // Find all sjasmplus labels without ":" in the document
+        if (this.labelsWithoutColons) {
             const searchRegex2 = regexLabelWithoutColon();
-            const matches = grepTextDocumentMultiple(document, [searchRegex, searchRegex2]);
-             // Loop all matches and create code lenses
-            for (const fmatch of matches) {
-                // Create codeLens
-                const lineNr = fmatch.line;
-                const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
-                let colEnd = fmatch.end;
-                const lineContents = document.lineAt(lineNr).text;
-                let matchedText = lineContents.substr(colStart, colEnd - colStart);
-                if (matchedText.endsWith(':')) {
-                    colEnd--;
-                    matchedText = matchedText.substr(0, matchedText.length - 1);
-                }
-                const trimmedMatchedText = matchedText.trim();
-                const startPos = new vscode.Position(lineNr, colStart);
-                const endPos = new vscode.Position(lineNr, colEnd);
-                const range = new vscode.Range(startPos, endPos);
-                const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
-                // Store
-                codeLenses.push(codeLense);
+            regexes.push(searchRegex2);
+        }
+        const matches = grepTextDocumentMultiple(document, regexes);
+        // Loop all matches and create code lenses
+        for (const fmatch of matches) {
+            // Create codeLens
+            const lineNr = fmatch.line;
+            const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
+            let colEnd = fmatch.end;
+            const lineContents = document.lineAt(lineNr).text;
+            let matchedText = lineContents.substr(colStart, colEnd - colStart);
+            if (matchedText.endsWith(':')) {
+                colEnd--;
+                matchedText = matchedText.substr(0, matchedText.length - 1);
             }
+            const trimmedMatchedText = matchedText.trim();
+            const startPos = new vscode.Position(lineNr, colStart);
+            const endPos = new vscode.Position(lineNr, colEnd);
+            const range = new vscode.Range(startPos, endPos);
+            const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
+            // Store
+            codeLenses.push(codeLense);
         }
 
         return codeLenses;

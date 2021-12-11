@@ -53,7 +53,7 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 
 		// Get hex prefix
 		const configuration = PackageInfo.getConfiguration();
-		let hexPrefix = configuration.get<string>('hexCalculator.hexPrefix');
+		const hexPrefix = configuration.get<string>('hexCalculator.hexPrefix');
 		// Add to initialization
 		mainHtml = mainHtml.replace('//${init}', `
 let hexPrefix = "${hexPrefix}";`

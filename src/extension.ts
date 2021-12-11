@@ -75,6 +75,10 @@ export function activate(context: vscode.ExtensionContext) {
  * Reads the configuration.
  */
 function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
+    // Note: All configuration preferences are scoped 'window' which means:
+    // user, workspace or remote.
+    // So, in multiroot configurations all folders share the same settings.
+    // There are no special settings for the different multiroot folders.
     const settings = PackageInfo.getConfiguration();
 
     // Get all workspace folders
@@ -86,7 +90,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
             || event.affectsConfiguration('asm-code-lens.donated')) {
             // Update the hex calculators
             if (hexCalcExplorerProvider)
-                hexCalcExplorerProvider.setMainHtml();
+                hexCalcExplorerProvider.setMainHtml();  // TODO : Pass as argument
             if (hexCalcDebugProvider)
                 hexCalcDebugProvider.setMainHtml();
         }
@@ -116,6 +120,11 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // Set search paths.
     setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
 
+    // Get some settings.
+    const labelsWithColons = settings.get<boolean>('labels.labelsWithColons') || false;
+    const labelsWithoutColons = settings.get<boolean>('labels.labelsWithoutColons') || false;
+    const excludeFromLabelsString = settings.get<string>('labels.excludeFromLabels') || '';
+    const excludeFromLabels = excludeFromLabelsString.split(';');
 
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
     // If the identifier is missing it also doesn't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
@@ -127,7 +136,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         // Code Lenses
         if (settings.enableCodeLenses) {
             // Register
-            const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(rootFolder));
+            const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(rootFolder, labelsWithColons, labelsWithoutColons, excludeFromLabels));
             regCodeLensProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }

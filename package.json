@@ -65,101 +65,111 @@
             "title": "asm-code-lens configuration",
             "properties": {
                 "asm-code-lens.enableOutlineView": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable outline view for the active document."
                 },
                 "asm-code-lens.enableCodeLenses": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable the display of code lenses (references) above labels. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.enableHovering": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable the of showing information while hovering labels etc."
                 },
                 "asm-code-lens.enableCompletions": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable symbol input completion."
                 },
                 "asm-code-lens.completionsRequiredLength": {
+                    "scope": "window",
                     "type": "number",
                     "default": 1,
                     "description": "The number of characters required before completion proposals will be presented."
                 },
                 "asm-code-lens.enableGotoDefinition": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable 'Go to Type Definition'. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.enableFindAllReferences": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable 'Find All References'."
                 },
                 "asm-code-lens.enableRenaming": {
+                    "scope": "window",
                     "type": "boolean",
                     "default": true,
                     "description": "Enable/disable the possibility to rename labels. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.includeFiles": {
+                    "scope": "window",
                     "type": "string",
                     "default": "**/*.{asm,inc,s,a80}",
                     "description": "Choose what files to include e.g '**/*.{asm,inc,s,a80,z80}'. If your assembler sources suffix is different then you can change it here."
                 },
                 "asm-code-lens.excludeFiles": {
+                    "scope": "window",
                     "type": "string",
                     "default": "",
                     "description": "Choose what files or directories to exclude e.g '**/*.{inc,s}'."
                 },
                 "asm-code-lens.hexCalculator.showInExplorer": {
+                    "scope": "window",
                     "description": "Set to false to disable calculator in explorer view.",
                     "type": "boolean",
-                    "scope": "resource",
                     "default": true
                 },
                 "asm-code-lens.hexCalculator.showInDebug": {
+                    "scope": "window",
                     "description": "Set to false to disable calculator in debug view.",
                     "type": "boolean",
-                    "scope": "resource",
                     "default": true
                 },
                 "asm-code-lens.hexCalculator.hexPrefix": {
+                    "scope": "window",
                     "description": "The prefix to use for hex values, e.g. '0x' or '$'",
                     "type": "string",
-                    "scope": "resource",
                     "default": "0x"
                 },
                 "asm-code-lens.donated": {
+                    "scope": "window",
                     "description": "If you donated (press the 'Donate...' button in hex calculator to do so) you can hide the button by setting this parameter.",
                     "type": "boolean",
-                    "scope": "resource",
                     "default": false
                 },
                 "asm-code-lens.comments.toggleLineCommentPrefix": {
+                    "scope": "window",
                     "description": "Configure the prefix used when toggling the line comment.",
                     "type": "string",
-                    "scope": "resource",
                     "default": ";"
                 },
-                "asm-code-lens.comments.allowLabelsWithColons": {
+                "asm-code-lens.labels.labelsWithColons": {
+                    "scope": "window",
                     "description": "Recognizes labels with a trailing colon.",
                     "type": "boolean",
-                    "scope": "resource",
                     "default": true
                 },
-                "asm-code-lens.comments.allowLabelsWithoutColons": {
+                "asm-code-lens.labels.labelsWithoutColons": {
+                    "scope": "window",
                     "description": "Recognizes labels without a trailing colon.",
                     "type": "boolean",
-                    "scope": "resource",
                     "default": true
                 },
-                "asm-code-lens.comments.excludeFromLabels": {
+                "asm-code-lens.labels.excludeFromLabels": {
+                    "scope": "window",
                     "description": "Configure here a comma separated list of words that should not be recognized as labels. E.g. if asm-code-lens wrongly interprets an assembler directive as label you can exclude it here.",
                     "type": "string",
-                    "scope": "resource",
                     "default": ""
                 }
             }

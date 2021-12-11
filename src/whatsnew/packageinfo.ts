@@ -27,11 +27,13 @@ export class PackageInfo {
 
 	/**
 	 * Convenience method to return the configuration/the settings.
+	 * @param workspaceFolder The workspace folder to get the configuration for
+	 * (in case of multiroot)
 	 */
-	public static getConfiguration(): vscode.WorkspaceConfiguration {
+	public static getConfiguration(workspaceFolder?: vscode.WorkspaceFolder): vscode.WorkspaceConfiguration {
 		const packageJSON = this.extension.packageJSON;
 		const extensionBaseName = packageJSON.name;
-		const config = vscode.workspace.getConfiguration(extensionBaseName, null);
+		const config = vscode.workspace.getConfiguration(extensionBaseName, workspaceFolder);
 		return config;
 	}
 }
