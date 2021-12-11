@@ -81,6 +81,11 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      */
     protected async search(document, position): Promise<vscode.Location[]> {
         const searchWord = document.getText(document.getWordRangeAtPosition(position)); //, /[a-z0-9_.]+/i));
+
+        // Check if search word is in the excludes
+        if (this.config.labelsExcludes.includes(searchWord))
+            return [];  // Abort
+
         // Find all "something:" (labels) in the document, also labels without colon.
         const regexes = regexesLabelForWord(searchWord, this.config);
         // Find all sjasmplus MODULEs in the document
