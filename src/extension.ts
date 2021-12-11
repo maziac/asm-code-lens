@@ -121,10 +121,15 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
 
     // Get some settings.
-    const labelsWithColons = settings.get<boolean>('labels.labelsWithColons') || false;
-    const labelsWithoutColons = settings.get<boolean>('labels.labelsWithoutColons') || false;
-    const excludeFromLabelsString = settings.get<string>('labels.excludeFromLabels') || '';
-    const excludeFromLabels = excludeFromLabelsString.split(';');
+    let labelsWithColons = true;
+    let labelsWithoutColons = true;
+    const labelsIncludedTypes = (settings.get<string>('labels.includedTypes') || '').toLowerCase();
+    if (labelsIncludedTypes.startsWith('without '))
+        labelsWithColons = false;
+    else if (labelsIncludedTypes.startsWith('with '))
+        labelsWithoutColons = false;
+    const excludeFromLabelsString = settings.get<string>('labels.exclude') || '';
+    const excludeFromLabels = excludeFromLabelsString.toLowerCase().split(';');
 
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
     // If the identifier is missing it also doesn't help to define it in package.json. And if "id" would be used it clashes again with other extensions.

@@ -102,12 +102,16 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 matchedText = matchedText.substr(0, matchedText.length - 1);
             }
             const trimmedMatchedText = matchedText.trim();
-            const startPos = new vscode.Position(lineNr, colStart);
-            const endPos = new vscode.Position(lineNr, colEnd);
-            const range = new vscode.Range(startPos, endPos);
-            const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
-            // Store
-            codeLenses.push(codeLense);
+            // Check that label is not excluded
+            if (!this.excludeFromLabels.includes(trimmedMatchedText.toLowerCase())) {
+                // Create code lens
+                const startPos = new vscode.Position(lineNr, colStart);
+                const endPos = new vscode.Position(lineNr, colEnd);
+                const range = new vscode.Range(startPos, endPos);
+                const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
+                // Store
+                codeLenses.push(codeLense);
+            }
         }
 
         return codeLenses;

@@ -2,6 +2,8 @@
 
 # 1.9.0
 - Added PR #65: Add syntax highlight to Markdown code blocks.
+- Added configuration to exclude certain labels.
+- Added configurations to recognize labels with colons, without colons or both.
 
 # 1.8.4
 - Fixed negative number formatting in hex number in hex calculator.
