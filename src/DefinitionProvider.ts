@@ -41,11 +41,11 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         const match = regexInclude().exec(lineContents);
         if (match) {
             // INCLUDE found
-            return await this.getInclude(match[1]);
+            return this.getInclude(match[1]);
         }
         else {
             // Normal definition
-            return await this.search(document, position);
+            return this.search(document, position);
         }
     }
 

@@ -35,7 +35,7 @@ export class HoverProvider implements vscode.HoverProvider {
         if (docPath.indexOf(this.rootFolder) < 0)
             return undefined as any; // Path is wrong.
         // Right path.
-        return await this.search(document, position);
+        return this.search(document, position);
     }
 
 
@@ -77,9 +77,7 @@ export class HoverProvider implements vscode.HoverProvider {
         // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
         const hoverTexts = new Array<vscode.MarkdownString>();
         // Check for end
-        for (let index = 0; index < reducedLocations.length; index++) {
-            // Not end.
-            const loc = reducedLocations[index];
+        for(const loc of reducedLocations) {
             const lineNr = loc.range.start.line;
             const filePath = loc.uri.fsPath;
             const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});

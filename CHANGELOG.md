@@ -1,7 +1,7 @@
 # Changelog
 
 # 1.9.0
-- Added PR #65: Add syntax highlight to Markdown code blocks
+- Added PR #65: Add syntax highlight to Markdown code blocks.
 
 # 1.8.4
 - Fixed negative number formatting in hex number in hex calculator.

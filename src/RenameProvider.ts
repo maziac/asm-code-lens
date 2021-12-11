@@ -32,7 +32,7 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param token
      */
     public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit> {
-        return await this.rename(document, position, newName);
+        return this.rename(document, position, newName);
     }
 
 

@@ -68,7 +68,7 @@ export class GrepLocation extends vscode.Location {
 export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepLocation) => string): GrepLocation[] {
     // Put all in a map;
     const locMap = new Map<string,GrepLocation>();
-    locations.map(loc => locMap.set(handler(loc), loc));
+    locations.forEach(loc => locMap.set(handler(loc), loc));
     // Then generate an array from the map:
     const results = Array.from(locMap.values());
     return results;
@@ -149,7 +149,6 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
             else {
                 // Check file on disk
                 let fileMatches = allMatches.get(fileName);
-                let lastIndex = 0;
 
                 // Read
                 const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
@@ -160,7 +159,6 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
                     const lineContents = stripComment(lines[index]);
                     if (lineContents.length == 0)
                         continue;
-                    const line = lastIndex + index;
                     regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
                     const lineMatches: Array<FileMatch> = [];
                     do {
@@ -189,7 +187,7 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
                         // Reverse order (useful if names should be replaced later on)
                         lineMatches.unshift({
                             filePath,
-                            line,
+                            line: index,
                             start,
                             end,
                             lineContents,
@@ -201,8 +199,6 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
                     if (fileMatches)
                         fileMatches.push(...lineMatches);
                 }
-
-                lastIndex += len;
             }
         }
     }
@@ -484,7 +480,7 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
 export async function reduceLocations(locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
     // 1. Get module label
-    const searchLabel = await getLabelAndModuleLabel(docFileName, position, docs, regexEnd);
+    const searchLabel = getLabelAndModuleLabel(docFileName, position, docs, regexEnd);
 
     // For item completion:
     let regexLabel;
@@ -522,7 +518,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
             continue;
         }
 
-        const mLabel = await getLabelAndModuleLabel(fileName, pos, docs, regexEnd);
+        const mLabel = getLabelAndModuleLabel(fileName, pos, docs, regexEnd);
         // Assign to location
         loc.label = mLabel.label;
         loc.moduleLabel = mLabel.moduleLabel;
@@ -629,7 +625,7 @@ export function getModule(lines: Array<string>, len: number): string {
         const matchEndmodule = regexEndmodule.exec(lineContents);
         if(matchEndmodule) {
             modules.pop();
-            continue;
+            //continue; // Is last statement anyway
         }
     }
 

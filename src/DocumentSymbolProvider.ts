@@ -186,7 +186,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                         for (const elem of lastSymbols) {
                             elem.kind = kind;
                             elem.detail = match![1] + ' ' + match![2].trimRight();
-                        } match
+                        }
                         defaultSymbolKind = kind;
                     }
                     // Something different, so assume code

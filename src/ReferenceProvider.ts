@@ -35,7 +35,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         if (docPath.indexOf(this.rootFolder) < 0)
                 return [];   // Skip because path belongs to different project
         // Path is from right project -> search
-        return await this.search(document, position);
+        return this.search(document, position);
     }
 
 

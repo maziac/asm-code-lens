@@ -143,6 +143,24 @@
                     "type": "string",
                     "scope": "resource",
                     "default": ";"
+                },
+                "asm-code-lens.comments.allowLabelsWithColons": {
+                    "description": "Recognizes labels with a trailing colon.",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": true
+                },
+                "asm-code-lens.comments.allowLabelsWithoutColons": {
+                    "description": "Recognizes labels without a trailing colon.",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": true
+                },
+                "asm-code-lens.comments.excludeFromLabels": {
+                    "description": "Configure here a comma separated list of words that should not be recognized as labels. E.g. if asm-code-lens wrongly interprets an assembler directive as label you can exclude it here.",
+                    "type": "string",
+                    "scope": "resource",
+                    "default": ""
                 }
             }
         },
