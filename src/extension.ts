@@ -123,13 +123,19 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // Get some settings.
     let labelsWithColons = true;
     let labelsWithoutColons = true;
-    const labelsIncludedTypes = (settings.get<string>('labels.includedTypes') || '').toLowerCase();
-    if (labelsIncludedTypes.startsWith('without '))
+    const labelsColon = (settings.get<string>('labels.colon') || '').toLowerCase();
+    if (labelsColon.startsWith('without '))
         labelsWithColons = false;
-    else if (labelsIncludedTypes.startsWith('with '))
+    else if (labelsColon.startsWith('with '))
         labelsWithoutColons = false;
-    const excludeFromLabelsString = settings.get<string>('labels.exclude') || '';
-    const excludeFromLabels = excludeFromLabelsString.toLowerCase().split(';');
+    const labelsExcludesString = settings.get<string>('labels.excludes') || '';
+    const labelsExcludes = labelsExcludesString.toLowerCase().split(';');
+    const config: Config = {
+        rootFolder: '',
+        labelsWithColons,
+        labelsWithoutColons,
+        labelsExcludes
+    };
 
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
     // If the identifier is missing it also doesn't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
@@ -137,11 +143,13 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
     // Multiroot: do for all root folders:
     for (const rootFolder of wsFolders) {
+        // For multiroot
+        config.rootFolder = rootFolder;
 
         // Code Lenses
         if (settings.enableCodeLenses) {
             // Register
-            const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(rootFolder, labelsWithColons, labelsWithoutColons, excludeFromLabels));
+            const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(config));
             regCodeLensProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }

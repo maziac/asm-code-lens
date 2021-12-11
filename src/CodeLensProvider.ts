@@ -30,32 +30,18 @@ class AsmCodeLens extends vscode.CodeLens {
  * CodeLensProvider for assembly language.
  */
 export class CodeLensProvider implements vscode.CodeLensProvider {
-     // The root folder of the project.
-    protected rootFolder: string;
-
-    // true if labels with colons should be searched.
-    protected labelsWithColons: boolean;
-
-    //  true if labels without colons should be searched.
-    protected labelsWithoutColons: boolean;
-
-    // A list of strings with words to exclude from the found labels list.
-    protected excludeFromLabels: string[]
+    // The configuration to use.
+    protected config: Config;
 
 
     /**
      * Constructor.
-     * @param rootFolder Stores the root folder for multiroot projects.
-     * @param labelsWithColons true if labels with colons should be searched.
-     * @param labelsWithoutColons true if labels without colons should be searched.
-     * @param excludeFromLabels A list of strings with words to exclude from the found labels list.
+     * @param config The configuration (preferences) to use.
      */
-    constructor(rootFolder: string, labelsWithColons: boolean, labelsWithoutColons: boolean, excludeFromLabels: string[]) {
+    constructor(config: Config) {
         // Store
-        this.rootFolder = rootFolder + path.sep;
-        this.labelsWithColons = labelsWithColons;
-        this.labelsWithoutColons = labelsWithoutColons;
-        this.excludeFromLabels = excludeFromLabels;
+        this.config = {...config};
+        this.config.rootFolder += path.sep;
     }
 
 
@@ -70,7 +56,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.rootFolder) < 0)
+        if (docPath.indexOf(this.config.rootFolder) < 0)
             return [];
 
 
@@ -79,12 +65,12 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const codeLenses: Array<vscode.CodeLens> = [];
         const regexes: RegExp[] = [];
         // Find all "some.thing:" (labels) in the document
-        if (this.labelsWithColons) {
+        if (this.config.labelsWithColons) {
             const searchRegex = regexLabelColon();
             regexes.push(searchRegex);
         }
         // Find all sjasmplus labels without ":" in the document
-        if (this.labelsWithoutColons) {
+        if (this.config.labelsWithoutColons) {
             const searchRegex2 = regexLabelWithoutColon();
             regexes.push(searchRegex2);
         }
@@ -103,7 +89,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             }
             const trimmedMatchedText = matchedText.trim();
             // Check that label is not excluded
-            if (!this.excludeFromLabels.includes(trimmedMatchedText.toLowerCase())) {
+            if (!this.config.labelsExcludes.includes(trimmedMatchedText.toLowerCase())) {
                 // Create code lens
                 const startPos = new vscode.Position(lineNr, colStart);
                 const endPos = new vscode.Position(lineNr, colEnd);
@@ -134,7 +120,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const pos = codeLens.range.start;
         //const line = pos.line;
 
-        const locations = await grep(searchRegex, this.rootFolder);
+        const locations = await grep(searchRegex, this.config.rootFolder);
         // Remove any locations because of module information (dot notation)
         const reducedLocations = await reduceLocations(locations, doc.fileName, pos)
         // create title

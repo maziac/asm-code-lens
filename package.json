@@ -170,7 +170,7 @@
                     ],
                     "default": "Both"
                 },
-                "asm-code-lens.labels.exclude": {
+                "asm-code-lens.labels.excludes": {
                     "scope": "window",
                     "markdownDescription": "Configure here a comma separated list of words that should not be recognized as labels. E.g. if asm-code-lens wrongly interprets an assembler directive as label you can exclude it here. For example `if;then;else;elif;endif`. The exclude is case-insensitive.",
                     "type": "string",
