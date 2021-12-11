@@ -1,10 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
-//import { CodeLensProvider } from './CodeLensProvider';
-//import { stringify } from 'querystring';
-import { regexPrepareFuzzy } from './regexes';
-import { regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord } from './regexes';
+import {regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord, regexPrepareFuzzy } from './regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 
@@ -153,12 +150,12 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         // Find all sjasmplus labels without ":" in the document
         const searchSjasmLabel = regexEveryLabelWithoutColonForWord(searchWord);
         // Find all sjasmplus MODULEs in the document
-        const searchsJasmModule = regexEveryModuleForWord(searchWord);
+        const searchSjasmModule = regexEveryModuleForWord(searchWord);
         // Find all sjasmplus MACROs in the document
-        const searchsJasmMacro = regexEveryMacroForWord(searchWord);
+        const searchSjasmMacro = regexEveryMacroForWord(searchWord);
 
         // Put all searches in one array
-        const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
+        const searchRegexes = [searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro];
 
         const locations = await grepMultiple(searchRegexes, this.rootFolder);
         // Reduce the found locations.
