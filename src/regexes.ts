@@ -121,6 +121,27 @@ export function regexLabelWithoutColonForWord(searchWord: string): RegExp {
 
 
 /**
+ * Returns an array of regexes with 1 or 2 regexes.
+ * @param labelsWithColons Add regex with colons
+ * @param labelsWithoutColons Add regex without colons
+ */
+export function regexesLabelForWord(searchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
+    const regexes: RegExp[] = [];
+    // Find all "some.thing:" (labels) in the document
+    if (cfg.labelsWithColons) {
+        const searchRegex = regexLabelColonForWord(searchWord);
+        regexes.push(searchRegex);
+    }
+    // Find all sjasmplus labels without ":" in the document
+    if (cfg.labelsWithoutColons) {
+        const searchRegex2 = regexLabelWithoutColonForWord(searchWord);
+        regexes.push(searchRegex2);
+    }
+    return regexes;
+}
+
+
+/**
  * Searches for a (sjasmplus) MODULE that contains the given word.
  * Capture groups:
  *  1 = preceding characters before 'searchWord'.

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs';
-import { regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct } from './regexes';
+import {regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct} from './regexes';
 
 
 // Is set on start and whenver the settings change.
@@ -67,7 +67,7 @@ export class GrepLocation extends vscode.Location {
  */
 export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepLocation) => string): GrepLocation[] {
     // Put all in a map;
-    const locMap = new Map<string,GrepLocation>();
+    const locMap = new Map<string, GrepLocation>();
     locations.forEach(loc => locMap.set(handler(loc), loc));
     // Then generate an array from the map:
     const results = Array.from(locMap.values());
@@ -85,12 +85,12 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
 export function getTextDocument(filePath: string, docs: Array<vscode.TextDocument>): vscode.TextDocument {
     // Check if file is opened in editor
     let foundDoc;
-    for(const doc of docs) {
+    for (const doc of docs) {
         //if(doc.isDirty)    // Only check dirty documents, other are on disk
-            if(doc.fileName == filePath) {
-                foundDoc = doc;
-                break;
-            }
+        if (doc.fileName == filePath) {
+            foundDoc = doc;
+            break;
+        }
     }
     return foundDoc;
 }
@@ -123,7 +123,7 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
     assert(grepGlobInclude);
     try {
         const uris = await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude);
-            const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+        const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
 
         for (const uri of uris) {
             // get fileName
@@ -202,17 +202,17 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
             }
         }
     }
-    catch(e) {
+    catch (e) {
         console.log("Error: ", e);
     }
 
     // Convert matches to vscode locations
     const locations: Array<GrepLocation> = [];
-    for(const [file,matches] of allMatches) {
+    for (const [file, matches] of allMatches) {
         // Iterate all matches inside file
-        for(const match of matches) {
+        for (const match of matches) {
             const lineNr = match.line;
-            let colStart=match.start;
+            let colStart = match.start;
             // Check for dot label
             //if (match.match[1].indexOf('.')>=0)
             //    colStart--; // include the dot
@@ -241,14 +241,14 @@ export async function grepMultiple(regexes: RegExp[], rootFolder: string): Promi
     let allLocations: Array<GrepLocation> = [];
 
     // grep all regex
-    for(const regex of regexes) {
+    for (const regex of regexes) {
         const locations = await grep(regex, rootFolder);
         // Add found locations
         allLocations.push(...locations);
     }
 
     // Remove double entries
-    if(regexes.length > 0) {
+    if (regexes.length > 0) {
         allLocations = removeDuplicates(allLocations, loc => {
             const fm = loc.fileMatch;
             const s = fm.filePath + ':' + fm.line + ':' + fm.start;
@@ -270,21 +270,21 @@ export async function grepMultiple(regexes: RegExp[], rootFolder: string): Promi
 export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileMatch[] {
     const matches: FileMatch[] = [];
     const len = doc.lineCount;
-    for (let line=0; line<len; line++) {
+    for (let line = 0; line < len; line++) {
         const textLine = doc.lineAt(line);
         const lineContents = stripComment(textLine.text);
 
         regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
         do {
             const match = regex.exec(lineContents);
-            if(!match)
+            if (!match)
                 break;
 
             // Found: get start and end
             let start = match.index;
-            for(let j=1; j<match.length; j++) {
+            for (let j = 1; j < match.length; j++) {
                 // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                if(match[j]) {
+                if (match[j]) {
                     // Note: an optional group might be undefined
                     const i = match[j].length;
                     start += i;
@@ -302,7 +302,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
                 lineContents,
                 match
             });
-        } while(regex.global);  // Note if "g" was specified multiple matches (e.g. for rename) can be found.
+        } while (regex.global);  // Note if "g" was specified multiple matches (e.g. for rename) can be found.
     }
     return matches;
 }
@@ -319,7 +319,7 @@ export function grepTextDocumentMultiple(doc: vscode.TextDocument, regexes: RegE
     const allMatches: FileMatch[] = [];
 
     // grep all regex
-    for(const regex of regexes) {
+    for (const regex of regexes) {
         // grep doc
         const fileMatches = grepTextDocument(doc, regex);
         // Add found matches
@@ -338,10 +338,10 @@ export function grepTextDocumentMultiple(doc: vscode.TextDocument, regexes: RegE
  */
 export function getLastLabelPart(label: string): string {
     const k = label.indexOf('.');
-    if(k < 0)
+    if (k < 0)
         return label;   // No dot.
 
-    return label.substr(k+1);
+    return label.substr(k + 1);
 }
 
 
@@ -362,20 +362,20 @@ export function getRegExFromLabel(label: string): RegExp {
     let prefix;
     let lastPart;
     const k = label.indexOf('.');
-    if(k < 0) {
+    if (k < 0) {
         // No dot
         prefix = '';
         lastPart = label;
     }
     else {
         // Includes dot
-        prefix = label.substr(0,k+1);
-        lastPart = label.substr(k+1);
+        prefix = label.substr(0, k + 1);
+        lastPart = label.substr(k + 1);
     }
 
     // Change last part
     const lastRegexStr = regexPrepareFuzzy(lastPart) + '\\w*';
-    let regexStr = prefix.replace(/(\.)/g,'\\.');  // Make sure to convert . to \. for regular expression.
+    let regexStr = prefix.replace(/(\.)/g, '\\.');  // Make sure to convert . to \. for regular expression.
     regexStr += lastRegexStr;
 
     // Return
@@ -391,9 +391,9 @@ export function getRegExFromLabel(label: string): RegExp {
  * @return E.g. sound.effects.explosion. If module is undefined or an empty string then label is returned unchanged.
  */
 function concatenateModuleAndLabel(module: string, label: string): string {
-    if(!module)
+    if (!module)
         return label;
-    if(module.length == 0)
+    if (module.length == 0)
         return label;
 
     const mLabel = module + '.' + label;
@@ -426,7 +426,7 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
 
     let lines: Array<string>;
     // Different handling: open text document or file on disk
-    if(foundDoc) {
+    if (foundDoc) {
         // Doc is opened in text editor (and dirty).
         lines = foundDoc.getText().split('\n');
     }
@@ -441,7 +441,7 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
     let {label, preString} = getCompleteLabel(line, clmn, regexEnd);
 
     // 2. If local label: The document is parsed from position to begin for a non-local label.
-    if(label.startsWith('.')) {
+    if (label.startsWith('.')) {
         // Local label, e.g. ".loop"
         const nonLocalLabel = getNonLocalLabel(lines, row);
         label = nonLocalLabel + label;
@@ -454,7 +454,7 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
     const moduleLabel = concatenateModuleAndLabel(module, label);
 
     // Check that no character is preceding the label.
-    if(preString.length == 0) {
+    if (preString.length == 0) {
         // It's the definition of a label, so moduleLabel is the only possible label.
         label = moduleLabel;
     }
@@ -487,7 +487,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
     let regexModuleLabel;
 
     // Check if we care about upper/lower case.
-    if(!checkFullName) {
+    if (!checkFullName) {
         // Do not care
         //searchLabel.label = searchLabel.label.toLowerCase();
         //searchLabel.moduleLabel = searchLabel.moduleLabel.toLowerCase();
@@ -578,18 +578,18 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
 
     // Loop
     let match;
-    for(; index>=0; index--) {
+    for (; index >= 0; index--) {
         const line = lines[index];
         match = regex.exec(line);
-        if(match)
+        if (match)
             break;
         match = regex2.exec(line);
-        if(match)
+        if (match)
             break;
     }
 
     // Out of bounds check
-    if(!match)
+    if (!match)
         return undefined as any;
 
     // Return
@@ -611,19 +611,19 @@ export function getModule(lines: Array<string>, len: number): string {
     const regexModule = regexModuleStruct();
     const regexEndmodule = regexEndModuleStruct();
     const modules: Array<string> = [];
-    for (let row=0; row<len; row++) {
+    for (let row = 0; row < len; row++) {
         const lineContents = lines[row];
 
         // MODULE
         const matchModule = regexModule.exec(lineContents);
-        if(matchModule) {
+        if (matchModule) {
             modules.push(matchModule[2]);
             continue;
         }
 
         // ENDMODULE
         const matchEndmodule = regexEndmodule.exec(lineContents);
-        if(matchEndmodule) {
+        if (matchEndmodule) {
             modules.pop();
             //continue; // Is last statement anyway
         }
@@ -651,29 +651,29 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
     // Find end of label.
     const len = lineContents.length;    // REMARK: This can lead to error: "length of undefined"
     let k: number;
-    for(k = startIndex; k<len; k++) {
+    for (k = startIndex; k < len; k++) {
         const s = lineContents.charAt(k);
         // Allow [a-z0-9_]
         const match = regexEnd.exec(s);
-        if(!match)
+        if (!match)
             break;
     }
     // k points now after the label
 
     // Find start of label.
     let i;
-    for(i = startIndex-1; i>=0; i--) {
+    for (i = startIndex - 1; i >= 0; i--) {
         const s = lineContents.charAt(i);
         // Allow [a-z0-9_.]
         const match = /[\w\.]/.exec(s);
-        if(!match)
+        if (!match)
             break;
     }
     // i points one before the start of the label
     i++;
 
     // Get complete string
-    const label = lineContents.substr(i, k-i);
+    const label = lineContents.substr(i, k - i);
     const preString = lineContents.substr(0, i);
 
     return {label, preString};
@@ -686,7 +686,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
  */
 export function setCustomCommentPrefix(prefix: string) {
     const commentsSet = new Set<string>([';', '//']);
-    if(prefix)
+    if (prefix)
         commentsSet.add(prefix);
     commentPrefixes = Array.from(commentsSet);
 }
@@ -719,7 +719,7 @@ export function stripComment(text: string) {
  *
  */
 export function dbgPrintLocations(locs: GrepLocation[]) {
-    for(let loc of locs) {
+    for (let loc of locs) {
         console.log(loc.symbol + ': ' + loc.label + ', ' + loc.moduleLabel);
     }
 }

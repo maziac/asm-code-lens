@@ -161,7 +161,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
         if (settings.enableGotoDefinition) {
             // Register
-            const provider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider(rootFolder));
+            const provider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider(config));
             regDefinitionProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
