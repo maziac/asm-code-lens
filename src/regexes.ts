@@ -31,6 +31,25 @@ export function regexLabelWithoutColon(): RegExp {
 }
 
 
+/**
+ * Returns an array of regexes with 1 or 2 regexes.
+ * @param labelsWithColons Add regex with colons
+ * @param labelsWithoutColons Add regex without colons
+ */
+export function regexesLabel(cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
+    const regexes: RegExp[] = [];
+    // Find all "some.thing:" (labels) in the document
+    if (cfg.labelsWithColons) {
+        const searchRegex = regexLabelColon();
+        regexes.push(searchRegex);
+    }
+    // Find all sjasmplus labels without ":" in the document
+    if (cfg.labelsWithoutColons) {
+        const searchRegex2 = regexLabelWithoutColon();
+        regexes.push(searchRegex2);
+    }
+    return regexes;
+}
 
 
 /**

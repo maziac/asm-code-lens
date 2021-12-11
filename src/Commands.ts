@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { grep, FileMatch, grepMultiple, reduceLocations  } from './grep';
-import { regexLabelColon, regexLabelWithoutColon, regexLabelEquOrMacro, regexAnyReferenceForWord } from './regexes';
+import { regexLabelEquOrMacro, regexAnyReferenceForWord, regexesLabel } from './regexes';
+import {Config} from './config';
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -16,16 +17,20 @@ export class Commands {
 
     /**
      * Searches all labels and shows the ones that are not referenced.
-     * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
+     * @param config The configuration (preferences) to use.
+     * (config.rootFolder The search is limited to the root / project
+     * folder. This needs to contain a trailing '/'.)
      */
-    public static async findLabelsWithNoReference(rootFolder: string): Promise<void> {
+    public static async findLabelsWithNoReference(config: Config): Promise<void> {
+        // Get regexes
+        const regexes = regexesLabel(config);
         // Get all label definition (locations)
-        const labelLocations = await grepMultiple([regexLabelColon(), regexLabelWithoutColon()], rootFolder);
+        const labelLocations = await grepMultiple(regexes, config.rootFolder);
 
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
         // Convert this to an array of labels.
-        this.findLabels(labelLocations, rootFolder);
+        this.findLabels(labelLocations, config.rootFolder);
     }
 
 

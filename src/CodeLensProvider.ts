@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { grep, grepTextDocumentMultiple, reduceLocations } from './grep';
-import { regexLabelColon, regexLabelWithoutColon, regexAnyReferenceForWord } from './regexes';
+import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
+import {regexAnyReferenceForWord, regexesLabel} from './regexes';
+import {Config} from './config';
 
 
 /**
@@ -18,7 +19,7 @@ class AsmCodeLens extends vscode.CodeLens {
      * @param range The range in the TextDocument.
      * @param matchedText The matchedText, i.e. the symbol.
      */
-    constructor(doc:vscode.TextDocument, range: vscode.Range, matchedText: string) {
+    constructor(doc: vscode.TextDocument, range: vscode.Range, matchedText: string) {
         super(range);
         this.document = doc;
         this.symbol = matchedText;
@@ -63,17 +64,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
         // Find all code lenses
         const codeLenses: Array<vscode.CodeLens> = [];
-        const regexes: RegExp[] = [];
-        // Find all "some.thing:" (labels) in the document
-        if (this.config.labelsWithColons) {
-            const searchRegex = regexLabelColon();
-            regexes.push(searchRegex);
-        }
-        // Find all sjasmplus labels without ":" in the document
-        if (this.config.labelsWithoutColons) {
-            const searchRegex2 = regexLabelWithoutColon();
-            regexes.push(searchRegex2);
-        }
+        const regexes = regexesLabel(this.config);
         const matches = grepTextDocumentMultiple(document, regexes);
         // Loop all matches and create code lenses
         for (const fmatch of matches) {

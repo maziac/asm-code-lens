@@ -13,6 +13,7 @@ import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
+import {getLabelsConfig} from './config';
 
 
 
@@ -58,11 +59,14 @@ export function activate(context: vscode.ExtensionContext) {
         const editorPath = vscode.window.activeTextEditor?.document.uri.fsPath || '';
         // Get all workspace folders
         const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath);
+        const config = getLabelsConfig();
         // Check in which workspace folder the path is included
         for (const rootFolder of wsFolders) {
-            if (editorPath.indexOf(rootFolder) >= 0) {
+            if (editorPath.includes(rootFolder)) {
+                // Add root folder
+                config.rootFolder = rootFolder + path.sep;
                 // Found. Find labels
-                Commands.findLabelsWithNoReference(rootFolder + path.sep);
+                Commands.findLabelsWithNoReference(config);
                 // Stop loop
                 break;
             }
@@ -121,21 +125,8 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
 
     // Get some settings.
-    let labelsWithColons = true;
-    let labelsWithoutColons = true;
-    const labelsColon = (settings.get<string>('labels.colon') || '').toLowerCase();
-    if (labelsColon.startsWith('without '))
-        labelsWithColons = false;
-    else if (labelsColon.startsWith('with '))
-        labelsWithoutColons = false;
-    const labelsExcludesString = settings.get<string>('labels.excludes') || '';
-    const labelsExcludes = labelsExcludesString.toLowerCase().split(';');
-    const config: Config = {
-        rootFolder: '',
-        labelsWithColons,
-        labelsWithoutColons,
-        labelsExcludes
-    };
+    const config = getLabelsConfig();
+
 
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
     // If the identifier is missing it also doesn't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
