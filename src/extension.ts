@@ -86,7 +86,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     const settings = PackageInfo.getConfiguration();
 
     // Get all workspace folders
-    const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath);
+    const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
 
     // Check for the hex calculator params
     if (event) {
@@ -125,7 +125,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
 
     // Get some settings.
-    const config = getLabelsConfig();
+    const configWoRoot = getLabelsConfig();
 
 
     // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
@@ -134,6 +134,8 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
     // Multiroot: do for all root folders:
     for (const rootFolder of wsFolders) {
+        // Copy config
+        const config = {...configWoRoot};
         // For multiroot
         config.rootFolder = rootFolder;
 

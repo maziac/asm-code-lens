@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
-import {regexEveryModuleForWord, regexEveryMacroForWord, regexPrepareFuzzy, regexesLabelForWord, regexesEveryLabelForWord } from './regexes';
+import {regexEveryModuleForWord, regexEveryMacroForWord, regexPrepareFuzzy, regexesEveryLabelForWord } from './regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {Config} from './config';
 
@@ -81,8 +80,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
      */
     constructor(config: Config) {
         // Store
-        this.config = {...config};
-        this.config.rootFolder += path.sep;
+        this.config = config;
     }
 
 

@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { grep, reduceLocations } from './grep';
 import { regexAnyReferenceForWord } from './regexes';
 
@@ -18,7 +17,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      */
     constructor(rootFolder: string) {
         // Store
-        this.rootFolder = rootFolder + path.sep;
+        this.rootFolder = rootFolder;
     }
 
 
@@ -33,7 +32,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         // First check for right path
         const docPath = document.uri.fsPath;
         if (docPath.indexOf(this.rootFolder) < 0)
-                return [];   // Skip because path belongs to different project
+                return [];   // Skip because path belongs to different workspace
         // Path is from right project -> search
         return this.search(document, position);
     }

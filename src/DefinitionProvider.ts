@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { grepMultiple, reduceLocations } from './grep';
 //import { resolve } from 'path';
 import {regexInclude, regexModuleForWord, regexMacroForWord, regexStructForWord, regexesLabelForWord} from './regexes';
@@ -22,8 +21,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      */
     constructor(config: Config) {
         // Store
-        this.config = {...config};
-        this.config.rootFolder += path.sep;
+        this.config = config;
     }
 
 

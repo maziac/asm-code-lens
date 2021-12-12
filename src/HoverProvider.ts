@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
 import {regexModuleForWord, regexMacroForWord, regexesLabelForWord} from './regexes';
 import * as fs from 'fs';
@@ -20,8 +19,7 @@ export class HoverProvider implements vscode.HoverProvider {
      */
     constructor(config: Config) {
         // Store
-        this.config = {...config};
-        this.config.rootFolder += path.sep;
+        this.config = config;
     }
 
 

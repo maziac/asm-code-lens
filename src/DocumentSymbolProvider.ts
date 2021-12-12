@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { stripComment } from './grep';
 import {Config} from './config';
 
@@ -20,8 +19,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
      */
     constructor(config: Config) {
         // Store
-        this.config = {...config};
-        this.config.rootFolder += path.sep;
+        this.config = config;
     }
 
 

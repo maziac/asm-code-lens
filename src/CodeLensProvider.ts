@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
 import {regexAnyReferenceForWord, regexesLabel} from './regexes';
 import {Config} from './config';
@@ -41,8 +40,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      */
     constructor(config: Config) {
         // Store
-        this.config = {...config};
-        this.config.rootFolder += path.sep;
+        this.config = config;
     }
 
 
