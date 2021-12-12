@@ -244,6 +244,27 @@ export function regexEveryLabelWithoutColonForWord(searchWord: string): RegExp {
 
 
 /**
+ * Returns an array of regexes with 1 or 2 regexes.
+ * @param labelsWithColons Add regex with colons
+ * @param labelsWithoutColons Add regex without colons
+ */
+export function regexesEveryLabelForWord(searchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
+    const regexes: RegExp[] = [];
+    // Find all "some.thing:" (labels) in the document
+    if (cfg.labelsWithColons) {
+        const searchRegex = regexEveryLabelColonForWord(searchWord);
+        regexes.push(searchRegex);
+    }
+    // Find all sjasmplus labels without ":" in the document
+    if (cfg.labelsWithoutColons) {
+        const searchRegex2 = regexEveryLabelWithoutColonForWord(searchWord);
+        regexes.push(searchRegex2);
+    }
+    return regexes;
+}
+
+
+/**
  * Searches for a (sjasmplus) MODULE that contains the given word.
  * The label can be everywhere. I.e. it can be a middle part of a dot
  * notated label.

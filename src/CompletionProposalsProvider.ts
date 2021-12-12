@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
-import {regexEveryLabelColonForWord, regexEveryLabelWithoutColonForWord, regexEveryModuleForWord, regexEveryMacroForWord, regexPrepareFuzzy } from './regexes';
+import {regexEveryModuleForWord, regexEveryMacroForWord, regexPrepareFuzzy, regexesLabelForWord, regexesEveryLabelForWord } from './regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
+import {Config} from './config';
 
 
 /// All additional completions like Z80 instructions and assembler
@@ -69,16 +70,19 @@ const completions = [
  * CompletionItemProvider for assembly language.
  */
 export class CompletionProposalsProvider implements vscode.CompletionItemProvider {
-    protected rootFolder: string;   // The root folder of the project.
+
+    // The configuration to use.
+    protected config: Config;
 
 
     /**
      * Constructor.
-     * @param rootFolder Stores the root folder for multiroot projects.
+     * @param config The configuration (preferences) to use.
      */
-    constructor(rootFolder: string) {
+    constructor(config: Config) {
         // Store
-        this.rootFolder = rootFolder + path.sep;
+        this.config = {...config};
+        this.config.rootFolder += path.sep;
     }
 
 
@@ -91,7 +95,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
     public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList>> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.rootFolder) < 0)
+        if (!docPath.includes(this.config.rootFolder))
             return undefined as any; // Path is wrong.
 
         // Get required length
@@ -145,19 +149,16 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         let searchWord = document.getText(document.getWordRangeAtPosition(position));
         searchWord = regexPrepareFuzzy(searchWord);
 
-        // Find all "something:" (labels) in the document
-        const searchNormal = regexEveryLabelColonForWord(searchWord);
-        // Find all sjasmplus labels without ":" in the document
-        const searchSjasmLabel = regexEveryLabelWithoutColonForWord(searchWord);
+        // regexes for labels with and without colon
+        const regexes = regexesEveryLabelForWord(searchWord, this.config);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = regexEveryModuleForWord(searchWord);
+        regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
         const searchSjasmMacro = regexEveryMacroForWord(searchWord);
+        regexes.push(searchSjasmMacro);
 
-        // Put all searches in one array
-        const searchRegexes = [searchNormal, searchSjasmLabel, searchSjasmModule, searchSjasmMacro];
-
-        const locations = await grepMultiple(searchRegexes, this.rootFolder);
+        const locations = await grepMultiple(regexes, this.config.rootFolder);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(locations, document.fileName, position, true, false);
         // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
@@ -169,6 +170,8 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         // Go through all found locations
         for (const loc of reducedLocations) {
             const text = loc.moduleLabel;
+            if (this.config.labelsExcludes.includes(text))
+                continue;   // Skip if excluded
             /*
             Alternative implementation that only proposes completion up to the next dot:
             const fullText = loc.moduleLabel;

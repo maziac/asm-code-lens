@@ -154,7 +154,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
         if (settings.enableCompletions) {
             // Register
-            const provider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider(rootFolder));
+            const provider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider(config));
             regCompletionProposalsProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }

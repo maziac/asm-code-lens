@@ -64,11 +64,11 @@ export class HoverProvider implements vscode.HoverProvider {
         // regexes for labels with and without colon
         const regexes = regexesLabelForWord(searchWord, this.config);
         // Find all sjasmplus MODULEs in the document
-        const searchsJasmModule = regexModuleForWord(searchWord);
-        regexes.push(searchsJasmModule);
+        const searchSjasmModule = regexModuleForWord(searchWord);
+        regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
-        const searchsJasmMacro = regexMacroForWord(searchWord);
-        regexes.push(searchsJasmMacro);
+        const searchSjasmMacro = regexMacroForWord(searchWord);
+        regexes.push(searchSjasmMacro);
 
         const locations = await grepMultiple(regexes, this.config.rootFolder);
         // Reduce the found locations.
@@ -79,7 +79,7 @@ export class HoverProvider implements vscode.HoverProvider {
         // Check for end
         for (const loc of reducedLocations) {
             // Check if included in exclusion list
-            const name = loc.label;
+            const name = loc.moduleLabel;
             if (this.config.labelsExcludes.includes(name))
                 continue;
             // Get comments
