@@ -5,6 +5,7 @@
 - Added configuration to exclude certain labels.
 - Added configurations to recognize labels with colons, without colons or both.
 - Fixed renaming in multiroot context.
+- Fixed CMD-click in output channel of 'Find Labels with no Reference'.
 
 # 1.8.4
 - Fixed negative number formatting in hex number in hex calculator.
