@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { stripComment } from './grep';
-//import { regexAnyReferenceForWord } from './regexes';
+import {Config} from './config';
 
 
 
@@ -9,16 +9,19 @@ import { stripComment } from './grep';
  * ReferenceProvider for assembly language.
  */
 export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
-    protected rootFolder: string;   // The root folder of the project.
+
+    // The configuration to use.
+    protected config: Config;
 
 
     /**
      * Constructor.
-     * @param rootFolder Stores the root folder for multiroot projects.
+     * @param config The configuration (preferences) to use.
      */
-    constructor(rootFolder: string) {
+    constructor(config: Config) {
         // Store
-        this.rootFolder = rootFolder + path.sep;
+        this.config = {...config};
+        this.config.rootFolder += path.sep;
     }
 
 
@@ -34,7 +37,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.rootFolder) < 0)
+        if (!docPath.includes(this.config.rootFolder))
             return undefined as any; // Path is wrong.
 
         // Loops through the whole document line by line and
@@ -44,10 +47,21 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // data-label and creates symbols for each.
         // Those symbols are returned.
         let symbols = new Array<vscode.DocumentSymbol>();
-        const regexLabel = /^([.a-z_@][\w.]*\b)(:?)/i;
+        //const regexLabel = /^([.a-z_@][\w.]*\b)(:?)/i;
+        let regexLabel;
+        if (this.config.labelsWithColons && this.config.labelsWithoutColons)
+            regexLabel = /^(((@?)([a-z_][\w\.]*))(:?))/i;   // With or without colon
+        else {
+            if (this.config.labelsWithColons)
+                regexLabel = /^(((@?)([a-z_][\w\.]*)):)/i;   // With colon
+            else
+                regexLabel = /^(((@?)([a-z_][\w\.]*)))(?:\s|$)/i;   // Without colon
+        }
+
         const regexModule = /\s+\b(module\s+([a-z_][\w\.]*)|endmodule.*)/i;
         const regexStruct = /\s+\b(struct\s+([a-z_][\w\.]*)|ends.*)/i;
-        const regexNotLabels = /^(include|if|endif|else)$/i;
+        //const regexNotLabels = /^(include|if|endif|else|elif)$/i;
+        const excludes = ['include', ...this.config.labelsExcludes];
         const regexConst = /\b(equ)\s+(.*)/i;
         const regexData = /\b(d[bcdghmsw]|def[bdghmsw])\b\s*(.*)/i;
         let lastSymbol;
@@ -64,19 +78,12 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
             const match = regexLabel.exec(lineContents);
             if (match) {
                 // It is a label or module (or both)
-                const label = match[1];
-                let isLabel = true;
+                const labelPlus = match[1]; // Label plus e.g. ':'
+                const label = match[2]; // Label without ':'
 
-                // Ignore a few false positives (for languages other than sjasmplus).
-                // Required because of the sjasmplus labels without colons.
-                if (!match[2]) {    // no colon after label
-                    const matchNotLabel = regexNotLabels.exec(label);
-                    if (matchNotLabel)
-                        isLabel = false;
-                }
-
-                // First check label
-                if (isLabel) {
+                // Check that label is not excluded
+                if (!excludes.includes(label)) {
+                    // Check for label
                     // Create range
                     const range = new vscode.Range(line, 0, line, 10000);
                     const selRange = range; //new vscode.Range(line, 0, line, 3);
@@ -109,9 +116,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     }
 
                     // Remove label from line contents.
-                    let len = label.length;
-                    if (match[2])    // colon after label
-                        len++;
+                    const len = labelPlus.length;
                     lineContents = lineContents.substr(len);
                     // Add a whitespace to recognize a directly following MODULE
                     lineContents += ' ';

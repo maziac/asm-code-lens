@@ -182,7 +182,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
         if (settings.enableOutlineView) {
             // Register
-            const provider = vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider(rootFolder));
+            const provider = vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider(config));
             regDocumentSymbolProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
