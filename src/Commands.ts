@@ -79,7 +79,7 @@ export class Commands {
                 if (count == 0) {
                     // No reference
                     unrefLabels++;
-                    output.appendLine(label + ", " + fileName + ":" + (pos.line + 1));
+                    output.appendLine(label + ", file://" + fileName + "#" + (pos.line + 1));
                 }
                 // Check for last search
                 labelsCount--;
@@ -95,6 +95,7 @@ export class Commands {
         // Check if any label is unreferenced
         if (locLabels.length == 0)
             output.appendLine("None.");
+        output.appendLine('');
     }
 
 }

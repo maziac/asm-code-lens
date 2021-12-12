@@ -58,13 +58,13 @@ export function activate(context: vscode.ExtensionContext) {
         // Get current text editor to get current project/root folder.
         const editorPath = vscode.window.activeTextEditor?.document.uri.fsPath || '';
         // Get all workspace folders
-        const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath);
+        const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
         const config = getLabelsConfig();
         // Check in which workspace folder the path is included
         for (const rootFolder of wsFolders) {
             if (editorPath.includes(rootFolder)) {
                 // Add root folder
-                config.rootFolder = rootFolder + path.sep;
+                config.rootFolder = rootFolder;
                 // Found. Find labels
                 Commands.findLabelsWithNoReference(config);
                 // Stop loop
