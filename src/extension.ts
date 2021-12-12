@@ -147,7 +147,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
         if (settings.enableHovering) {
             // Register
-            const provider = vscode.languages.registerHoverProvider(asmFiles, new HoverProvider(rootFolder));
+            const provider = vscode.languages.registerHoverProvider(asmFiles, new HoverProvider(config));
             regHoverProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }

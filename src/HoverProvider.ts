@@ -1,24 +1,27 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { grepMultiple, reduceLocations, getCompleteLabel } from './grep';
-import {regexLabelColonForWord, regexLabelWithoutColonForWord, regexModuleForWord, regexMacroForWord} from './regexes';
+import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
+import {regexModuleForWord, regexMacroForWord, regexesLabelForWord} from './regexes';
 import * as fs from 'fs';
+import {Config} from './config';
 
 
 /**
  * HoverProvider for assembly language.
  */
 export class HoverProvider implements vscode.HoverProvider {
-    protected rootFolder: string;   // The root folder of the project.
+    // The configuration to use.
+    protected config: Config;
 
 
     /**
      * Constructor.
-     * @param rootFolder Stores the root folder for multiroot projects.
+     * @param config The configuration (preferences) to use.
      */
-    constructor(rootFolder: string) {
+    constructor(config: Config) {
         // Store
-        this.rootFolder = rootFolder + path.sep;
+        this.config = {...config};
+        this.config.rootFolder += path.sep;
     }
 
 
@@ -32,7 +35,7 @@ export class HoverProvider implements vscode.HoverProvider {
     public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.rootFolder) < 0)
+        if (!docPath.includes(this.config.rootFolder))
             return undefined as any; // Path is wrong.
         // Right path.
         return this.search(document, position);
@@ -58,26 +61,28 @@ export class HoverProvider implements vscode.HoverProvider {
         // It is a non local label
         const range = document.getWordRangeAtPosition(position);
         const searchWord = document.getText(range);
-        // Find all "something:" (labels) in the document
-        const searchNormal = regexLabelColonForWord(searchWord);
-        // Find all sjasmplus labels without ":" in the document
-        const searchSjasmLabel = regexLabelWithoutColonForWord(searchWord);
+        // regexes for labels with and without colon
+        const regexes = regexesLabelForWord(searchWord, this.config);
         // Find all sjasmplus MODULEs in the document
         const searchsJasmModule = regexModuleForWord(searchWord);
+        regexes.push(searchsJasmModule);
         // Find all sjasmplus MACROs in the document
         const searchsJasmMacro = regexMacroForWord(searchWord);
+        regexes.push(searchsJasmMacro);
 
-        // Put all searches in one array
-        const searchRegexes = [searchNormal, searchSjasmLabel, searchsJasmModule, searchsJasmMacro];
-
-        const locations = await grepMultiple(searchRegexes, this.rootFolder);
+        const locations = await grepMultiple(regexes, this.config.rootFolder);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
         // Now read the comment lines above the document.
         // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
         const hoverTexts = new Array<vscode.MarkdownString>();
         // Check for end
-        for(const loc of reducedLocations) {
+        for (const loc of reducedLocations) {
+            // Check if included in exclusion list
+            const name = loc.label;
+            if (this.config.labelsExcludes.includes(name))
+                continue;
+            // Get comments
             const lineNr = loc.range.start.line;
             const filePath = loc.uri.fsPath;
             const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});

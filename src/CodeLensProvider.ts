@@ -60,8 +60,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         if (docPath.indexOf(this.config.rootFolder) < 0)
             return [];
 
-
-
         // Find all code lenses
         const codeLenses: Array<vscode.CodeLens> = [];
         const regexes = regexesLabel(this.config);
