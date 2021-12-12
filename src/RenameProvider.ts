@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { grep, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
-import * as path from 'path';
 import { regexInclude, regexAnyReferenceForWordGlobal } from './regexes';
 
 
@@ -20,7 +19,7 @@ export class RenameProvider implements vscode.RenameProvider {
      */
     constructor(rootFolder: string) {
         // Store
-        this.rootFolder = rootFolder + path.sep;
+        this.rootFolder = rootFolder;
     }
 
 
@@ -31,7 +30,14 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param options
      * @param token
      */
-    public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit> {
+    public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit|undefined> {
+        // First check for right path
+        const docPath = document.uri.fsPath;
+        if (!docPath.includes(this.rootFolder)) {
+            // Skip because path belongs to different workspace
+            return undefined;
+        }
+        // Path is from right project -> rename
         return this.rename(document, position, newName);
     }
 
