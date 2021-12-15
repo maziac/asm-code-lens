@@ -223,7 +223,7 @@
                 "configuration": "./language-configuration.json"
             },
             {
-              "id": "asm-markdown-codeblock"
+                "id": "asm-markdown-codeblock"
             }
         ],
         "grammars": [
