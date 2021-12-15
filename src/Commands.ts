@@ -34,7 +34,6 @@ export class Commands {
     }
 
 
-
     /**
      * Finds all labels without reference.
      * I.e. prints out all labels in 'locLabels' which are note referenced somewhere.

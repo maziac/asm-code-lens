@@ -90,7 +90,7 @@ function keypress(obj, event, numberBase) {
 	}
 	else {
 		// Decimal
-		regex = /^([+\-\*\/]?)\s*([0-9]*)$/;
+		regex = /^([+\-\*\/]?)\s*(\d*)$/;
 	}
 	const match = regex.exec(text);
 	if (!match) {
@@ -154,7 +154,6 @@ function keypress(obj, event, numberBase) {
 
 		// Clear input value
 		obj.value = '';
-		return;
 	}
 }
 
