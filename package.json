@@ -265,7 +265,7 @@
         "compile": "tsc -p ./",
         "tslint": "eslint ./**/*.ts",
         "watch": "tsc -w -p ./",
-        "test": "mocha -u tdd ./out/tests/",
+        "test": "mocha -u tdd 'out/**/*.tests.js'",
         "package": "vsce package",
         "publish": "vsce publish"
     },
@@ -282,6 +282,7 @@
         "@types/node": "^17.0.18",
         "@types/vscode": "^1.64.0",
         "mocha": "^9.2.1",
+        "source-map-support": "^0.5.21",
         "typescript": "^4.5.5"
     }
 }
