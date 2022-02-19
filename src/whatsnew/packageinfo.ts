@@ -18,7 +18,7 @@ export class PackageInfo {
 		// Store path
 		//this.extensionPath = path;
 		// Get package info from globalState
-		const _extension = context.globalState["_extension"]
+		const _extension = context.globalState["_extension"];
 		const extensionName = _extension.id;
 		// Store extension info
 		this.extension = vscode.extensions.getExtension(extensionName)!;
