@@ -10,25 +10,25 @@ suite('RegExes', () => {
 
     suite('Simple regexes', () => {
 
-        function checkResultsMatch(regex: RegExp, insOuts: (string|boolean)[]) {
+        function checkResultsMatch(regex: RegExp, insOuts: (string | boolean)[]) {
             try {
                 // Check the test
                 const count = insOuts.length;
                 const div = 2;  // Line divider
                 assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for(let i=0; i<count; i+=div) {
+                for (let i = 0; i < count; i += div) {
                     const input = insOuts[i] as string;
-                    const shouldMatch = insOuts[i+1];
+                    const shouldMatch = insOuts[i + 1];
                     const result = regex.exec(input);
-                    if(result) {
-                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div));
+                    if (result) {
+                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i / div));
                     }
                     else {
-                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div));
+                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i / div));
                     }
                 }
             }
-            catch(e) {
+            catch (e) {
                 assert.fail("Testcase assertion: " + e);
             }
         }
@@ -49,35 +49,35 @@ suite('RegExes', () => {
                 "label equ;", true,
                 "equ  ", false,
                 " equ  ", false,
-                ];
+            ];
 
             checkResultsMatch(regex, insOuts);
             done();
         });
 
 
-        function checkResultsMatchFound(regex: RegExp, insOuts: (string|boolean)[], matchIndex = 1) {
+        function checkResultsMatchFound(regex: RegExp, insOuts: (string | boolean)[], matchIndex = 1) {
             try {
                 // Check the test
                 const count = insOuts.length;
                 const div = 3;  // Line divider
                 assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for(let i=0; i<count; i+=div) {
+                for (let i = 0; i < count; i += div) {
                     const input = insOuts[i] as string;
-                    const shouldMatch = insOuts[i+1];
-                    const shouldFind = insOuts[i+2];
+                    const shouldMatch = insOuts[i + 1];
+                    const shouldFind = insOuts[i + 2];
                     const result = regex.exec(input);
-                    if(result) {
-                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div));
+                    if (result) {
+                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i / div));
                         const found = result[matchIndex];
-                        assert.equal(found, shouldFind, "'" + found + "' == '" + shouldFind + "', Line " + (i/div));
+                        assert.equal(found, shouldFind, "'" + found + "' == '" + shouldFind + "', Line " + (i / div));
                     }
                     else {
-                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div));
+                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i / div));
                     }
                 }
             }
-            catch(e) {
+            catch (e) {
                 assert.fail("Testcase assertion: " + e);
             }
         }
@@ -90,9 +90,9 @@ suite('RegExes', () => {
                 '  INCLUDE "src/sound.asm"', true, "src/sound.asm",
                 'include   abcd ', false, "",
                 'includex   "sound.asm" ', false, "",
-                ];
+            ];
 
-                checkResultsMatchFound(regex, insOuts);
+            checkResultsMatchFound(regex, insOuts);
             done();
         });
 
@@ -108,9 +108,9 @@ suite('RegExes', () => {
                 '  module  m.aa.b', true, "m.aa.b",
                 ' module   ', false, "",
                 ' module', false, "",
-                ];
+            ];
 
-                checkResultsMatchFound(regex, insOuts, 2);
+            checkResultsMatchFound(regex, insOuts, 2);
             done();
         });
 
@@ -123,9 +123,9 @@ suite('RegExes', () => {
                 ' ends', true,
                 'endmodule', false,
                 ' endmodule   mm', true,  // Is also found although this is not 100% correct
-                ];
+            ];
 
-                checkResultsMatch(regex, insOuts);
+            checkResultsMatch(regex, insOuts);
             done();
         });
 
@@ -146,32 +146,32 @@ suite('RegExes', () => {
                 "sounds", "snd", true,
                 "soun", "snd", false,
                 "sounkkkd", "snd", true,
-                ];
+            ];
 
-            try{
+            try {
                 // Check the test
                 const count = insOuts.length;
                 const div = 3;  // Line divider
                 assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for(let i=0; i<count; i+=div) {
+                for (let i = 0; i < count; i += div) {
                     const input = insOuts[i] as string;
-                    const searchWordRaw = insOuts[i+1] as string;
+                    const searchWordRaw = insOuts[i + 1] as string;
 
                     // To be tested function:
                     const searchWord = re.regexPrepareFuzzy(searchWordRaw);
 
                     const regex = new RegExp(searchWord);
-                    const shouldMatch = insOuts[i+2] as boolean;
+                    const shouldMatch = insOuts[i + 2] as boolean;
                     const result = regex.exec(input);
-                    if(result) {
-                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div));
+                    if (result) {
+                        assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i / div));
                     }
                     else {
-                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div));
+                        assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i / div));
                     }
                 }
             }
-            catch(e) {
+            catch (e) {
                 assert.fail("Testcase assertion: " + e);
             }
 
@@ -188,22 +188,22 @@ suite('RegExes', () => {
                 const count = insOuts.length;
                 const div = 3;  // Line divider
                 assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for(let i=0; i<count; i+=div) {
+                for (let i = 0; i < count; i += div) {
                     const input = insOuts[i];
-                    const prefix = insOuts[i+1];
-                    const label = insOuts[i+2];
+                    const prefix = insOuts[i + 1];
+                    const label = insOuts[i + 2];
                     const result = regex.exec(input);
-                    if(result) {
+                    if (result) {
                         const foundPrefix = result[1];
                         const foundLabel = result[2];
-                        assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i/div));
-                        assert.equal(label, foundLabel, "Label: '" + label + "' == '" + foundLabel + "', Line " + (i/div));
+                        assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i / div));
+                        assert.equal(label, foundLabel, "Label: '" + label + "' == '" + foundLabel + "', Line " + (i / div));
                     }
                     else
-                        assert.equal(label, '', "Label (b):'" + label + "' == '', Line " + (i/div));
+                        assert.equal(label, '', "Label (b):'" + label + "' == '', Line " + (i / div));
                 }
             }
-            catch(e) {
+            catch (e) {
                 assert.fail("Testcase assertion: " + e);
             }
         }
@@ -231,7 +231,7 @@ suite('RegExes', () => {
                 ".label:", "", "",
                 " .label:", "", "",
                 " .label: ", "", "",
-                ];
+            ];
 
             checkResults1Capture(regex, insOuts);
             done();
@@ -271,30 +271,30 @@ suite('RegExes', () => {
 
 
     // insOuts: search-word, input-line, should-match, found-prefix
-    function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string|boolean)[]) {
+    function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string | boolean)[]) {
         try {
             // Check the test
             const count = insOuts.length;
             const div = 4;  // Line divider
             assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-            for(let i=0; i<count; i+=div) {
+            for (let i = 0; i < count; i += div) {
                 const searchWord = insOuts[i];
-                const input = insOuts[i+1] as string;
-                const shouldMatch = insOuts[i+2];
-                const prefix = insOuts[i+3];
+                const input = insOuts[i + 1] as string;
+                const shouldMatch = insOuts[i + 2];
+                const prefix = insOuts[i + 3];
                 const regex = func(searchWord);
                 const result = regex.exec(input);
-                if(result) {
-                    assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "' in '" + input + "'");
+                if (result) {
+                    assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i / div) + ", searched for: '" + searchWord + "' in '" + input + "'");
                     const foundPrefix = result[1];
-                    assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + (i/div));
+                    assert.equal(prefix, foundPrefix, "'" + prefix + "' == '" + foundPrefix + "', Prefix of line " + (i / div));
                 }
                 else {
-                    assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i/div) + ", searched for: '" + searchWord + "' in '" + input + "'");
+                    assert.ok(!shouldMatch, "No match was found although a match should be found. Line " + (i / div) + ", searched for: '" + searchWord + "' in '" + input + "'");
                 }
             }
         }
-        catch(e) {
+        catch (e) {
             assert.fail("Testcase assertion: " + e);
         }
     }
@@ -326,7 +326,7 @@ suite('RegExes', () => {
                 "label", "labely:", false, "",
                 "label", "xxx.xlabel:", false, "",
                 "label", "xlabel.yyy:", false, "",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexLabelColonForWord, insOuts);
             done();
@@ -362,7 +362,7 @@ suite('RegExes', () => {
                 "label", "label: ", false, "",
                 "label", "label:;", false, "",
                 "label", "xxx.label:", false, "",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexLabelWithoutColonForWord, insOuts);
             done();
@@ -377,7 +377,7 @@ suite('RegExes', () => {
                 "m", " MODULE m", true, " MODULE ",
                 "m", " module x", false, "",
                 "Mm_0123456789", "  module Mm_0123456789;", true, "  module ",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexModuleForWord, insOuts);
             done();
@@ -392,7 +392,7 @@ suite('RegExes', () => {
                 "m", " MACRO m", true, " MACRO ",
                 "m", " macro x", false, "",
                 "Mm_0123456789", "  macro Mm_0123456789;", true, "  macro ",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexMacroForWord, insOuts);
             done();
@@ -407,7 +407,7 @@ suite('RegExes', () => {
                 "m", " STRUCT m", true, " STRUCT ",
                 "m", " struct x", false, "",
                 "Mm_0123456789", "  struct Mm_0123456789;", true, "  struct ",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexStructForWord, insOuts);
             done();
@@ -433,7 +433,7 @@ suite('RegExes', () => {
                 "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
                 "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexAnyReferenceForWord, insOuts);
             done();
@@ -441,25 +441,25 @@ suite('RegExes', () => {
 
 
         // insOuts: search-word, input-line, number of matches, found1, found2, ...
-        function checkResultsSearchWordGlobal(func: (string) => RegExp, insOuts: (string|number)[]) {
+        function checkResultsSearchWordGlobal(func: (string) => RegExp, insOuts: (string | number)[]) {
             try {
                 // Check the test
                 const count = insOuts.length;
-                let i=0;
+                let i = 0;
                 let lineNumber = 0;
-                while(i<count) {
+                while (i < count) {
                     const searchWord = insOuts[i++];
                     const input = insOuts[i++] as string;
                     const countMatches = insOuts[i++] as number;
                     const regex = func(searchWord);
-                    if(countMatches == 0) {
+                    if (countMatches == 0) {
                         // Assure that there is no match
                         const result = regex.exec(input);
                         assert.equal(result, undefined, "A match was found although no match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "'");
                     }
                     else {
                         // Compare all matches
-                        for(let m=0; m<countMatches; m++) {
+                        for (let m = 0; m < countMatches; m++) {
                             const prefix = insOuts[i++] as string;
                             const result = regex.exec(input);
                             assert.notEqual(result, undefined, "No match was found although a match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "' (" + m + ")");
@@ -472,7 +472,7 @@ suite('RegExes', () => {
                     lineNumber++;
                 }
             }
-            catch(e) {
+            catch (e) {
                 assert.fail("Testcase assertion: " + e);
             }
         }
@@ -498,9 +498,9 @@ suite('RegExes', () => {
                 "label", "  ld a,(5-init.label*8)", 1, "  ld a,(5-init.",
 
                 "label", "label: djnz sound.label", 2, "", ": djnz sound.",
-                ];
+            ];
 
-                checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
+            checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
             done();
         });
     });
@@ -547,7 +547,7 @@ suite('RegExes', () => {
                 "\\w*s\\w*n\\w*d", "yyy.sound.zzz:", true, "yyy.",
 
                 "label", "LaBeL:", true, "",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);
             done();
@@ -593,7 +593,7 @@ suite('RegExes', () => {
                 "\\w*s\\w*n\\w*d", "yyy.sound.zzz", true, "yyy.",
 
                 "label", "LaBeL", true, "",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexEveryLabelWithoutColonForWord, insOuts);
             done();
@@ -613,7 +613,7 @@ suite('RegExes', () => {
                 "m", " module maaa.bb", true, " module ",
                 "m", " module ma.b.c", true, " module ",
                 "m", " module a.m", false, "",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexEveryModuleForWord, insOuts);
             done();
@@ -632,14 +632,14 @@ suite('RegExes', () => {
                 "m", " macro maaa.bb", true, " macro ",
                 "m", " macro ma.b.c", true, " macro ",
                 "m", " macro a.m", false, "",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexEveryMacroForWord, insOuts);
             done();
         });
 
 
-        test('regexStructForWord', (done) => {
+        test('regexStructForWord', (done) => {  // NOSONAR
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "m", "struct m", false, "",
@@ -647,14 +647,14 @@ suite('RegExes', () => {
                 "m", " STRUCT m", true, " STRUCT ",
                 "m", " struct x", false, "",
                 "Mm_0123456789", "  struct Mm_0123456789;", true, "  struct ",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexStructForWord, insOuts);
             done();
         });
 
 
-        test('regexAnyReferenceForWord', (done) => {
+        test('regexAnyReferenceForWord', (done) => {  // NOSONAR
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "label", "label ", true, "",
@@ -673,7 +673,7 @@ suite('RegExes', () => {
                 "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
                 "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
-                ];
+            ];
 
             checkResultsSearchWord(re.regexAnyReferenceForWord, insOuts);
             done();
@@ -681,25 +681,25 @@ suite('RegExes', () => {
 
 
         // insOuts: search-word, input-line, number of matches, found1, found2, ...
-        function checkResultsSearchWordGlobal(func: (string) => RegExp, insOuts: (string|number)[]) {
+        function checkResultsSearchWordGlobal(func: (string) => RegExp, insOuts: (string | number)[]) {  // NOSONAR
             try {
                 // Check the test
                 const count = insOuts.length;
-                let i=0;
+                let i = 0;
                 let lineNumber = 0;
-                while(i<count) {
+                while (i < count) {
                     const searchWord = insOuts[i++];
                     const input = insOuts[i++] as string;
                     const countMatches = insOuts[i++] as number;
                     const regex = func(searchWord);
-                    if(countMatches == 0) {
+                    if (countMatches == 0) {
                         // Assure that there is no match
                         const result = regex.exec(input);
                         assert.equal(result, undefined, "A match was found although no match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "'");
                     }
                     else {
                         // Compare all matches
-                        for(let m=0; m<countMatches; m++) {
+                        for (let m = 0; m < countMatches; m++) {
                             const prefix = insOuts[i++] as string;
                             const result = regex.exec(input);
                             assert.notEqual(result, undefined, "No match was found although a match should be found. Line " + lineNumber + ", searched for: '" + searchWord + "' (" + m + ")");
@@ -712,12 +712,12 @@ suite('RegExes', () => {
                     lineNumber++;
                 }
             }
-            catch(e) {
+            catch (e) {
                 assert.fail("Testcase assertion: " + e);
             }
         }
 
-        test('regexAnyReferenceForWordGlobal', (done) => {
+        test('regexAnyReferenceForWordGlobal', (done) => {  // NOSONAR
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "label", "label ", 1, "",
@@ -738,9 +738,9 @@ suite('RegExes', () => {
                 "label", "  ld a,(5-init.label*8)", 1, "  ld a,(5-init.",
 
                 "label", "label: djnz sound.label", 2, "", ": djnz sound.",
-                ];
+            ];
 
-                checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
+            checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
             done();
         });
     });
