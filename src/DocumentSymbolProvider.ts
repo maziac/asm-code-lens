@@ -115,7 +115,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
                     // Remove label from line contents.
                     const len = labelPlus.length;
-                    lineContents = lineContents.substr(len);
+                    lineContents = lineContents.substring(len);
                     // Add a whitespace to recognize a directly following MODULE
                     lineContents += ' ';
                 }

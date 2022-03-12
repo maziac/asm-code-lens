@@ -69,10 +69,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             const colStart = (fmatch.match[1]) ? fmatch.match[1].length : 0;
             let colEnd = fmatch.end;
             const lineContents = document.lineAt(lineNr).text;
-            let matchedText = lineContents.substr(colStart, colEnd - colStart);
+            let matchedText = lineContents.substring(colStart, colEnd);
             if (matchedText.endsWith(':')) {
                 colEnd--;
-                matchedText = matchedText.substr(0, matchedText.length - 1);
+                matchedText = matchedText.substring(0, matchedText.length - 1);
             }
             const trimmedMatchedText = matchedText.trim();
             // Check that label is not excluded

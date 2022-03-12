@@ -341,7 +341,7 @@ export function getLastLabelPart(label: string): string {
     if (k < 0)
         return label;   // No dot.
 
-    return label.substr(k + 1);
+    return label.substring(k + 1);
 }
 
 
@@ -369,8 +369,8 @@ export function getRegExFromLabel(label: string): RegExp {
     }
     else {
         // Includes dot
-        prefix = label.substr(0, k + 1);
-        lastPart = label.substr(k + 1);
+        prefix = label.substring(0, k + 1);
+        lastPart = label.substring(k + 1);
     }
 
     // Change last part
@@ -673,8 +673,8 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
     i++;
 
     // Get complete string
-    const label = lineContents.substr(i, k - i);
-    const preString = lineContents.substr(0, i);
+    const label = lineContents.substring(i, k);
+    const preString = lineContents.substring(0, i);
 
     return {label, preString};
 }
@@ -706,7 +706,7 @@ export function stripComment(text: string) {
         }
     }
     if (i != Number.MAX_SAFE_INTEGER)
-        return text.substr(0, i);   // strip comment
+        return text.substring(0, i);   // strip comment
     // No comment
     return text;
 }

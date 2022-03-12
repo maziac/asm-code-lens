@@ -196,7 +196,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
                 if (k > 0)
                     k++;    // For the dot '.'
                 k += nonLocalLabel.length;
-                let part = text.substr(k);
+                let part = text.substring(k);
                 item.insertText = part;
                 // change shown text
                 item.label = part;
@@ -207,10 +207,10 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
             else if (text.startsWith(moduleLabel + '.')) {
                 // Change insert text
                 const k = moduleLabel.length + 1;
-                let part = text.substr(k);
+                let part = text.substring(k);
                 item.insertText = part;
                 // change shown text
-                item.label = '[' + text.substr(0, k) + '] ' + part;
+                item.label = '[' + text.substring(0, k) + '] ' + part;
             }
 
             proposals.set(item.label as string, item);

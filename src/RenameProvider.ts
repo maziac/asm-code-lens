@@ -129,7 +129,7 @@ export class RenameProvider implements vscode.RenameProvider {
                 continue;
 
             // Replace
-            const replacedLine = line.substr(0, clmn) + newName + line.substr(clmnEnd);
+            const replacedLine = line.substring(0, clmn) + newName + line.substring(clmnEnd);
             lines[row] = replacedLine;
         }
 
