@@ -1,5 +1,7 @@
 # Changelog
 
+# 1.9.1
+- Wider references: Fixed #68
 # 1.9.0
 - Added PR #65: Add syntax highlight to Markdown code blocks.
 - Added configuration to exclude certain labels.

@@ -109,7 +109,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
         const locations = await grep(searchRegex, this.config.rootFolder);
         // Remove any locations because of module information (dot notation)
-        const reducedLocations = await reduceLocations(locations, doc.fileName, pos)
+        const reducedLocations = await reduceLocations(locations, doc.fileName, pos, true, false);
         // create title
         const count = reducedLocations.length;
         let title = count + ' reference';

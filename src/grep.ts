@@ -486,7 +486,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
     let regexLabel;
     let regexModuleLabel;
 
-    // Check if we care about upper/lower case.
+    // Check for full name
     if (!checkFullName) {
         // Do not care
         //searchLabel.label = searchLabel.label.toLowerCase();
@@ -682,7 +682,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
 
 /**
  * Sets the characters used as comments.
- * @param prefix Text from togglecommentPrefix.
+ * @param prefix Text from toggleCommentPrefix.
  */
 export function setCustomCommentPrefix(prefix: string) {
     const commentsSet = new Set<string>([';', '//']);
