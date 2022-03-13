@@ -72,7 +72,7 @@ export class Commands {
                 const regex = regexAnyReferenceForWord(searchLabel);
                 const locations = await grep(regex, rootFolder);
                 // Remove any locations because of module information (dot notation)
-                const reducedLocations = await reduceLocations(locations, fileName, pos);
+                const reducedLocations = await reduceLocations(locations, fileName, pos, true, false);
                 // Check count
                 const count = reducedLocations.length;
                 if (count == 0) {

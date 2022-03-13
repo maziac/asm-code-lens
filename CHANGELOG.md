@@ -1,7 +1,7 @@
 # Changelog
 
 # 1.9.1
-- Wider references: Fixed #68
+- Wider references for code lenses and "Find labels with no Reference": Fixed #68
 - Delayed activation event to "onStartupFinished"
 
 # 1.9.0
