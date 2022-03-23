@@ -22,7 +22,7 @@ export function regexLabelColon(): RegExp {
  * But not ".label".
  * Capture groups:
  *  1 = ''
- *  2 = the label itself e.g. "init.label_1
+ *  2 = the label itself e.g. "init.label_1"
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelWithoutColon(): RegExp {
@@ -182,7 +182,7 @@ export function regexStructForWord(searchWord: string): RegExp {
  * Used by resolveCodeLens.
  */
 export function regexAnyReferenceForWord(searchWord: string): RegExp {
-    return new RegExp('^([^"]*)\\b' + searchWord + '\\b');
+    return new RegExp('^(.*)\\b' + searchWord + '\\b');
 }
 
 

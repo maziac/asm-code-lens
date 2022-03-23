@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.9.2
+- Fix for references after quotes (issue #69)
+
 # 1.9.1
 - Wider references for code lenses and "Find labels with no Reference": Fixed #68
 - Delayed activation event to "onStartupFinished"

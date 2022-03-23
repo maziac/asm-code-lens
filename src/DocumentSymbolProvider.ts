@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { stripComment } from './grep';
+import { stripComment } from './utils';
 import {Config} from './config';
 
 

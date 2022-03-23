@@ -2,11 +2,8 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import {regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct} from './regexes';
+import {stripComment} from './utils';
 
-
-// Is set on start and whenver the settings change.
-// It holds all prefixes (like ';' and '//') that are used as comment prefixes.
-let commentPrefixes: Array<string>;
 
 
 export interface FileMatch {
@@ -677,38 +674,6 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
     const preString = lineContents.substring(0, i);
 
     return {label, preString};
-}
-
-
-/**
- * Sets the characters used as comments.
- * @param prefix Text from toggleCommentPrefix.
- */
-export function setCustomCommentPrefix(prefix: string) {
-    const commentsSet = new Set<string>([';', '//']);
-    if (prefix)
-        commentsSet.add(prefix);
-    commentPrefixes = Array.from(commentsSet);
-}
-
-
-/**
- * Strips the comment (;) from the text and returns it.
- * @param text Text with comment.
- * @returns string before the first ";"
- */
-export function stripComment(text: string) {
-    let i = Number.MAX_SAFE_INTEGER;
-    for (const commentPrefix of commentPrefixes) {
-        const k = text.indexOf(commentPrefix);
-        if (k >= 0 && k < i) {
-            i = k;
-        }
-    }
-    if (i != Number.MAX_SAFE_INTEGER)
-        return text.substring(0, i);   // strip comment
-    // No comment
-    return text;
 }
 
 
