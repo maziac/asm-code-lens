@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { stripComment } from './utils';
+import {stripAllComments} from './comments';
 import {Config} from './config';
 
 
@@ -68,10 +68,18 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         let lastModules = new Array<vscode.DocumentSymbol>();
         let defaultSymbolKind = vscode.SymbolKind.Function;
 
+        // Strip all comments
         const len = document.lineCount;
+        const lines = Array<string>(len);
+        for (let i = 0; i < len; i++) {
+            const textLine = document.lineAt(i);
+            lines[i] = textLine.text;
+        }
+        stripAllComments(lines);
+
+        // Go through all lines
         for (let line = 0; line < len; line++) {
-            const textLine = document.lineAt(line);
-            let lineContents = stripComment(textLine.text);
+            let lineContents = lines[line];
 
             const match = regexLabel.exec(lineContents);
             if (match) {

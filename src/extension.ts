@@ -9,7 +9,7 @@ import {DocumentSymbolProvider} from './DocumentSymbolProvider';
 import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
 import {setGrepGlobPatterns} from './grep';
-import {setCustomCommentPrefix} from './utils';
+import {setCustomCommentPrefix} from './comments';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';

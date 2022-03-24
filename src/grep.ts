@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import {regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct} from './regexes';
-import {stripComment} from './utils';
+import {stripAllComments} from './comments';
 
 
 
@@ -150,10 +150,11 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
                 // Read
                 const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
                 const lines = linesData.split('\n');
+                stripAllComments(lines);
 
                 const len = lines.length;
                 for (let index = 0; index < len; index++) {
-                    const lineContents = stripComment(lines[index]);
+                    const lineContents = lines[index];
                     if (lineContents.length == 0)
                         continue;
                     regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
@@ -267,9 +268,19 @@ export async function grepMultiple(regexes: RegExp[], rootFolder: string): Promi
 export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileMatch[] {
     const matches: FileMatch[] = [];
     const len = doc.lineCount;
+
+
+    // Strip all comments
+    const lines = Array<string>(len);
+    for (let i = 0; i < len; i++) {
+        const textLine = doc.lineAt(i);
+        lines[i] = textLine.text;
+    }
+    stripAllComments(lines);
+
+    // Go through all lines
     for (let line = 0; line < len; line++) {
-        const textLine = doc.lineAt(line);
-        const lineContents = stripComment(textLine.text);
+        const lineContents = lines[line];
 
         regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
         do {
