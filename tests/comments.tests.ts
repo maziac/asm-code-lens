@@ -71,6 +71,31 @@ suite('comments', () => {
 
         setCustomCommentPrefix();
 
+        function verifyMultiLines(inpOutp: string[]) {
+            // Split into input and output
+            const inp: string[] = [];
+            const outp: string[] = [];
+            let isInput = true;
+            for (const item of inpOutp) {
+                if (isInput)
+                    inp.push(item);
+                else
+                    outp.push(item);
+                isInput = !isInput;
+            }
+
+            // Execute
+            stripAllComments(inp);
+
+            // Verify
+            const len = inp.length;
+            assert.equal(len, inpOutp.length / 2);
+
+            for (let i = 0; i < len; i++) {
+                assert.equal(inp[i], outp[i], 'Line ' + i);
+            }
+        }
+
         test('single line comments', () => {
             const inpOutp = [
                 '',	            '',
@@ -99,30 +124,81 @@ suite('comments', () => {
                 'a"//"b',	    'a    b',
                 ' "abc" "//x ',	'            ',
             ];
-
-            // Split into input and output
-            const inp: string[] = [];
-            const outp: string[] = [];
-            let isInput = true;
-            for (const item of inpOutp) {
-                if (isInput)
-                    inp.push(item);
-                else
-                    outp.push(item);
-                isInput = !isInput;
-            }
-
-            // Execute
-            stripAllComments(inp);
-
             // Verify
-            const len = inp.length;
-            assert.equal(len, inpOutp.length / 2);
-
-            for (let i = 0; i < len; i++) {
-                assert.equal(inp[i], outp[i]);
-            }
+            verifyMultiLines(inpOutp);
         });
+
+
+
+        suite('multiline', () => {
+
+            test('one or 2 liners', () => {
+                const inpOutp = [
+                    '/*/', '',
+                    '*/', '  ',
+
+                    '*/*', '*',
+                    '*/', '  ',
+
+                    'ab/*/', 'ab',
+                    'cd/*/', '     ',
+
+                    '/**/', '    ',
+
+                    'a/*b*/c', 'a     c',
+                ];
+
+                // Verify
+                verifyMultiLines(inpOutp);
+            });
+
+            test('several comments in one line', () => {
+                const inpOutp = [
+                    'd/*ee', 'd',
+                    'f*//*g*/h', '        h',
+
+                    '/**/a/*b*/', '    a     ',
+
+                    '/**/a/*b', '    a',
+                    '*/', '  ',
+
+                    '/**/a/*b*/c', '    a     c',
+
+                    ' /*aa*/bb/*ccc*/ddd/*ee', '       bb       ddd',
+                    'f*//*gg*/h', '         h',
+
+                    'ab/*/', 'ab',
+                    'cd/*/', '     ',
+
+                    '/**/', '    ',
+
+                    'a/*b*/c', 'a     c',
+                ];
+
+                // Verify
+                verifyMultiLines(inpOutp);
+            });
+
+            test('several lines', () => {
+                const inpOutp = [
+                    '/*/', '',
+                    '', '',
+                    'asdfgh', '',
+                    '*/', '  ',
+
+                    'ab/*/', 'ab',
+                    'cd/*/', '     ',
+
+                    '/**/', '    ',
+
+                    'a/*b*/c', 'a     c',
+                ];
+
+                // Verify
+                verifyMultiLines(inpOutp);
+            });
+        });
+
 
     });
 

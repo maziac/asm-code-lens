@@ -68,14 +68,6 @@ export function stripComment(text: string): string {
  * I.e. lines with comments are stripped.
  */
 export function stripAllComments(lines: Array<string>) {
-	const len = lines.length;
-	for (let i = 0; i < len; i++) {
-		const line = lines[i];
-		const strippedLine = stripComment(line);
-		lines[i] = strippedLine;
-	}
-}
-export function stripAllCommentsMultiline(lines: Array<string>) {
 	let insideMultilineComment = false;
 	const len = lines.length;
 	for (let i = 0; i < len; i++) {
@@ -85,33 +77,45 @@ export function stripAllCommentsMultiline(lines: Array<string>) {
 		let modLine = stripComment(line);
 
 		// Strip out multiline comments /*...*/
-		if (insideMultilineComment) {
-			// Find the next closing */
-			//...
-		}
-		else {
-			// Search for occurrence of /*
-			let j2 = 0;
-			while (true) {
-				const j1 = modLine.indexOf('/*', j2);
+		let j2 = 0;
+		do {
+			let j1 = 0;
+			if (!insideMultilineComment) {
+				j1 = modLine.indexOf('/*', j2);
 				if (j1 < 0)
 					break;
+				insideMultilineComment = true;
 				// Search for occurrence of */
 				j2 = modLine.indexOf('*/', j1 + 2);
-				if (j2 < 0) {
-					// No closing */ found
-					j2 = modLine.length - 2;
-					// I.e. this was the start of a multiline comment
-					insideMultilineComment = true;
+			}
+			else {
+				// Search for occurrence of */
+				j2 = modLine.indexOf('*/', j1);
+			}
+			console.log('a i=' + i + ', j1=' + j1 + ', j2=' + j2 + ', modline='+modLine);
+			if (j2 < 0) {
+				// No closing */ found
+				if (j1 == 0) {
+					// Clear out the whole line
+					modLine = '';
 				}
-				modLine = modLine.substring(0, j1) + ' '.repeat(j2 - j1 + 2) + modLine.substring(j2 + 2);
-				// Next
-				j2 += 2;
-			} while (j2 < modLine.length);
-		}
+				else {
+					// Otherwise clear from j1 on
+					modLine = modLine.substring(0, j1);
+				}
+				// End line
+				break;
+			}
+			else {
+				insideMultilineComment = false;
+			}
+			console.log('b i=' + i + ', j1=' + j1 + ', j2=' + j2 + ', modline=' + modLine);
+			modLine = modLine.substring(0, j1) + ' '.repeat(j2 - j1 + 2) + modLine.substring(j2 + 2);
+			// Next
+			j2 += 2;
+		} while (j2 < modLine.length);
 
-
+		// Store line
 		lines[i] = modLine;
-
 	}
 }
