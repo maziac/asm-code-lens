@@ -14,7 +14,7 @@ export function setCustomCommentPrefix(prefix?: string) {
 	if (prefix)
 		singleLineCommentsSet.add(prefix);
 	const prefixes = Array.from(singleLineCommentsSet);
-	const r = '("|/\\*|' + prefixes.join('|') + ')';
+	const r = '("|\'|/\\*|' + prefixes.join('|') + ')';
 	console.log(r);
 	commentEtcPrefixes = new RegExp(r, 'g');
 }
@@ -55,9 +55,9 @@ export function stripAllComments(lines: Array<string>) {
 			const j1 = match.index;
 			// Which opening
 			const opening = match[1];
-			if (opening == '"') {
+			if (opening == '"' || opening == "'") {
 				// Quote: Find closing quote
-				const j2 = line.indexOf('"', j1 + 1);
+				const j2 = line.indexOf(opening, j1 + 1);
 				if (j2 >= 0) {
 					// blank out between quotes
 					line = line.substring(0, j1) + ' '.repeat(j2 - j1 + 1) + line.substring(j2 + 1);
