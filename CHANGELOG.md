@@ -1,6 +1,7 @@
 # Changelog
 
-# 1.9.2
+# 1.10.0
+- Multiline comments support (/* ... */)
 - Fix for references after quotes (issue #69)
 
 # 1.9.1
