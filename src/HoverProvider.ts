@@ -3,6 +3,7 @@ import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
 import {regexModuleForWord, regexMacroForWord, regexesLabelForWord} from './regexes';
 import * as fs from 'fs';
 import {Config} from './config';
+import {readCommentsForLine} from './comments';
 
 
 /**
@@ -71,6 +72,7 @@ export class HoverProvider implements vscode.HoverProvider {
         const locations = await grepMultiple(regexes, this.config.rootFolder);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
+
         // Now read the comment lines above the document.
         // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.
         const hoverTexts = new Array<vscode.MarkdownString>();
@@ -87,39 +89,20 @@ export class HoverProvider implements vscode.HoverProvider {
             const lines = linesData.split('\n');
 
             // Now find all comments above the found line
-            const prevHoverTextArrayLength = hoverTexts.length;
-            const text = lines[lineNr];
-            const textMd = new vscode.MarkdownString();
-            textMd.appendText(text);
-            if (text.indexOf(';') >= 0 || text.toLowerCase().indexOf('equ') >= 0) // REMARK: This can lead to error: "indexOf of undefined"
-                hoverTexts.unshift(textMd);
-            let startLine = lineNr - 1;
-            while (startLine >= 0) {
-                // Check if line starts with ";"
-                const line = lines[startLine];
-                const match = /^\s*;(.*)/.exec(line);
-                if (!match)
-                    break;
+            const foundTexts = readCommentsForLine(lines, lineNr);
+            if (foundTexts.length > 0) {
+                // Separate several found texts
+                if (hoverTexts.length > 0)
+                    hoverTexts.push(new vscode.MarkdownString('============'));
                 // Add text
-                const textMatch = new vscode.MarkdownString();
-                textMatch.appendText(match[1]);
-                hoverTexts.unshift(textMatch);
-                // Next
-                startLine--;
+                hoverTexts.push(...foundTexts.map(line => new vscode.MarkdownString(line)));
             }
-
-            // Separate several entries
-            if (prevHoverTextArrayLength != hoverTexts.length)
-                hoverTexts.unshift(new vscode.MarkdownString('============'));
         }
 
         // End of processing.
         // Check if 0 entries
         if (hoverTexts.length == 0)
             return undefined as any;  // Nothing found
-
-        // Remove first ('============');
-        hoverTexts.splice(0, 1);
 
         // return
         const hover = new vscode.Hover(hoverTexts);

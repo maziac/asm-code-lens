@@ -1,7 +1,7 @@
 
 
 import * as assert from 'assert';
-import {setCustomCommentPrefix, stripAllComments} from '../src/comments';
+import {readCommentsForLine, setCustomCommentPrefix, stripAllComments} from '../src/comments';
 
 
 suite('comments', () => {
@@ -34,8 +34,6 @@ suite('comments', () => {
     suite('stripAllComments', () => {
 
         setCustomCommentPrefix();
-
-
 
         test('single line comments', () => {
             const inpOutp = [
@@ -174,6 +172,291 @@ suite('comments', () => {
             // Verify
             verifyMultiLines(inpOutp);
         });
+    });
+
+
+    suite('readCommentsForLine', () => {
+        setCustomCommentPrefix();
+
+        test('edge cases', () => {
+            let result = readCommentsForLine([], 0);
+            assert.equal(result.length, 0);
+            result = readCommentsForLine([' '], 0);
+            assert.equal(result.length, 0);
+            result = readCommentsForLine([' '], 1);
+            assert.equal(result.length, 0);
+            result = readCommentsForLine([' '], -1);
+            assert.equal(result.length, 0);
+        });
+
+        test('equ', () => {
+            let result = readCommentsForLine(['label:  EQU 10 '], 0);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'label:  EQU 10 ');
+
+            result = readCommentsForLine([
+                '   ',
+                'label:  EQU 10 ',
+            ], 1);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'label:  EQU 10 ');
+
+            result = readCommentsForLine([
+                '   ',
+                ' ; Bla ',
+                'label:  EQU 10 ',
+            ], 2);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla ');
+            assert.equal(result[1], 'label:  EQU 10 ');
+
+            result = readCommentsForLine([
+                '   ',
+                ' ; Bla1 ',
+                ' ; Bla2 ',
+                'label:  EQU 10 ',
+            ], 3);
+            assert.equal(result.length, 3);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+            assert.equal(result[2], 'label:  EQU 10 ');
+        });
+
+
+        test('label ; ...', () => {
+            let result = readCommentsForLine(['label: ; some text '], 0);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'label: ; some text ');
+
+            result = readCommentsForLine(['label: // some text '], 0);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'label: // some text ');
+
+            result = readCommentsForLine(['label:  '], 0);
+            assert.equal(result.length, 0);
+
+            result = readCommentsForLine([
+                '   ',
+                'label: ; some text ',
+            ], 1);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'label: ; some text ');
+
+            result = readCommentsForLine([
+                '   ',
+                ' ; Bla ',
+                'label: ; some text ',
+            ], 2);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla ');
+            assert.equal(result[1], 'label: ; some text ');
+
+            result = readCommentsForLine([
+                '   ',
+                ' ; Bla1 ',
+                ' ; Bla2 ',
+                'label: ; some text ',
+            ], 3);
+            assert.equal(result.length, 3);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+            assert.equal(result[2], 'label: ; some text ');
+        });
+
+
+        test('before label', () => {
+            let result = readCommentsForLine([
+                ' ; Bla1 ',
+                ' ; Bla2 ',
+                'label: ',
+            ], 2);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+
+            result = readCommentsForLine([
+                '  ',
+                ' ; Bla1 ',
+                'label: ',
+            ], 2);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], ' Bla1 ');
+
+            result = readCommentsForLine([
+                '  ',
+                '; Bla1 ',
+                'label: ',
+            ], 2);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], ' Bla1 ');
+
+            result = readCommentsForLine([
+                ' ; Bla1 ',
+                ' ; Bla2 ',
+                '',
+                'label: ',
+            ], 3);
+            assert.equal(result.length, 0);
+
+            result = readCommentsForLine([
+                ' ; Bla1 ',
+                ' ; Bla2 ',
+                '   ',
+                'label: ',
+            ], 3);
+            assert.equal(result.length, 0);
+        });
+
+        test('mutliline comment before label', () => {
+            let result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                ' Bla2 ',
+                '*/',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+
+            result = readCommentsForLine([
+                ' Bla1 ',
+                ' Bla2 ',
+                '*/',
+                'label: ',
+            ], 3);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+
+            result = readCommentsForLine([
+                'abcd:',
+                '/*',
+                ' Bla1 ',
+                ' Bla2 ',
+                '*/',
+                'label: ',
+            ], 5);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+
+            result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                '*/',
+                'label: ',
+            ], 3);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], ' Bla1 ');
+
+            result = readCommentsForLine([
+                '',
+                '/*',
+                '*/',
+                'label: ',
+            ], 3);
+            assert.equal(result.length, 0);
+
+            result = readCommentsForLine([
+                '',
+                '/*',
+                ' Bla1',
+                '*/Bla2',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], ' Bla1');
+
+            result = readCommentsForLine([
+                '',
+                '/*Bla1 ',
+                ' Bla2 ',
+                ' Bla3*/Bla4 ',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 3);
+            assert.equal(result[0], 'Bla1');
+            assert.equal(result[1], ' Bla2 ');
+            assert.equal(result[2], ' Bla3');
+        });
+
+        test('mixed', () => {
+            let result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                ' Bla2 ',
+                ';*/',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], '*/');
+
+            result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                ' Bla2 ',
+                'Bla3*/;kl',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 3);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' Bla2 ');
+            assert.equal(result[2], 'Bla3');
+
+            result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                ' ;Bla2 ',
+                '*/',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], ' ;Bla2 ');
+
+
+            // Note: this is actual wrong behavior:
+            // But it would be too complicated to do it right and
+            // it is only an edge case.
+            result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                '/*',
+                ' Bla2 ',
+                '*/',
+                'label: ',
+            ], 5);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], ' Bla2 ');
+
+            // Note: this is actual wrong behavior:
+            // But it would be too complicated to do it right and
+            // it is only an edge case.
+            result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                '//*Bla2 ',
+                '*/',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'Bla2');
+
+            // Note: this is actual wrong behavior:
+            // But it would be too complicated to do it right and
+            // it is only an edge case.
+            result = readCommentsForLine([
+                '/*',
+                ' Bla1 ',
+                '; /*Bla2 ',
+                '*/',
+                'label: ',
+            ], 4);
+            assert.equal(result.length, 1);
+            assert.equal(result[0], 'Bla2');
+        });
+
     });
 
 });
