@@ -2,6 +2,8 @@
 
 # 1.10.0
 - Multiline comments support (/* ... */)
+	- for references/code lenses
+	- for hover and descriptive text in front of the label
 - Fix for references after quotes (issue #69)
 
 # 1.9.1

@@ -60,7 +60,7 @@ export function stripAllComments(lines: Array<string>) {
 		// Search for opening
 		commentEtcPrefixes.lastIndex = 0;
 		let match;
-		while ((match = commentEtcPrefixes.exec(line))) { //'' matched immer?
+		while ((match = commentEtcPrefixes.exec(line))) {
 			const j1 = match.index;
 			// Which opening
 			const opening = match[1];

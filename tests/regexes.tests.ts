@@ -89,7 +89,7 @@ suite('RegExes', () => {
                 'include   "sound.asm" ', true, "sound.asm",
                 '  INCLUDE "src/sound.asm"', true, "src/sound.asm",
                 'include   abcd ', false, "",
-                'includex   "sound.asm" ', false, "",
+                'includeX   "sound.asm" ', false, "",
             ];
 
             checkResultsMatchFound(regex, insOuts);
@@ -145,7 +145,7 @@ suite('RegExes', () => {
                 "asound", "snd", true,
                 "sounds", "snd", true,
                 "soun", "snd", false,
-                "sounkkkd", "snd", true,
+                "sounkkd", "snd", true,
             ];
 
             try {
@@ -530,7 +530,7 @@ suite('RegExes', () => {
                 "_LabelA_0123456789", "_LabelA_0123456789:", true, "",
                 "label", "xxx.label:", true, "xxx.",
                 "label", "_xxx.label:", true, "_xxx.",
-                "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a nmber.
+                "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a number.
                 "label", ".label:", true, ".",
 
                 "label", "label.xxx:", true, "",

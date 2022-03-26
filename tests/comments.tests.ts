@@ -129,7 +129,7 @@ suite('comments', () => {
                 const inpOutp = [
                     '/*/', '',
                     '', '',
-                    'asdfgh', '',
+                    'abcdef', '',
                     '*/', '  ',
 
                     'ab/*/', 'ab',
@@ -307,7 +307,7 @@ suite('comments', () => {
             assert.equal(result.length, 0);
         });
 
-        test('mutliline comment before label', () => {
+        test('multiline comment before label', () => {
             let result = readCommentsForLine([
                 '/*',
                 ' Bla1 ',
