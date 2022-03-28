@@ -95,7 +95,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
             || event.affectsConfiguration('asm-code-lens.donated')) {
             // Update the hex calculators
             if (hexCalcExplorerProvider)
-                hexCalcExplorerProvider.setMainHtml();  // TODO : Pass as argument
+                hexCalcExplorerProvider.setMainHtml();
             if (hexCalcDebugProvider)
                 hexCalcDebugProvider.setMainHtml();
         }
