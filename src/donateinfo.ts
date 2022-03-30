@@ -55,7 +55,7 @@ export class DonateInfo {
 			if (Date.now() < this.donateTime) {
 				// Time not elapsed yet.
 				// Show info
-				const selected = await vscode.window.showWarningMessage("ASM Code Lens: If you use 'ASM Code Lens' regularly please support the project.", "Not now", "Yes, please");
+				const selected = await vscode.window.showWarningMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project alive.", "Not now", "Yes, please");
 				if (selected?.toLowerCase().startsWith('yes')) {
 					// Re-direct to donation page
 					this.openDonateWebView();
@@ -68,7 +68,7 @@ export class DonateInfo {
 	/**
 	 * Opens a webview with donation information.
 	 */
-	protected static openDonateWebView() {
+	public static openDonateWebView() {
 		// Create vscode panel view
 		const vscodePanel = vscode.window.createWebviewPanel('', '', {preserveFocus: true, viewColumn: vscode.ViewColumn.Nine});
 		vscodePanel.title = 'Donate...';

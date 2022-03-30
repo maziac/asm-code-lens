@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import {readFileSync} from 'fs';
 import {PackageInfo} from './whatsnew/packageinfo';
+import {DonateInfo} from './donateinfo';
 
 
 export class HexCalcProvider implements vscode.WebviewViewProvider {
@@ -25,7 +26,7 @@ export class HexCalcProvider implements vscode.WebviewViewProvider {
 		this.webview.onDidReceiveMessage(message => {
 			switch (message.command) {	// NOSONAR
 				case 'donateClicked':
-					this.openDonateWebView();
+					DonateInfo.openDonateWebView();
 					break;
 			}
 		});
@@ -72,41 +73,6 @@ let hexPrefix = "${hexPrefix}";`
 
 		// Set content
 		this.webview.html = mainHtml;
-	}
-
-
-	/**
-	 * Opens a webview with donation information.
-	 */
-	protected openDonateWebView() {
-		// Create vscode panel view
-		const vscodePanel = vscode.window.createWebviewPanel('', '', {preserveFocus: true, viewColumn: vscode.ViewColumn.Nine});
-		vscodePanel.title = 'Donate...';
-		// Read the file
-		const extPath = PackageInfo.extension.extensionPath;
-		const htmlFile = path.join(extPath, 'html/donate.html');
-		let html = readFileSync(htmlFile).toString();
-		// Exchange local path
-		const resourcePath = vscode.Uri.file(extPath);
-		const vscodeResPath = vscodePanel.webview.asWebviewUri(resourcePath).toString();
-		html = html.replace('${vscodeResPath}', vscodeResPath);
-
-		// Handle messages from the webview
-		vscodePanel.webview.options = {enableScripts: true};
-		vscodePanel.webview.onDidReceiveMessage(message => {
-			switch (message.command) {	// NOSONAR
-				case 'showExtension':
-					// Switch to Extension Manager
-					vscode.commands.executeCommand("workbench.extensions.search", PackageInfo.extension.packageJSON.publisher)
-					// And select the given extension
-					const extensionName = PackageInfo.extension.packageJSON.publisher + '.' + message.data;
-					vscode.commands.executeCommand("extension.open", extensionName);
-					break;
-			}
-		});
-
-		// Set html
-		vscodePanel.webview.html = html;
 	}
 
 }
