@@ -13,16 +13,15 @@ export class WhatsNewView {
 
 	/**
 	 * Updates the version number.
-	 * @param context The extension context.
 	 * @return true if version was updated. false if version major/minor are equal.
 	 */
-	public static updateVersion(context: vscode.ExtensionContext): boolean {
+	public static updateVersion(): boolean {
 		// Load data from extension storage
 		const versionId = 'version';
 		const previousVersion = GlobalStorage.Get<string>(versionId)!;
 		const currentVersion = PackageInfo.extension.packageJSON.version;
 
-		// Update version: "major", "minor"
+		// Update version: "major", "minor" and "patch"
 		if (currentVersion != previousVersion)
 			GlobalStorage.Set(versionId, currentVersion);
 

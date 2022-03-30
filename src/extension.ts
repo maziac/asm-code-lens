@@ -15,6 +15,7 @@ import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
 import {getLabelsConfig} from './config';
+import {DonateInfo} from './donateinfo';
 
 
 
@@ -26,8 +27,11 @@ export function activate(context: vscode.ExtensionContext) {
     // Init global storage
     GlobalStorage.Init(context);
 
+    // Check version for donate info
+    DonateInfo.checkVersion();
+
     // Check version and show 'What's new' if necessary.
-    const mjrMnrChanged = WhatsNewView.updateVersion(context);
+    const mjrMnrChanged = WhatsNewView.updateVersion();
     if (mjrMnrChanged) {
         // Major or minor version changed so show the whatsnew page.
         new WhatsNewView(); // NOSONAR

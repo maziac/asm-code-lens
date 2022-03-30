@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
 import {regexAnyReferenceForWord, regexesLabel} from './regexes';
 import {Config} from './config';
+import {DonateInfo} from './donateinfo';
 
 
 /**
@@ -57,6 +58,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const docPath = document.uri.fsPath;
         if (docPath.indexOf(this.config.rootFolder) < 0)
             return [];
+
+        // Show donate info
+        DonateInfo.checkDonateInfo();   // No need for 'await'.
 
         // Find all code lenses
         const codeLenses: Array<vscode.CodeLens> = [];
