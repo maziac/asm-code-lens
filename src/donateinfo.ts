@@ -7,23 +7,21 @@ import {PackageInfo} from './whatsnew/packageinfo';
 
 export class DonateInfo {
 	// Will be set to false if the donate info was shown once.
-	protected static evaluateDonateTime = true;
+	protected static evaluateDonateTime: number | undefined = undefined;
 
 	// The time until when the donation info will be shown
-	protected static donateTime: number|undefined = undefined;
+	protected static donateEndTime: number | undefined = undefined;
 
 	// Global storage properties
 	protected static VERSION_ID = 'version';
 	protected static DONATE_TIME_ID = 'donateTimeId';
-
-	// 2 weeks in ms
-	protected static TWO_WEEKS = 14 * 24 * 60 * 60 * 1000;
 
 
 	/**
 	 * Checks the version number.
 	 * If a new (different) version has been installed the DONATE_TIME_ID is set to undefined.
 	 * (To start a new timing.)
+	 * Is called at the start of the extension (before checkDonateInfo).
 	 */
 	public static checkVersion() {
 		// Load data from extension storage
@@ -34,32 +32,44 @@ export class DonateInfo {
 		if (currentVersion != previousVersion) {
 			// Yes, remove the previous donate time
 			GlobalStorage.Set(this.DONATE_TIME_ID, undefined);
-			this.donateTime = undefined;
+		}
+
+		// Check if already donated
+		const configuration = PackageInfo.getConfiguration();
+		const donated = configuration.get<boolean>('donated');
+		if (!donated) {
+			// Start evaluation
+			this.evaluateDonateTime = Date.now();
 		}
 	}
 
 
 	public static async checkDonateInfo() {
 		// Check if enabled
-		if (this.evaluateDonateTime) {
-			// Stop evaluating. Evaluate only once per activation.
-			this.evaluateDonateTime = false;
+		if (this.evaluateDonateTime != undefined &&
+			Date.now() > this.evaluateDonateTime) {
+			// Evaluate only once per day or activation.
+			this.evaluateDonateTime = Date.now() + this.daysInMs(1/24/60/2);
 			// Check if time already set
-			if (this.donateTime == undefined) {
-				this.donateTime = GlobalStorage.Get<number>(this.DONATE_TIME_ID);
-				if (this.donateTime == undefined) {
-					this.donateTime = Date.now() + this.TWO_WEEKS;
-					GlobalStorage.Set(this.DONATE_TIME_ID, this.donateTime);
+			if (this.donateEndTime == undefined) {
+				this.donateEndTime = GlobalStorage.Get<number>(this.DONATE_TIME_ID);
+				if (this.donateEndTime == undefined) {
+					this.donateEndTime = Date.now() + this.daysInMs(14);
+					GlobalStorage.Set(this.DONATE_TIME_ID, this.donateEndTime);
 				}
 			}
-			if (Date.now() < this.donateTime) {
+			if (Date.now() < this.donateEndTime) {
 				// Time not elapsed yet.
-				// Show info
-				const selected = await vscode.window.showWarningMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project alive.", "Not now", "Yes, please");
+				// Show info as error text (warning and info text goes away by itself after a short timeout)
+				const selected = await vscode.window.showErrorMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Not now", "Yes, please. I want to show my support.");
 				if (selected?.toLowerCase().startsWith('yes')) {
 					// Re-direct to donation page
 					this.openDonateWebView();
 				}
+			}
+			else {
+				// Stop evaluating.
+				this.evaluateDonateTime = undefined;
 			}
 		}
 	}
@@ -99,4 +109,11 @@ export class DonateInfo {
 		vscodePanel.webview.html = html;
 	}
 
+
+	/**
+	 * Returns the number of days in ms.
+	 */
+	protected static daysInMs(days: number) {
+		return days * 24 * 60 * 60 * 1000;
+	}
 }
