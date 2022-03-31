@@ -108,6 +108,8 @@ export class DonateInfoInner {
 			this.setDonationTime(undefined);
 		}
 
+		//		this.setDonationTime(undefined); // TODO : REMOVE
+
 		// Check if already donated
 		this.donatedPreferencesChanged();
 	}

@@ -87,6 +87,7 @@ suite('DonateInfoInner', () => {
 	suite('checkDonateInfo', () => {
 
 		test('not enabled', async () => {
+			// evaluateDonateTime = undefined
 			MockDonateInfo.showInfoMessageCalled = false;
 			MockDonateInfo.openDonateWebViewCalled = false;
 			MockDonateInfo.time = 17;
@@ -98,6 +99,7 @@ suite('DonateInfoInner', () => {
 			assert.equal(MockDonateInfo.showInfoMessageCalled, false);	// Not called
 			assert.equal(MockDonateInfo.openDonateWebViewCalled, false);	// Not called
 
+			// evaluateDonateTime set
 			MockDonateInfo.showInfoMessageCalled = false;
 			MockDonateInfo.openDonateWebViewCalled = false;
 			MockDonateInfo.time = 17;
@@ -132,6 +134,7 @@ suite('DonateInfoInner', () => {
 
 
 		test('showInfoMessage', async () => {
+			// First: Show info
 			MockDonateInfo.showInfoMessageCalled = false;
 			MockDonateInfo.time = 18;
 			(MockDonateInfo as any).evaluateDonateTime = 17;	// < time
@@ -141,6 +144,7 @@ suite('DonateInfoInner', () => {
 			assert.ok(MockDonateInfo.showInfoMessageCalled);	// Is called
 			assert.ok((MockDonateInfo as any).evaluateDonateTime != undefined);
 
+			// 2nd: don't show info
 			MockDonateInfo.showInfoMessageCalled = false;
 			MockDonateInfo.time = 18;
 			(MockDonateInfo as any).evaluateDonateTime = 17;	// < time
@@ -270,6 +274,74 @@ suite('DonateInfoInner', () => {
 			await MockDonateInfo.checkDonateInfo();
 			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
 		});
+
+
+		test('donated = true after first info', async () => {
+			const oneDay = 1 * 24 * 60 * 60 * 1000;
+
+			// First, info message is shown
+			MockDonateInfo.showInfoMessageCalled = false;
+			MockDonateInfo.time = 18;
+			(MockDonateInfo as any).evaluateDonateTime = 17;	// < time
+			(MockDonateInfo as any).donateEndTime = undefined;
+			MockDonateInfo.donationTime = undefined;
+			await MockDonateInfo.checkDonateInfo();
+			assert.ok(MockDonateInfo.showInfoMessageCalled);	// Is called
+
+			// Set 'donated'
+			MockDonateInfo.donated = true;
+			MockDonateInfo.donatedPreferencesChanged();
+
+			// Now a day is over: but not shown
+			MockDonateInfo.showInfoMessageCalled = false;
+			MockDonateInfo.time += oneDay;
+			await MockDonateInfo.checkDonateInfo();
+			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
+			
+			// Clear 'donated'
+			MockDonateInfo.donated = false;
+			MockDonateInfo.donatedPreferencesChanged();
+
+			// Same time: but now shown
+			MockDonateInfo.showInfoMessageCalled = false;
+			await MockDonateInfo.checkDonateInfo();
+			assert.ok(MockDonateInfo.showInfoMessageCalled);	// Is called
+
+		});
+
+		test('donated = false after first info', async () => {
+			const oneDay = 1 * 24 * 60 * 60 * 1000;
+
+			// First, info message is not shown
+			MockDonateInfo.donated = true;
+			MockDonateInfo.donatedPreferencesChanged();
+			MockDonateInfo.showInfoMessageCalled = false;
+			MockDonateInfo.time = 18;
+			(MockDonateInfo as any).donateEndTime = undefined;
+			MockDonateInfo.donationTime = undefined;
+			await MockDonateInfo.checkDonateInfo();
+			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
+
+			// Clear 'donated'
+			MockDonateInfo.donated = false;
+			MockDonateInfo.donatedPreferencesChanged();
+
+			// Same time: but now shown
+			MockDonateInfo.showInfoMessageCalled = false;
+			await MockDonateInfo.checkDonateInfo();
+			assert.ok(MockDonateInfo.showInfoMessageCalled);	// Is called
+
+			// Set 'donated'
+			MockDonateInfo.donated = true;
+			MockDonateInfo.donatedPreferencesChanged();
+
+			// Now a day is over: but not shown
+			MockDonateInfo.showInfoMessageCalled = false;
+			MockDonateInfo.time += oneDay;
+			await MockDonateInfo.checkDonateInfo();
+			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
+		});
+
 
 	});
 
