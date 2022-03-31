@@ -16,6 +16,15 @@ export class DonateInfo extends DonateInfoInner {
 	protected static VERSION_ID = 'version';
 	protected static DONATE_TIME_ID = 'donateTimeId';
 
+	/**
+	 * This function is used to display the donation info message.
+	 * @param message The text to show.
+	 * @param items The items to choose from.
+	 */
+	public static async showInfoMessage(message: string, ...items: string[]): Promise<string | undefined> {
+		return vscode.window.showErrorMessage(message, ...items);
+	}
+
 
 	/**
 	 * Returns the previous version, normally from GlobalStorage
