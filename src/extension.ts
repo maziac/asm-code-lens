@@ -15,7 +15,7 @@ import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
 import {getLabelsConfig} from './config';
-import {DonateInfo} from './donateinfo';
+import {DonateInfo} from './donate/donateinfo';
 
 
 
@@ -102,6 +102,8 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
                 hexCalcExplorerProvider.setMainHtml();
             if (hexCalcDebugProvider)
                 hexCalcDebugProvider.setMainHtml();
+            // Update the donate info
+            DonateInfo.donatedPreferencesChanged();
         }
     }
 

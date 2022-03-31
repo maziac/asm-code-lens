@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
 import {regexAnyReferenceForWord, regexesLabel} from './regexes';
 import {Config} from './config';
-import {DonateInfo} from './donateinfo';
+import {DonateInfo} from './donate/donateinfo';
 
 
 /**

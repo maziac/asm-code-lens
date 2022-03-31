@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import {readFileSync} from 'fs';
 import {PackageInfo} from './whatsnew/packageinfo';
-import {DonateInfo} from './donateinfo';
+import {DonateInfo} from './donate/donateinfo';
 
 
 export class HexCalcProvider implements vscode.WebviewViewProvider {
