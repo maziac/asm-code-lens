@@ -56,12 +56,28 @@ suite('DonateInfoInner', () => {
 
 	test('donatedPreferencesChanged', () => {
 		MockDonateInfo.donated = false;
+		MockDonateInfo.donationTime = 55;
+		MockDonateInfo.time = 2;
+		(MockDonateInfo as any).evaluateDonateTime = 23;
+		MockDonateInfo.donatedPreferencesChanged();
+		assert.equal((MockDonateInfo as any).evaluateDonateTime, 2);
+
+		MockDonateInfo.donated = false;
+		MockDonateInfo.donationTime = undefined;
 		MockDonateInfo.time = 12;
 		(MockDonateInfo as any).evaluateDonateTime = 23;
 		MockDonateInfo.donatedPreferencesChanged();
-		assert.equal((MockDonateInfo as any).evaluateDonateTime, 12);
+		assert.equal((MockDonateInfo as any).evaluateDonateTime, undefined);
 
 		MockDonateInfo.donated = true;
+		MockDonateInfo.donationTime = 55;
+		MockDonateInfo.time = 22;
+		(MockDonateInfo as any).evaluateDonateTime = 33;
+		MockDonateInfo.donatedPreferencesChanged();
+		assert.equal((MockDonateInfo as any).evaluateDonateTime, undefined);
+
+		MockDonateInfo.donated = true;
+		MockDonateInfo.donationTime = undefined;
 		MockDonateInfo.time = 22;
 		(MockDonateInfo as any).evaluateDonateTime = 33;
 		MockDonateInfo.donatedPreferencesChanged();
@@ -297,7 +313,7 @@ suite('DonateInfoInner', () => {
 			MockDonateInfo.time += oneDay;
 			await MockDonateInfo.checkDonateInfo();
 			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
-			
+
 			// Clear 'donated'
 			MockDonateInfo.donated = false;
 			MockDonateInfo.donatedPreferencesChanged();
@@ -313,12 +329,12 @@ suite('DonateInfoInner', () => {
 			const oneDay = 1 * 24 * 60 * 60 * 1000;
 
 			// First, info message is not shown
+			MockDonateInfo.donationTime = 100;
 			MockDonateInfo.donated = true;
 			MockDonateInfo.donatedPreferencesChanged();
 			MockDonateInfo.showInfoMessageCalled = false;
 			MockDonateInfo.time = 18;
 			(MockDonateInfo as any).donateEndTime = undefined;
-			MockDonateInfo.donationTime = undefined;
 			await MockDonateInfo.checkDonateInfo();
 			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
 
@@ -342,7 +358,25 @@ suite('DonateInfoInner', () => {
 			assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
 		});
 
+	});
 
+
+	test('enable/disable', async () => {
+		MockDonateInfo.showInfoMessageCalled = false;
+		MockDonateInfo.time = 18;
+		(MockDonateInfo as any).evaluateDonateTime = 17;	// < time
+		(MockDonateInfo as any).donateEndTime = undefined;
+		MockDonateInfo.donationTime = undefined;
+
+		// First, info message is not shown: disabled
+		(MockDonateInfo as any).enableDonationInfo = false;
+		await MockDonateInfo.checkDonateInfo();
+		assert.ok(!MockDonateInfo.showInfoMessageCalled);	// Is not called
+
+		// If enabled it is shown
+		(MockDonateInfo as any).enableDonationInfo = true;
+		await MockDonateInfo.checkDonateInfo();
+		assert.ok(MockDonateInfo.showInfoMessageCalled);	// Is called
 	});
 
 });

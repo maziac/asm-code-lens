@@ -2,8 +2,14 @@
  * These are the inner functions.
  * I.e. the functions that can be unit tested.
  * I.e. without 'vscode'.
+ *
+ * Use this.enableDonationInfo = false to disable the DonationInfo nag screen.
  */
 export class DonateInfoInner {
+
+	// To disable the DonationInfo set this to false.
+	protected static enableDonationInfo = true;
+
 	// Will be set to false if the donate info was shown once.
 	protected static evaluateDonateTime: number | undefined = undefined;
 
@@ -17,7 +23,7 @@ export class DonateInfoInner {
 	 * @param message The text to show.
 	 * @param items The items to choose from.
 	 */
-	public static async showInfoMessage(message: string, ...items: string[]): Promise<string> {
+	public static async showInfoMessage(message: string, ...items: string[]): Promise<string | undefined> {
 		// Overwrite
 		return '';
 	}
@@ -93,7 +99,7 @@ export class DonateInfoInner {
 
 	/**
 	 * Checks the version number.
-	 * If a new (different) version has been installed the DONATE_TIME_ID is set to undefined.
+	 * If a new (different) version has been installed the donation time is set to undefined.
 	 * (To start a new timing.)
 	 * Is called at the start of the extension (before checkDonateInfo).
 	 */
@@ -108,8 +114,6 @@ export class DonateInfoInner {
 			this.setDonationTime(undefined);
 		}
 
-		//		this.setDonationTime(undefined); // TODO : REMOVE
-
 		// Check if already donated
 		this.donatedPreferencesChanged();
 	}
@@ -122,31 +126,33 @@ export class DonateInfoInner {
 	 * donate nag screen.
 	 */
 	public static async checkDonateInfo() {
-		// Check if enabled
-		if (this.evaluateDonateTime != undefined &&
-			this.now() >= this.evaluateDonateTime) {
-			// Evaluate only once per day or activation.
-			this.evaluateDonateTime = this.now() + this.daysInMs(1);
-			// Check if time already set
-			if (this.donateEndTime == undefined) {
-				this.donateEndTime = this.getDonationTime();
+		if (this.enableDonationInfo) {
+			// Check if enabled
+			if (this.evaluateDonateTime != undefined &&
+				this.now() >= this.evaluateDonateTime) {
+				// Evaluate only once per day or activation.
+				this.evaluateDonateTime = this.now() + this.daysInMs(1);
+				// Check if time already set
 				if (this.donateEndTime == undefined) {
-					this.donateEndTime = this.now() + this.daysInMs(14);
-					this.setDonationTime(this.donateEndTime);
+					this.donateEndTime = this.getDonationTime();
+					if (this.donateEndTime == undefined) {
+						this.donateEndTime = this.now() + this.daysInMs(14);
+						this.setDonationTime(this.donateEndTime);
+					}
 				}
-			}
-			if (this.now() < this.donateEndTime) {
-				// Time not elapsed yet.
-				// Show info as error text (warning and info text goes away by itself after a short timeout)
-				const selected = await this.showInfoMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Not now", "Yes, please. I want to show my support.");
-				if (selected?.toLowerCase().startsWith('yes')) {
-					// Re-direct to donation page
-					this.openDonateWebView();
+				if (this.now() < this.donateEndTime) {
+					// Time not elapsed yet.
+					// Show info as error text (warning and info text goes away by itself after a short timeout)
+					const selected = await this.showInfoMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Not now", "Yes, please. I want to show my support.");
+					if (selected?.toLowerCase().startsWith('yes')) {
+						// Re-direct to donation page
+						this.openDonateWebView();
+					}
 				}
-			}
-			else {
-				// Stop evaluating.
-				this.evaluateDonateTime = undefined;
+				else {
+					// Stop evaluating.
+					this.evaluateDonateTime = undefined;
+				}
 			}
 		}
 	}
@@ -156,15 +162,16 @@ export class DonateInfoInner {
 	 * Called if user changed the 'donated' preferences.
 	 */
 	public static donatedPreferencesChanged() {
-		// Get donated state
-		const donated = this.getDonatedPref();
-		if (donated) {
-			// Stop donation info (if any)
-			this.evaluateDonateTime = undefined;
-		}
-		else {
-			// Start evaluation
-			this.evaluateDonateTime = this.now();
+		this.evaluateDonateTime = undefined;
+		// Check if donation time is set
+		const donationTime = this.getDonationTime();
+		if (donationTime != undefined) {
+			// And check if not donated
+			const donated = this.getDonatedPref();
+			if (!donated) {
+				// Start evaluation
+				this.evaluateDonateTime = this.now();
+			}
 		}
 	}
 
@@ -173,12 +180,12 @@ export class DonateInfoInner {
 	 * Returns the number of days in ms.
 	 */
 	protected static daysInMs(days: number): number {
-		/*
+		/* For testing purposes:
 		if (days == 1)
-			return 1000 * 20;
+			return 1000 * 10 * 60; // 10 mins
 		else
-			return 1000 * 60;
-			*/
+			return 1000 * 60 * 60;	// 1 hour
+		*/
 		return days * 24 * 60 * 60 * 1000;
 	}
 }
