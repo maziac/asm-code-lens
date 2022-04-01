@@ -1,6 +1,6 @@
 # Changelog
 
-# 1.10.0
+# 1.10.1
 - Multiline comments support (/* ... */)
 	- for references/code lenses
 	- for hover and descriptive text in front of the label
