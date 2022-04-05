@@ -80,9 +80,9 @@ export class DonateInfoInner {
 	/**
 	 * Sets the donation time until when the nag screen will be shown.
 	 * Should be 14 days into the future after new version ahs been installed.
-	 * @param time After this time the nag screen is not shown anymore. E.g .Date.now() + 14 days.
+	 * @param _time After this time the nag screen is not shown anymore. E.g Date.now() + 14 days.
 	 */
-	protected static setDonationTime(time: number | undefined) {
+	protected static setDonationTime(_time: number | undefined) {
 		// Override
 	}
 
@@ -120,6 +120,18 @@ export class DonateInfoInner {
 
 
 	/**
+	 * Called if user changed the 'donated' preferences.
+	 * If donated then 'evaluateDonateTime' is set to undefined which stops nagging.
+	 * If not donated 'evaluateDonateTime' is set to current time.
+	 */
+	public static donatedPreferencesChanged() {
+		// Check if donated
+		const donated = this.getDonatedPref();
+		this.evaluateDonateTime = donated ? undefined : this.now();
+	}
+
+
+	/**
 	 * Is called from a location that is frequently used.
 	 * E.g. the code lenses.
 	 * It checks if there is time (and other conditions) to show the
@@ -153,24 +165,6 @@ export class DonateInfoInner {
 					// Stop evaluating.
 					this.evaluateDonateTime = undefined;
 				}
-			}
-		}
-	}
-
-
-	/**
-	 * Called if user changed the 'donated' preferences.
-	 */
-	public static donatedPreferencesChanged() {
-		this.evaluateDonateTime = undefined;
-		// Check if donation time is set
-		const donationTime = this.getDonationTime();
-		if (donationTime != undefined) {
-			// And check if not donated
-			const donated = this.getDonatedPref();
-			if (!donated) {
-				// Start evaluation
-				this.evaluateDonateTime = this.now();
 			}
 		}
 	}

@@ -56,28 +56,12 @@ suite('DonateInfoInner', () => {
 
 	test('donatedPreferencesChanged', () => {
 		MockDonateInfo.donated = false;
-		MockDonateInfo.donationTime = 55;
 		MockDonateInfo.time = 2;
 		(MockDonateInfo as any).evaluateDonateTime = 23;
 		MockDonateInfo.donatedPreferencesChanged();
 		assert.equal((MockDonateInfo as any).evaluateDonateTime, 2);
 
-		MockDonateInfo.donated = false;
-		MockDonateInfo.donationTime = undefined;
-		MockDonateInfo.time = 12;
-		(MockDonateInfo as any).evaluateDonateTime = 23;
-		MockDonateInfo.donatedPreferencesChanged();
-		assert.equal((MockDonateInfo as any).evaluateDonateTime, undefined);
-
 		MockDonateInfo.donated = true;
-		MockDonateInfo.donationTime = 55;
-		MockDonateInfo.time = 22;
-		(MockDonateInfo as any).evaluateDonateTime = 33;
-		MockDonateInfo.donatedPreferencesChanged();
-		assert.equal((MockDonateInfo as any).evaluateDonateTime, undefined);
-
-		MockDonateInfo.donated = true;
-		MockDonateInfo.donationTime = undefined;
 		MockDonateInfo.time = 22;
 		(MockDonateInfo as any).evaluateDonateTime = 33;
 		MockDonateInfo.donatedPreferencesChanged();
