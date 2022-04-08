@@ -8,7 +8,7 @@
 export class DonateInfoInner {
 
 	// To disable the DonationInfo set this to false.
-	protected static enableDonationInfo = true;
+	protected static enableDonationInfo = false;
 
 	// Will be set to false if the donate info was shown once.
 	protected static evaluateDonateTime: number | undefined = undefined;
@@ -155,7 +155,7 @@ export class DonateInfoInner {
 				if (this.now() < this.donateEndTime) {
 					// Time not elapsed yet.
 					// Show info as error text (warning and info text goes away by itself after a short timeout)
-					const selected = await this.showInfoMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Yes, please. I want to show my support.", "Not now");
+					const selected = await this.showInfoMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Yes, please. I want to show my support", "Not now");
 					if (selected?.toLowerCase().startsWith('yes')) {
 						// Re-direct to donation page
 						this.openDonateWebView();
