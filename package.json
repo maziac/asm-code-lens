@@ -38,6 +38,11 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "breakpoints": [
+            {
+                "language": "asm-collection"
+            }
+        ],
         "views": {
             "explorer": [
                 {
