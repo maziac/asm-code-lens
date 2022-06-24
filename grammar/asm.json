@@ -3,6 +3,9 @@
 	"name": "asm",
 	"patterns": [
 		{
+			"include": "#listfile"
+		},
+		{
 			"include": "#comments"
 		},
 		{
@@ -15,10 +18,10 @@
 			"include": "#mnemonics"
 		},
 		{
-			"include": "#numbers"
+			"include": "#labels"
 		},
 		{
-			"include": "#labels"
+			"include": "#numbers"
 		}
 	],
 	"repository": {
@@ -261,21 +264,25 @@
 				{
 					"name": "constant.numeric.integer.decimal.asm",
 					"match": "\\-?\\d+"
+				},
+				{
+					"name": "constant.numeric.integer.hexadecimal.asm",
+					"match": "[0-9a-fA-F]+"
+				}
+			]
+		},
+		"listfile": {
+			"patterns": [
+				{
+					"name": "constant.numeric.integer.hexadecimal.asm",
+					"match": "\\b[0-9a-fA-F]{4,}\\s+([0-9a-fA-F]{2,}\\s)*"
 				}
 			]
 		},
 		"labels": {
 			"patterns": [
 				{
-					"match": "^\\@?((\\$\\$(?!\\.))?[\\w\\.]+)[:\\s]",
-					"captures": {
-						"1": {
-							"name": "entity.name.function.asm"
-						}
-					}
-				},
-				{
-					"match": "\\b([a-zA-Z][\\w\\.]+)\\b",
+					"match": "(\\@?(\\.?[a-zA-Z_]\\w*)+)",
 					"name": "variable.parameter.label.asm"
 				}
 			]
