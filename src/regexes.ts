@@ -245,7 +245,7 @@ export function regexPrepareFuzzy(searchWord: string): string {
  */
 export function regexEveryLabelColonForWord(searchWord: string): RegExp {
     //return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
-    return new RegExp('(^[\\w\\.]*|^.*?\\s[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
+    return new RegExp('(^@?[\\w\\.]*|^.*\\s@?[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
 }
 
 

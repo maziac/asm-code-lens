@@ -547,6 +547,12 @@ suite('RegExes', () => {
                     "\\w*s\\w*n\\w*d", "yyy.sound.zzz:", true, "yyy.",
 
                     "label", "LaBeL:", true, "",
+
+                    "label", "@Label:", true, "@",
+
+                    // List file
+                    "label", "  @label:", true, "  @",
+                    "label", "6017.R11 00 AF       @label:", true, "6017.R11 00 AF       @",
                 ];
 
                 checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);
