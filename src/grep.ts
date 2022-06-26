@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
-import {regexEndModuleStruct, regexModuleStruct, regexPrepareFuzzy} from './regexes';
+import {calcStartIndex, regexEndModuleStruct, regexModuleStruct, regexPrepareFuzzy} from './regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 
@@ -370,15 +370,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
                 break;
 
             // Found: get start and end
-            let start = match.index;
-            for (let j = 1; j < match.length; j++) {
-                // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                if (match[j]) {
-                    // Note: an optional group might be undefined
-                    const i = match[j].length;
-                    start += i;
-                }
-            }
+            const start = calcStartIndex(match);
             const end = match.index + match[0].length;
 
 

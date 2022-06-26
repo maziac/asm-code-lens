@@ -97,6 +97,23 @@ export function regexEndModuleStruct(): RegExp {
 }
 
 
+/**
+ * Calculates the start index by adding the length of each matches.
+ * (Exported for unit tests)
+ */
+export function calcStartIndex(match: RegExpExecArray): number {
+    let start = match.index;
+    for (let j = 1; j < match.length; j++) {
+        // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
+        if (match[j]) {
+            // Note: an optional group might be undefined
+            const i = match[j].length;
+            start += i;
+        }
+    }
+    return start;
+}
+
 
 /**
  * Searches for labels that contain the given word.
@@ -227,7 +244,8 @@ export function regexPrepareFuzzy(searchWord: string): string {
  * Used by CompletionProposalsProvider.
  */
 export function regexEveryLabelColonForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
+    //return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
+    return new RegExp('(^[\\w\\.]*|^.*?\\s[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
 }
 
 

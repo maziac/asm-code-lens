@@ -1,9 +1,5 @@
-
-
 import * as assert from 'assert';
 import * as re from '../src/regexes';
-//import * as path from 'path';
-//const fs = require('fs-extra');
 
 
 suite('RegExes', () => {
@@ -514,45 +510,63 @@ suite('RegExes', () => {
 
     suite('RegEx with search-word middle, ignore case', () => {
 
-        test('regexEveryLabelColonForWord', (done) => {
-            const insOuts = [
-                // search-word, input-line, should-match, found-prefix
-                "label", "label:", true, "",
-                "label", "label: ", true, "",
-                "label", "label:;", true, "",
-                "label", "  label:", true, "  ",
-                "label", "   label: ", true, "   ",
+        suite('regexEveryLabelColonForWord', () => {
 
-                "label", " label:;", true, " ",
-                "label", "label", false, "",
-                "label", "label ", false, "",
-                "label", "label;", false, "",
-                "LabelA_0123456789", "LabelA_0123456789:", true, "",
+            test('find label', (done) => {
+                const insOuts = [
+                    // search-word, input-line, should-match, found-prefix
+                    "label", "label:", true, "",
+                    "label", "label: ", true, "",
+                    "label", "label:;", true, "",
+                    "label", "  label:", true, "  ",
+                    "label", "   label: ", true, "   ",
 
-                "_LabelA_0123456789", "_LabelA_0123456789:", true, "",
-                "label", "xxx.label:", true, "xxx.",
-                "label", "_xxx.label:", true, "_xxx.",
-                "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a number.
-                "label", ".label:", true, ".",
+                    "label", " label:;", true, " ",
+                    "label", "label", false, "",
+                    "label", "label ", false, "",
+                    "label", "label;", false, "",
+                    "LabelA_0123456789", "LabelA_0123456789:", true, "",
 
-                "label", "label.xxx:", true, "",
-                "label", "yyy.label.xxx:", true, "yyy.",
-                "label", "xlabel:", false, "",
-                "label", "labely:", true, "",
-                "label", "xxx.labely:", true, "xxx.",
-                "label", "xxx.xlabel:", false, "",
+                    "_LabelA_0123456789", "_LabelA_0123456789:", true, "",
+                    "label", "xxx.label:", true, "xxx.",
+                    "label", "_xxx.label:", true, "_xxx.",
+                    "label", "0xxx.label:", true, "0xxx.", // Allows more than senseful, i.e. labels don't start with a number.
+                    "label", ".label:", true, ".",
 
-                "label", "xlabel.yyy:", false, "",
-                "\\w*s\\w*n\\w*d", "sound:", true, "",
-                "\\w*s\\w*n\\w*d", "snd:", true, "",
-                "\\w*s\\w*n\\w*d", "xxx.soundaaa:", true, "xxx.",
-                "\\w*s\\w*n\\w*d", "yyy.sound.zzz:", true, "yyy.",
+                    "label", "label.xxx:", true, "",
+                    "label", "yyy.label.xxx:", true, "yyy.",
+                    "label", "xlabel:", false, "",
+                    "label", "labely:", true, "",
+                    "label", "xxx.labely:", true, "xxx.",
+                    "label", "xxx.xlabel:", false, "",
 
-                "label", "LaBeL:", true, "",
-            ];
+                    "label", "xlabel.yyy:", false, "",
+                    "\\w*s\\w*n\\w*d", "sound:", true, "",
+                    "\\w*s\\w*n\\w*d", "snd:", true, "",
+                    "\\w*s\\w*n\\w*d", "xxx.soundaaa:", true, "xxx.",
+                    "\\w*s\\w*n\\w*d", "yyy.sound.zzz:", true, "yyy.",
 
-            checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);
-            done();
+                    "label", "LaBeL:", true, "",
+                ];
+
+                checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);
+                done();
+            });
+
+
+            test('start index', (done) => {
+                const regex = re.regexEveryLabelColonForWord('fill_memory');
+
+                let match = regex.exec("24 + 600F              fill_memory:");
+                // Calculate start index
+                assert.equal(re.calcStartIndex(match!), 23);
+
+                match = regex.exec("fill_memory:");
+                // Calculate start index
+                assert.equal(re.calcStartIndex(match!), 0);
+                done();
+            });
+
         });
 
 
