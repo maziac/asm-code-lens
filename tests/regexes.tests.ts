@@ -45,6 +45,13 @@ suite('RegExes', () => {
                 "label equ;", true,
                 "equ  ", false,
                 " equ  ", false,
+
+                // For list file
+                "6017.R11 00 AF     label: equ ", true,
+                "39+ 6017           label: macro", true,
+                "29    0012  D3 FE  label: equ ", true,
+                "625++C4D1          label: equ ", true,
+                "626++C4D1 FE 10    label: equ ", true,
             ];
 
             checkResultsMatch(regex, insOuts);
@@ -86,6 +93,13 @@ suite('RegExes', () => {
                 '  INCLUDE "src/sound.asm"', true, "src/sound.asm",
                 'include   abcd ', false, "",
                 'includeX   "sound.asm" ', false, "",
+
+                // For list file
+                '6017.R11 00 AF     include   "sound.asm" ', true, "sound.asm",
+                '39+ 6017           include   "sound.asm" ', true, "sound.asm",
+                '29    0012  D3 FE  include   "sound.asm" ', true, "sound.asm",
+                '625++C4D1          include   "sound.asm" ', true, "sound.asm",
+                '626++C4D1 FE 10    include   "sound.asm" ', true, "sound.asm",
             ];
 
             checkResultsMatchFound(regex, insOuts);
@@ -104,6 +118,13 @@ suite('RegExes', () => {
                 '  module  m.aa.b', true, "m.aa.b",
                 ' module   ', false, "",
                 ' module', false, "",
+
+                // For list file
+                "6017.R11 00 AF     module mod", true, "mod",
+                "39+ 6017           module mod", true, "mod",
+                "29    0012  D3 FE  module mod", true, "mod",
+                "625++C4D1          module mod", true, "mod",
+                "626++C4D1 FE 10    module mod", true, "mod",
             ];
 
             checkResultsMatchFound(regex, insOuts, 2);
@@ -227,6 +248,13 @@ suite('RegExes', () => {
                 ".label:", "", "",
                 " .label:", "", "",
                 " .label: ", "", "",
+
+                // For list file
+                "6017.R11 00 AF     label:", "6017.R11 00 AF     ", "label",
+                "39+ 6017           label:", "39+ 6017           ", "label",
+                "29    0012  D3 FE  label:", "29    0012  D3 FE  ", "label",
+                "625++C4D1          label:", "625++C4D1          ", "label",
+                "626++C4D1 FE 10    label:", "626++C4D1 FE 10    ", "label",
             ];
 
             checkResults1Capture(regex, insOuts);
@@ -324,6 +352,14 @@ suite('RegExes', () => {
                 "label", "labely:", false, "",
                 "label", "xxx.xlabel:", false, "",
                 "label", "xlabel.yyy:", false, "",
+
+
+                // For list file
+                "label", "6017.R11 00 AF     label:", true, "6017.R11 00 AF     ",
+                "label", "39+ 6017           label:", true, "39+ 6017           ",
+                "label", "29    0012  D3 FE  label:", true, "29    0012  D3 FE  ",
+                "label", "625++C4D1          label:", true, "625++C4D1          ",
+                "label", "626++C4D1 FE 10    label:", true, "626++C4D1 FE 10    ",
             ];
 
             checkResultsSearchWord(re.regexLabelColonForWord, insOuts);
@@ -375,6 +411,13 @@ suite('RegExes', () => {
                 "m", " MODULE m", true, " MODULE ",
                 "m", " module x", false, "",
                 "Mm_0123456789", "  module Mm_0123456789;", true, "  module ",
+
+                // For list file
+                "m", "6017.R11 00 AF     module m", true, "6017.R11 00 AF     module ",
+                "m", "39+ 6017           module m", true, "39+ 6017           module ",
+                "m", "29    0012  D3 FE  module m", true, "29    0012  D3 FE  module ",
+                "m", "625++C4D1          module m", true, "625++C4D1          module ",
+                "m", "626++C4D1 FE 10    module m", true, "626++C4D1 FE 10    module ",
             ];
 
             checkResultsSearchWord(re.regexModuleForWord, insOuts);
@@ -390,6 +433,13 @@ suite('RegExes', () => {
                 "m", " MACRO m", true, " MACRO ",
                 "m", " macro x", false, "",
                 "Mm_0123456789", "  macro Mm_0123456789;", true, "  macro ",
+
+                // For list file
+                "m", "6017.R11 00 AF     macro m", true, "6017.R11 00 AF     macro ",
+                "m", "39+ 6017           macro m", true, "39+ 6017           macro ",
+                "m", "29    0012  D3 FE  macro m", true, "29    0012  D3 FE  macro ",
+                "m", "625++C4D1          macro m", true, "625++C4D1          macro ",
+                "m", "626++C4D1 FE 10    macro m", true, "626++C4D1 FE 10    macro ",
             ];
 
             checkResultsSearchWord(re.regexMacroForWord, insOuts);
@@ -405,6 +455,13 @@ suite('RegExes', () => {
                 "m", " STRUCT m", true, " STRUCT ",
                 "m", " struct x", false, "",
                 "Mm_0123456789", "  struct Mm_0123456789;", true, "  struct ",
+
+                // For list file
+                "m", "6017.R11 00 AF     struct m", true, "6017.R11 00 AF     struct ",
+                "m", "39+ 6017           struct m", true, "39+ 6017           struct ",
+                "m", "29    0012  D3 FE  struct m", true, "29    0012  D3 FE  struct ",
+                "m", "625++C4D1          struct m", true, "625++C4D1          struct ",
+                "m", "626++C4D1 FE 10    struct m", true, "626++C4D1 FE 10    struct ",
             ];
 
             checkResultsSearchWord(re.regexStructForWord, insOuts);
@@ -648,6 +705,13 @@ suite('RegExes', () => {
                 "m", " module maaa.bb", true, " module ",
                 "m", " module ma.b.c", true, " module ",
                 "m", " module a.m", false, "",
+
+                // For list file
+                "m", "6017.R11 00 AF     module m", true, "6017.R11 00 AF     module ",
+                "m", "39+ 6017           module m", true, "39+ 6017           module ",
+                "m", "29    0012  D3 FE  module m", true, "29    0012  D3 FE  module ",
+                "m", "625++C4D1          module m", true, "625++C4D1          module ",
+                "m", "626++C4D1 FE 10    module m", true, "626++C4D1 FE 10    module ",
             ];
 
             checkResultsSearchWord(re.regexEveryModuleForWord, insOuts);
@@ -667,6 +731,13 @@ suite('RegExes', () => {
                 "m", " macro maaa.bb", true, " macro ",
                 "m", " macro ma.b.c", true, " macro ",
                 "m", " macro a.m", false, "",
+
+                // For list file
+                "m", "6017.R11 00 AF     macro m", true, "6017.R11 00 AF     macro ",
+                "m", "39+ 6017           macro m", true, "39+ 6017           macro ",
+                "m", "29    0012  D3 FE  macro m", true, "29    0012  D3 FE  macro ",
+                "m", "625++C4D1          macro m", true, "625++C4D1          macro ",
+                "m", "626++C4D1 FE 10    macro m", true, "626++C4D1 FE 10    macro ",
             ];
 
             checkResultsSearchWord(re.regexEveryMacroForWord, insOuts);
@@ -682,6 +753,13 @@ suite('RegExes', () => {
                 "m", " STRUCT m", true, " STRUCT ",
                 "m", " struct x", false, "",
                 "Mm_0123456789", "  struct Mm_0123456789;", true, "  struct ",
+
+                // For list file
+                "m", "6017.R11 00 AF     struct m", true, "6017.R11 00 AF     struct ",
+                "m", "39+ 6017           struct m", true, "39+ 6017           struct ",
+                "m", "29    0012  D3 FE  struct m", true, "29    0012  D3 FE  struct ",
+                "m", "625++C4D1          struct m", true, "625++C4D1          struct ",
+                "m", "626++C4D1 FE 10    struct m", true, "626++C4D1 FE 10    struct ",
             ];
 
             checkResultsSearchWord(re.regexStructForWord, insOuts);

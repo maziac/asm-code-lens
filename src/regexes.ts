@@ -12,7 +12,6 @@
 export function regexLabelColon(): RegExp {
 //    return /(^\s*@?)\b([a-z_][\w\.]*):/i;
     return /(^@?|^.*?\s@?)([a-z_][\w\.]*):/i;
-    // TODO: Could be that the @ is wrong here and should be in the other capture.
 }
 
 
@@ -62,7 +61,8 @@ export function regexesLabel(cfg: {labelsWithColons: boolean, labelsWithoutColon
  * Used by findLabelsWithNoReference.
  */
 export function regexLabelEquOrMacro(): RegExp {
-    return /^[\w\.]+:?\s*\b(equ|macro)/i;
+    //return /^[\w\.]+:?\s*\b(equ|macro)/i;
+    return /^.*?[\w\.]+:?\s*\b(equ|macro)/i;
 }
 
 
@@ -84,7 +84,8 @@ export function regexInclude(): RegExp {
  * Used by getModule.
  */
 export function regexModuleStruct(): RegExp {
-    return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
+    //return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
+    return /^.*?\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
 }
 
 
@@ -168,7 +169,8 @@ export function regexesLabelForWord(searchWord: string, cfg: {labelsWithColons: 
  * Used by DefinitionProvider.
  */
 export function regexModuleForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
+    //return new RegExp('^(\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
+    return new RegExp('^(.*?\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
 }
 
 
@@ -179,7 +181,8 @@ export function regexModuleForWord(searchWord: string): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexMacroForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(macro|MACRO)\\s+)' + searchWord + '\\b');
+    //return new RegExp('^(\\s+(macro|MACRO)\\s+)' + searchWord + '\\b');
+    return new RegExp('^(.*?\\s+(macro|MACRO)\\s+)' + searchWord + '\\b');
 }
 
 
@@ -190,7 +193,8 @@ export function regexMacroForWord(searchWord: string): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexStructForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
+    //return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
+    return new RegExp('^(.*?\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
 }
 
 
@@ -294,7 +298,8 @@ export function regexesEveryLabelForWord(searchWord: string, cfg: {labelsWithCol
  * Used by CompletionProposalsProvider.
  */
 export function regexEveryModuleForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(MODULE)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+    //return new RegExp('^(\\s+(MODULE)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+    return new RegExp('^(.*?\\s+(MODULE)\\s+)' + searchWord + '[\\w\\.]*', 'i');
 }
 
 
@@ -307,6 +312,7 @@ export function regexEveryModuleForWord(searchWord: string): RegExp {
  * Used by CompletionProposalsProvider.
  */
 export function regexEveryMacroForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+    //return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+    return new RegExp('^(.*?\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
 }
 
