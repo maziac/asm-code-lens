@@ -71,7 +71,8 @@ export function activate(context: vscode.ExtensionContext) {
                 // Add root folder
                 config.rootFolder = rootFolder;
                 // Found. Find labels
-                Commands.findLabelsWithNoReference(config);
+                Commands.findLabelsWithNoReference(config, 'asm-collection');
+                // TODO: Also for asm-list-file ?
                 // Stop loop
                 break;
             }
@@ -149,9 +150,12 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         // Code Lenses
         if (settings.enableCodeLenses) {
             // Register
-            const provider = vscode.languages.registerCodeLensProvider(asmFiles, new CodeLensProvider(config));
-            regCodeLensProviders.set(rootFolder, provider);
+            const codeLensProvider = new CodeLensProvider(config);
+            const provider = vscode.languages.registerCodeLensProvider('asm-collection', codeLensProvider);
+            const provider2 = vscode.languages.registerCodeLensProvider('asm-list-file', codeLensProvider);
+            regCodeLensProviders.set(rootFolder, provider); // TODO: provider2 cannot be stored yet.
             context.subscriptions.push(provider);
+            context.subscriptions.push(provider2);
         }
 
         if (settings.enableHovering) {

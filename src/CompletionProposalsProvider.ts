@@ -156,7 +156,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const searchSjasmMacro = regexEveryMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, this.config.rootFolder);
+        const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(locations, document.fileName, position, true, false);
         // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)

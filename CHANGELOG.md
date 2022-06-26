@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.11.0
+- +++++ disasm.lists support, somehow
+
 # 1.10.2
 - Multiline comments support (/* ... */)
 	- for references/code lenses

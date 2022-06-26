@@ -47,7 +47,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         const searchWord = document.getText(document.getWordRangeAtPosition(position));
         const searchRegex = regexAnyReferenceForWord(searchWord);
 
-        const locations = await grep(searchRegex, this.rootFolder);
+        const locations = await grep(searchRegex, this.rootFolder, document.languageId);
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
         return reducedLocations;
     }

@@ -209,8 +209,6 @@
             {
                 "id": "asm-collection",
                 "extensions": [
-                    ".list",
-                    ".lis",
                     ".a80",
                     ".z80",
                     ".asm",
@@ -223,6 +221,17 @@
                 "configuration": "./language-configuration.json"
             },
             {
+                "id": "asm-list-file",
+                "extensions": [
+                    ".list",
+                    ".lis"
+                ],
+                "aliases": [
+                    "Assembler list file"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
                 "id": "asm-markdown-codeblock"
             }
         ],
@@ -231,6 +240,11 @@
                 "language": "asm-collection",
                 "scopeName": "source.asm",
                 "path": "./grammar/asm.json"
+            },
+            {
+                "language": "asm-list-file",
+                "scopeName": "source.asm.list",
+                "path": "./grammar/asm_list.json"
             },
             {
                 "language": "asm-markdown-codeblock",

@@ -1,8 +1,10 @@
-import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as fs from 'fs';
-import {regexPrepareFuzzy, regexModuleStruct, regexEndModuleStruct} from './regexes';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
+import {regexEndModuleStruct, regexModuleStruct, regexPrepareFuzzy} from './regexes';
+import {PackageInfo} from './whatsnew/packageinfo';
 
 
 
@@ -106,21 +108,100 @@ export let grepGlobInclude;
 export let grepGlobExclude;
 
 
+
+function getGlobeIncludeForLanguageId(languageId: string): string {
+    // Package json
+    const pckgJson = PackageInfo.extension.packageJSON;
+    const languages = pckgJson.contributes.languages;
+    const exts: string[] = [];
+    for (const lang of languages) {
+        if (lang.id == languageId) {
+            // Use the extensions defined for the language
+            exts.push(...lang.extensions.map(ext => ext.substring(1)));
+            break;
+        }
+    }
+
+    // User's file associations
+    //const files = vscode.workspace.getConfiguration("files");// as any as Map<string, string>;
+    const filesAssociations = vscode.workspace.getConfiguration("files.associations");
+    // Make iterable
+    const iterAssocs = Object.entries(filesAssociations);
+    // Loop (contains also function entries)
+    for (const [ext, lang] of iterAssocs) {
+        if (typeof lang == 'string') { // Skip functions
+            // remove *
+            const onlyExt = path.extname(ext).substring(1);
+            if (lang == languageId) {
+                // Add
+                exts.push(onlyExt);
+            }
+            else {
+                const k = exts.indexOf(onlyExt);
+                if (k >= 0) {
+                    // Remove
+                    exts.splice(k, 1);
+                }
+            }
+        }
+    }
+
+    // Create glob string
+    const glob = '**/*.{' + exts.join(',') + '}';
+    return glob;    // E.g. "**/*.{asm,inc,s}"
+}
+
+
+/*
+function fileBelongsToLanguageId(filepath: string, languageId: string): boolean {
+    const ext = path.extname(filepath);
+
+    // Look in user's associations
+    const filesAssociations = vscode.workspace.getConfiguration("files.associations");
+    const assoc = filesAssociations.get(ext);
+    if (assoc) {
+        // Already found in the user's associations
+        const rightId = (assoc == languageId);
+        return rightId;
+    }
+
+    // Now check package json (i.e. original associations)
+    const pckgJson = PackageInfo.extension.packageJSON;
+    const languages = pckgJson.contributes.languages;
+    // Iterate all languages
+    for (const lang of languages) {
+        if (lang.id == languageId) {
+            // Check if file extension is included
+            const rightExt = (lang.extensions.indexOf(ext) >= 0);
+            return rightExt;
+        }
+    }
+
+    // Nothing found, should not happen, i.e. languageId was wrong.
+    return false;
+}
+*/
+
+
 /**
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
  * @param regex The regular expression to search for.
  * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
+ * @param languageId Only files with the language ID are grepped. Is either "asm-collection" or "asm-list-file".
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocation[]> {
+export async function grep(regex: RegExp, rootFolder: string, languageId: string): Promise<GrepLocation[]> {
     const allMatches = new Map();
 
     assert(grepGlobInclude);
     try {
-        const uris = await vscode.workspace.findFiles(grepGlobInclude, grepGlobExclude);
-        const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
+        const globInclude = getGlobeIncludeForLanguageId(languageId);
+        const uris = await vscode.workspace.findFiles(globInclude, grepGlobExclude);
+        //const urisUnfiltered = await vscode.workspace.findFiles('**/*.*', grepGlobExclude);
+        //const uris = urisUnfiltered.filter(uri => fileBelongsToLanguageId(uri.fsPath, languageId));
+        const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty && doc.languageId == languageId);
 
         for (const uri of uris) {
             // get fileName
@@ -235,12 +316,12 @@ export async function grep(regex: RegExp, rootFolder: string): Promise<GrepLocat
  * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
  * @return An array with all regex search results.
  */
-export async function grepMultiple(regexes: RegExp[], rootFolder: string): Promise<GrepLocation[]> {
+export async function grepMultiple(regexes: RegExp[], rootFolder: string, languageId: string): Promise<GrepLocation[]> {
     let allLocations: Array<GrepLocation> = [];
 
     // grep all regex
     for (const regex of regexes) {
-        const locations = await grep(regex, rootFolder);
+        const locations = await grep(regex, rootFolder, languageId);
         // Add found locations
         allLocations.push(...locations);
     }

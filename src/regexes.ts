@@ -10,7 +10,8 @@
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelColon(): RegExp {
-    return /(^\s*@?)\b([a-z_][\w\.]*):/i;
+//    return /(^\s*@?)\b([a-z_][\w\.]*):/i;
+    return /(^.*@?)\b([a-z_][\w\.]*):/i;
 }
 
 
@@ -104,7 +105,8 @@ export function regexEndModuleStruct(): RegExp {
  * Used by DefinitionProvider.
  */
 export function regexLabelColonForWord(searchWord: string): RegExp {
-    return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+    //return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+    return new RegExp('^(.*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
 }
 
 

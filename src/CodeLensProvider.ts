@@ -54,11 +54,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token
      */
     public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
-        // First check for right path
-        const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.config.rootFolder) < 0)
-            return [];
-
         // Show donate info
         DonateInfo.checkDonateInfo();   // No need for 'await'.
 
@@ -103,6 +98,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token
      */
     public async resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Promise<vscode.CodeLens> {
+
+       // const files = vscode.workspace.getConfiguration("files");
+       // const filesAssocs = vscode.workspace.getConfiguration("files.associations");
+
         // Search the references
         const searchWord = codeLens.symbol;
         const searchRegex = regexAnyReferenceForWord(searchWord);
@@ -111,7 +110,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const pos = codeLens.range.start;
         //const line = pos.line;
 
-        const locations = await grep(searchRegex, this.config.rootFolder);
+        const locations = await grep(searchRegex, this.config.rootFolder, doc.languageId);
         // Remove any locations because of module information (dot notation)
         const reducedLocations = await reduceLocations(locations, doc.fileName, pos, true, false);
         // create title

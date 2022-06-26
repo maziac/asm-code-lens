@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-import { grep, FileMatch, grepMultiple, reduceLocations  } from './grep';
-import { regexLabelEquOrMacro, regexAnyReferenceForWord, regexesLabel } from './regexes';
+import * as vscode from 'vscode';
 import {Config} from './config';
+import {FileMatch, grep, grepMultiple, reduceLocations} from './grep';
+import {regexAnyReferenceForWord, regexesLabel, regexLabelEquOrMacro} from './regexes';
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -21,16 +21,16 @@ export class Commands {
      * (config.rootFolder The search is limited to the root / project
      * folder. This needs to contain a trailing '/'.)
      */
-    public static async findLabelsWithNoReference(config: Config): Promise<void> {
+    public static async findLabelsWithNoReference(config: Config, languageId: string): Promise<void> {
         // Get regexes
         const regexes = regexesLabel(config);
         // Get all label definition (locations)
-        const labelLocations = await grepMultiple(regexes, config.rootFolder);
+        const labelLocations = await grepMultiple(regexes, config.rootFolder, languageId);
 
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
         // Convert this to an array of labels.
-        this.findLabels(labelLocations, config.rootFolder);
+        this.findLabels(labelLocations, config.rootFolder, languageId);
     }
 
 
@@ -40,7 +40,7 @@ export class Commands {
      * @param locLabels A list of GrepLocations.
      * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
      */
-    protected static async findLabels(locLabels, rootFolder: string): Promise<void> {
+    protected static async findLabels(locLabels, rootFolder: string, languageId: string): Promise<void> {
         const baseName = path.basename(rootFolder);
         output.appendLine("Unreferenced labels, " + baseName + ":");
         output.show(true);
@@ -70,7 +70,7 @@ export class Commands {
 
                 // And search for references
                 const regex = regexAnyReferenceForWord(searchLabel);
-                const locations = await grep(regex, rootFolder);
+                const locations = await grep(regex, rootFolder, languageId);
                 // Remove any locations because of module information (dot notation)
                 const reducedLocations = await reduceLocations(locations, fileName, pos, true, false);
                 // Check count

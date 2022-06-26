@@ -51,7 +51,7 @@ export class RenameProvider implements vscode.RenameProvider {
         const oldName = document.getText(document.getWordRangeAtPosition(position));
         const searchRegex = regexAnyReferenceForWordGlobal(oldName);
 
-        const locations = await grep(searchRegex, this.rootFolder);
+        const locations = await grep(searchRegex, this.rootFolder, document.languageId);
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
 
         // Change to WorkSpaceEdits.

@@ -211,6 +211,9 @@ suite('RegExes', () => {
         test('regexLabelColon', (done) => {
             const regex = re.regexLabelColon();
             const insOuts = [
+
+                "label.init: ", "", "label.init",
+                
                 // input-line, found-prefix, found-label
                 "label1:", "", "label1",
                 "label1:  defb 0 ; comment", "", "label1",
