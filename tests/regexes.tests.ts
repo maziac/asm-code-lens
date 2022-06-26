@@ -551,8 +551,21 @@ suite('RegExes', () => {
                     "label", "@Label:", true, "@",
 
                     // List file
+                    "label", "  label:", true, "  ",
+                    "label", "6017.R11 00 AF     label:", true, "6017.R11 00 AF     ",
+                    "label", "39+  6017          label:", true, "39+  6017          ",
+                    "label", "7002 00 70         label:", true, "7002 00 70         ",
+                    "label", "29    0012  D3 FE  label:", true, "29    0012  D3 FE  ",
+                    "label", "625++C4D1          label:", true, "625++C4D1          ",
+                    "label", "626++C4D1 FE 10    label:", true, "626++C4D1 FE 10    ",
+
                     "label", "  @label:", true, "  @",
-                    "label", "6017.R11 00 AF       @label:", true, "6017.R11 00 AF       @",
+                    "label", "6017.R11 00 AF     @label:", true, "6017.R11 00 AF     @",
+                    "label", "39+  6017          @label:", true, "39+  6017          @",
+                    "label", "7002 00 70         @label:", true, "7002 00 70         @",
+                    "label", "29    0012  D3 FE  @label:", true, "29    0012  D3 FE  @",
+                    "label", "625++C4D1          @label:", true, "625++C4D1          @",
+                    "label", "626++C4D1 FE 10    @label:", true, "626++C4D1 FE 10    @",
                 ];
 
                 checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);

@@ -310,9 +310,13 @@ suite('comments', () => {
             result = readCommentsForLine([
                 '39+  6017              ; Bla1 ',
                 '6017.R11 00 AF         ;  Bla2 ',
+                '7002 00 70             ; Bla3 ',
+                '29    0012  D3 FE      ; Bla4 ',
+                '625++C4D1              ; Bla5 ',
+                '626++C4D1 FE 10        ; Bla6 ',
                 'label: ',
-            ], 2);
-            assert.equal(result.length, 2);
+            ], 6);
+            assert.equal(result.length, 6);
             assert.equal(result[0], ' Bla1 ');
             assert.equal(result[1], '  Bla2 ');
         });
