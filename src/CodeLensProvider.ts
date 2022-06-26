@@ -98,10 +98,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token
      */
     public async resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Promise<vscode.CodeLens> {
-
-       // const files = vscode.workspace.getConfiguration("files");
-       // const filesAssocs = vscode.workspace.getConfiguration("files.associations");
-
         // Search the references
         const searchWord = codeLens.symbol;
         const searchRegex = regexAnyReferenceForWord(searchWord);
