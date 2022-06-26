@@ -5,13 +5,14 @@
  * Also "@label:".
  * But not ".label:".
  * Capture groups:
- *  1 = preceding spaces
+ *  1 = preceding spaces (and other chars in case of list file)
  *  2 = the label itself e.g. "init.label_1
  * Used by findLabelsWithNoReference, provideCodeLenses.
  */
 export function regexLabelColon(): RegExp {
 //    return /(^\s*@?)\b([a-z_][\w\.]*):/i;
-    return /(^.*@?)\b([a-z_][\w\.]*):/i;
+    return /(^@?|^.*?\s@?)([a-z_][\w\.]*):/i;
+    // TODO: Could be that the @ is wrong here and should be in the other capture.
 }
 
 
@@ -106,7 +107,7 @@ export function regexEndModuleStruct(): RegExp {
  */
 export function regexLabelColonForWord(searchWord: string): RegExp {
     //return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
-    return new RegExp('^(.*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+    return new RegExp('(^|^.*?\\s)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
 }
 
 

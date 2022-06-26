@@ -196,7 +196,7 @@ suite('RegExes', () => {
                     if (result) {
                         const foundPrefix = result[1];
                         const foundLabel = result[2];
-                        assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i / div));
+                        assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i / div) + ": " + input);
                         assert.equal(label, foundLabel, "Label: '" + label + "' == '" + foundLabel + "', Line " + (i / div));
                     }
                     else
@@ -211,9 +211,6 @@ suite('RegExes', () => {
         test('regexLabelColon', (done) => {
             const regex = re.regexLabelColon();
             const insOuts = [
-
-                "label.init: ", "", "label.init",
-                
                 // input-line, found-prefix, found-label
                 "label1:", "", "label1",
                 "label1:  defb 0 ; comment", "", "label1",
@@ -306,6 +303,8 @@ suite('RegExes', () => {
 
         test('regexLabelColonForWord', (done) => {
             const insOuts = [
+                "label", "xxx.label:", true, "",
+
                 // search-word, input-line, should-match, found-prefix
                 "label", "label:", true, "",
                 "label", "label: ", true, "",
