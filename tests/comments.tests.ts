@@ -305,6 +305,16 @@ suite('comments', () => {
                 'label: ',
             ], 3);
             assert.equal(result.length, 0);
+
+            // For list file
+            result = readCommentsForLine([
+                '39+  6017              ; Bla1 ',
+                '6017.R11 00 AF         ;  Bla2 ',
+                'label: ',
+            ], 2);
+            assert.equal(result.length, 2);
+            assert.equal(result[0], ' Bla1 ');
+            assert.equal(result[1], '  Bla2 ');
         });
 
         test('multiline comment before label', () => {

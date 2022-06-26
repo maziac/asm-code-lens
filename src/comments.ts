@@ -22,10 +22,11 @@ export function setCustomCommentPrefix(prefix?: string) {
 	commentEtcPrefixes = new RegExp(rc, 'g');
 
 	// Prefixes to find the comment while hovering
-	const rh = '^(\\s*)(' + prefixes.join('|') + ')(.*)';
-	commentHoverPrefixes = new RegExp(rh);
+	//const rh = '^(\\s*)(' + prefixes.join('|') + ')(.*)';
+	const rh = '^(.*?)(' + prefixes.join('|') + ')(.*)';
+	commentHoverPrefixes = new RegExp(rh, 'i');
 	const rhs = '(' + prefixes.join('|') + ')';
-	commentHoverPrefixesSameLine = new RegExp(rhs);
+	commentHoverPrefixesSameLine = new RegExp(rhs, 'i');
 }
 
 
@@ -124,7 +125,7 @@ export function readCommentsForLine(lines: string[], lineNr: number): string[] {
 
 	const hoverTexts: string[] = [];
 	const text = lines[lineNr];
-	// Check for match on line;
+	// Check for match on line
 	const commentFound = commentHoverPrefixesSameLine.test(text);
 	if (commentFound || text.toLowerCase().indexOf('equ') >= 0)
 		hoverTexts.unshift(text);
