@@ -94,7 +94,7 @@ export function regexModuleStruct(): RegExp {
  * Used by getModule.
  */
 export function regexEndModuleStruct(): RegExp {
-    return /^\s+(ENDMODULE|ENDS)\b/i;
+    return /^.*?\s+(ENDMODULE|ENDS)\b/i;
 }
 
 

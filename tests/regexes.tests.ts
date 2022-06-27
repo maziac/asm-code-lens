@@ -140,6 +140,13 @@ suite('RegExes', () => {
                 ' ends', true,
                 'endmodule', false,
                 ' endmodule   mm', true,  // Is also found although this is not 100% correct
+
+                // For list file
+                "6017.R11 00 AF     endmodule", true,
+                "39+ 6017           endmodule ", true,
+                "29    0012  D3 FE  endmodule", true,
+                "625++C4D1          endmodule ", true,
+                "626++C4D1 FE 10    endmodule", true, 
             ];
 
             checkResultsMatch(regex, insOuts);
