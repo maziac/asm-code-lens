@@ -145,9 +145,59 @@ suite('Performance', () => {
         });
 
 
-        test('regexLabelColonxxx', () => {
-            const speed = compare(re.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
-            console.log('regexLabelColon: ', speed + '% speed');
+        test('regexLabelColonForWord', () => {
+            const speed = compare(re.regexLabelColonForWord('ulabel'), RefRegexes.regexLabelColonForWord('ulabel'), BASE_COUNT);
+            console.log('regexLabelColonForWord: ', speed + '% speed');
+        });
+
+        test('regexLabelWithoutColonForWord', () => {
+            const speed = compare(re.regexLabelWithoutColonForWord('ulabel'), RefRegexes.regexLabelWithoutColonForWord('ulabel'), BASE_COUNT);
+            console.log('regexLabelWithoutColonForWord: ', speed + '% speed');
+        });
+
+        test('regexModuleForWord', () => {
+            const speed = compare(re.regexModuleForWord('ulabel'), RefRegexes.regexModuleForWord('ulabel'), BASE_COUNT);
+            console.log('regexModuleForWord: ', speed + '% speed');
+        });
+
+        test('regexMacroForWord', () => {
+            const speed = compare(re.regexMacroForWord('ulabel'), RefRegexes.regexMacroForWord('ulabel'), BASE_COUNT);
+            console.log('regexMacroForWord: ', speed + '% speed');
+        });
+
+        test('regexStructForWord', () => {
+            const speed = compare(re.regexStructForWord('ulabel'), RefRegexes.regexStructForWord('ulabel'), BASE_COUNT);
+            console.log('regexStructForWord: ', speed + '% speed');
+        });
+
+        test('regexAnyReferenceForWord', () => {
+            const speed = compare(re.regexAnyReferenceForWord('ulabel'), RefRegexes.regexAnyReferenceForWord('ulabel'), BASE_COUNT);
+            console.log('regexAnyReferenceForWord: ', speed + '% speed');
+        });
+
+        test('regexAnyReferenceForWordGlobal', () => {
+            const speed = compare(re.regexAnyReferenceForWordGlobal('ulabel'), RefRegexes.regexAnyReferenceForWordGlobal('ulabel'), BASE_COUNT);
+            console.log('regexAnyReferenceForWordGlobal: ', speed + '% speed');
+        });
+
+        test('regexEveryLabelColonForWord', () => {
+            const speed = compare(re.regexEveryLabelColonForWord('ulabel'), RefRegexes.regexEveryLabelColonForWord('ulabel'), BASE_COUNT);
+            console.log('regexEveryLabelColonForWord: ', speed + '% speed');
+        });
+
+        test('regexEveryLabelWithoutColonForWord', () => {
+            const speed = compare(re.regexEveryLabelWithoutColonForWord('ulabel'), RefRegexes.regexEveryLabelWithoutColonForWord('ulabel'), BASE_COUNT);
+            console.log('regexEveryLabelWithoutColonForWord: ', speed + '% speed');
+        });
+
+        test('regexEveryModuleForWord', () => {
+            const speed = compare(re.regexEveryModuleForWord('ulabel'), RefRegexes.regexEveryModuleForWord('ulabel'), BASE_COUNT);
+            console.log('regexEveryModuleForWord: ', speed + '% speed');
+        });
+
+        test('regexEveryMacroForWord', () => {
+            const speed = compare(re.regexEveryMacroForWord('ulabel'), RefRegexes.regexEveryMacroForWord('ulabel'), BASE_COUNT);
+            console.log('regexEveryMacroForWord: ', speed + '% speed');
         });
 
 
