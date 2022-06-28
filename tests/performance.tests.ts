@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+//import * as assert from 'assert';
 import * as re from '../src/regexes';
 
 
@@ -10,11 +10,21 @@ class RefRegexes {
     public static regexLabelColon(): RegExp {
         return /(^\s*@?)\b([a-z_][\w\.]*):/i;
     }
-    public static regexLabelWithoutColon = /^()([a-z_][\w\.]*)\b(?![:\.])/i;
-    public static regexLabelEquOrMacro = /^[\w\.]+:?\s*\b(equ|macro)/i;
-    public static regexInclude = /\s*INCLUDE\s+"(.*)"/i;
-    public static regexModuleStruct = /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
-    public static regexEndModuleStruct = /^\s+(ENDMODULE|ENDS)\b/i;
+    public static regexLabelWithoutColon(): RegExp {
+        return /^(@?)([a-z_][\w\.]*)(?:\s|$)/i;
+    }
+    public static regexLabelEquOrMacro(): RegExp {
+        return /^[\w\.]+:?\s*\b(equ|macro)/i;
+    }
+    public static regexInclude(): RegExp {
+        return /\s*INCLUDE\s+"(.*)"/i;
+    }
+    public static regexModuleStruct(): RegExp {
+        return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
+    }
+    public static regexEndModuleStruct(): RegExp {
+        return /^\s+(ENDMODULE|ENDS)\b/i;
+    }
     public static regexLabelColonForWord(searchWord: string): RegExp {
         return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
     }
@@ -52,14 +62,14 @@ class RefRegexes {
 
 
 // The base count. I.e. number of times function calls are repeated.
-const BASE_COUNT = 1000000;
+const BASE_COUNT = 100000;
 
 
 suite('Performance', () => {
 
     /**
      * Returns the number of ms it takes to call the function a number of times.
-     * @param func The function to call.
+     * @param regex The regex to call.
      * @param count The number of times to call func.
      * @returns The duration in ms.
      */
@@ -82,15 +92,14 @@ suite('Performance', () => {
 
     /**
     * Compares execution times of 2 functions.
-    * @param func The function to call.
-    * @param refFunc The reference function to call. func is compared with refFunc
+    * @param regex The regex to call.
+    * @param refRegex The reference regex to call. regex is compared with refFunc
     * @param count The number of times to call func.
-    * @returns The relation ship func_time/refFunc_time*100 in percent.
+    * @returns The relation ship refregex_time/regex_time*100 in percent.
     */
     function compare(regex: RegExp, refRegex: RegExp, count = BASE_COUNT): number {
-        // To get better results also the execution time of an empty regex is calculated and subtracted from both times.
-        measure(new RegExp(''), count); // Throw away first measure.
-        const emptyRegexTime = measure(/'.*'/, count);
+        // Throw away first measure.
+        measure(/.*/, count);
 
         // Call reference regex
         const refRegexTime = measure(refRegex, count);
@@ -98,11 +107,7 @@ suite('Performance', () => {
         // Call regex
         const regexTime = measure(regex, count);
 
-        // Do some safety checks
-        assert.ok(emptyRegexTime < refRegexTime, 'emptyRegexTime= ' + emptyRegexTime + ', refRegexTime=' + refRegexTime);
-        assert.ok(emptyRegexTime < regexTime, 'emptyRegexTime= ' + emptyRegexTime + ', regexTime=' + regexTime);
-
-        const rel = (regexTime - emptyRegexTime) / (refRegexTime - emptyRegexTime);
+        const rel = refRegexTime / regexTime;
         return rel*100;
     }
 
@@ -111,8 +116,40 @@ suite('Performance', () => {
 
         test('regexLabelColon', () => {
             const speed = compare(re.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
-            console.log('regexLabelColon: ' + speed + '% speed');
+            console.log('regexLabelColon: ', speed + '% speed');
         });
+
+        test('regexLabelWithoutColon', () => {
+            const speed = compare(re.regexLabelWithoutColon(), RefRegexes.regexLabelWithoutColon(), BASE_COUNT);
+            console.log('regexLabelWithoutColon: ', speed + '% speed');
+        });
+
+        test('regexLabelEquOrMacro', () => {
+            const speed = compare(re.regexLabelEquOrMacro(), RefRegexes.regexLabelEquOrMacro(), BASE_COUNT);
+            console.log('regexLabelEquOrMacro: ', speed + '% speed');
+        });
+
+        test('regexInclude', () => {
+            const speed = compare(re.regexInclude(), RefRegexes.regexInclude(), BASE_COUNT);
+            console.log('regexInclude: ', speed + '% speed');
+        });
+
+        test('regexModuleStruct', () => {
+            const speed = compare(re.regexModuleStruct(), RefRegexes.regexModuleStruct(), BASE_COUNT);
+            console.log('regexModuleStruct: ', speed + '% speed');
+        });
+
+        test('regexEndModuleStruct', () => {
+            const speed = compare(re.regexEndModuleStruct(), RefRegexes.regexEndModuleStruct(), BASE_COUNT);
+            console.log('regexEndModuleStruct: ', speed + '% speed');
+        });
+
+
+        test('regexLabelColonxxx', () => {
+            const speed = compare(re.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
+            console.log('regexLabelColon: ', speed + '% speed');
+        });
+
 
     });
 
