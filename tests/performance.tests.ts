@@ -75,6 +75,14 @@ suite('Performance', () => {
      */
     function measure(regex: RegExp, count = BASE_COUNT): number {
         const lines = [
+            "label:equ",
+            "label:macro",
+            "label: MACRO",
+            "label: equ",
+            "label: equ;",
+            "   label2:defw 898; comm",
+            "   label2.loop:",
+
             "6017.R11 00 AF     label: equ ",
             "39+ 6017           label: macro",
             "29    0012  D3 FE  label: equ ",
