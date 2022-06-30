@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { grepMultiple, reduceLocations, getCompleteLabel, getModule, getNonLocalLabel } from './grep';
-import {regexEveryModuleForWord, regexEveryMacroForWord, regexPrepareFuzzy, regexesEveryLabelForWord } from './regexes';
-import {PackageInfo} from './whatsnew/packageinfo';
 import {Config} from './config';
+import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
+import {regexEveryMacroForWordForCompletion, regexEveryModuleForWordForCompletion, regexPrepareFuzzy, regexesEveryLabelForWordForCompletion} from './regexes';
+import {PackageInfo} from './whatsnew/packageinfo';
 
 
 /// All additional completions like Z80 instructions and assembler
@@ -144,16 +144,16 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         }
 
         // Search
-        let searchWord = document.getText(document.getWordRangeAtPosition(position));
-        searchWord = regexPrepareFuzzy(searchWord);
+        const searchWord = document.getText(document.getWordRangeAtPosition(position));
+        const fuzzySearchWord = regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon
-        const regexes = regexesEveryLabelForWord(searchWord, this.config);
+        const regexes = regexesEveryLabelForWordForCompletion(fuzzySearchWord, this.config);
         // Find all sjasmplus MODULEs in the document
-        const searchSjasmModule = regexEveryModuleForWord(searchWord);
+        const searchSjasmModule = regexEveryModuleForWordForCompletion(fuzzySearchWord);
         regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
-        const searchSjasmMacro = regexEveryMacroForWord(searchWord);
+        const searchSjasmMacro = regexEveryMacroForWordForCompletion(fuzzySearchWord);
         regexes.push(searchSjasmMacro);
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);

@@ -1,6 +1,31 @@
-//import * as assert from 'assert';
+import { FastRegex } from './../src/fastregex';
+
+import * as fs from 'fs';
 import * as re from '../src/regexes';
 
+
+/**
+ * For reference.
+ * A test without FastRegex implementation.
+ *
+regexLabelColon:  56.25% speed
+regexLabelWithoutColon:  100% speed
+regexLabelEquOrMacro:  4.545454545454546% speed
+regexInclude:  102.7027027027027% speed
+regexModuleStruct:  8.695652173913043% speed
+regexEndModuleStruct:  6.8181818181818175% speed
+regexLabelColonForWord:  17.142857142857142% speed
+regexLabelWithoutColonForWord:  100% speed
+regexModuleForWord:  10.526315789473683% speed
+regexMacroForWord:  10% speed
+regexStructForWord:  7.142857142857142% speed
+regexAnyReferenceForWord:  105.88235294117648% speed
+regexAnyReferenceForWordGlobal:  111.42857142857143% speed
+regexEveryLabelColonForWord:  15% speed
+regexEveryLabelWithoutColonForWord:  100% speed
+regexEveryModuleForWord:  8.108108108108109% speed
+regexEveryMacroForWord:  7.5% speed
+ */
 
 /**
  * These here are the reference regexes from the 2.9.1 version.
@@ -46,26 +71,37 @@ class RefRegexes {
     public static regexAnyReferenceForWordGlobal(searchWord: string): RegExp {
         return new RegExp('(.*?)\\b' + searchWord + '\\b', 'g');
     }
-    public static regexEveryLabelColonForWord(searchWord: string): RegExp {
+    public static regexEveryLabelColonForWordForCompletion(searchWord: string): RegExp {
         return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
     }
-    public static regexEveryLabelWithoutColonForWord(searchWord: string): RegExp {
+    public static regexEveryLabelWithoutColonForWordForCompletion(searchWord: string): RegExp {
         return new RegExp('^(([^0-9 ][\\w\\.]*)?)\\b' + searchWord + '[\\w\\.]*\\b(?![:\\w\\.])', 'i');
     }
-    public static regexEveryModuleForWord(searchWord: string): RegExp {
+    public static regexEveryModuleForWordForCompletion(searchWord: string): RegExp {
         return new RegExp('^(\\s+(MODULE)\\s+)' + searchWord + '[\\w\\.]*', 'i');
     }
-    public static regexEveryMacroForWord(searchWord: string): RegExp {
+    public static regexEveryMacroForWordForCompletion(searchWord: string): RegExp {
         return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
     }
 }
 
 
 // The base count. I.e. number of times function calls are repeated.
-const BASE_COUNT = 100000;
+const BASE_COUNT = 100;
 
 
 suite('Performance', () => {
+
+    let asmLines: string[];
+    let listLines: string[];
+
+    setup(() => {
+        const asmString = fs.readFileSync('./tests/data/sample.asm').toString();
+        asmLines = asmString.split('\n');
+        const listString = fs.readFileSync('./tests/data/sample.list').toString();
+        listLines = listString.split('\n');
+    });
+
 
     /**
      * Returns the number of ms it takes to call the function a number of times.
@@ -73,29 +109,40 @@ suite('Performance', () => {
      * @param count The number of times to call func.
      * @returns The duration in ms.
      */
-    function measure(regex: RegExp, count = BASE_COUNT): number {
-        const lines = [
-            "label:equ",
-            "label:macro",
-            "label: MACRO",
-            "label: equ",
-            "label: equ;",
-            "   label2:defw 898; comm",
-            "   label2.loop:",
+    function measure(regex: RegExp | FastRegex, count = BASE_COUNT): number {
+        /*
+        if (regex instanceof FastRegex) {
+            const prevTime = Date.now();
 
-            "6017.R11 00 AF     label: equ ",
-            "39+ 6017           label: macro",
-            "29    0012  D3 FE  label: equ ",
-            "625++C4D1          label: equ ",
-            "626++C4D1 FE 10    label: equ ",
-        ];
-        const prevTime = Date.now();
-        for (let i = count; i > 0; i--) {
-            for (const line of lines)
-                regex.exec(line);
+            for (let i = count; i > 0; i--) {
+                // asm file
+                for (const line of asmLines)
+                    regex.regexes[0].exec(line) || regex.regexes[1].exec(line);
+                // list file
+                for (const line of listLines)
+                    regex.regexes[0].exec(line) || regex.regexes[1].exec(line);
+            }
+
+            const afterTime = Date.now();
+            return afterTime - prevTime;
         }
-        const afterTime = Date.now();
-        return afterTime - prevTime;
+        else
+        */
+        {
+            const prevTime = Date.now();
+
+            for (let i = count; i > 0; i--) {
+                // asm file
+                for (const line of asmLines)
+                    regex.exec(line);
+                // list file
+                for (const line of listLines)
+                    regex.exec(line);
+            }
+
+            const afterTime = Date.now();
+            return afterTime - prevTime;
+        }
     }
 
     /**
@@ -103,9 +150,9 @@ suite('Performance', () => {
     * @param regex The regex to call.
     * @param refRegex The reference regex to call. regex is compared with refFunc
     * @param count The number of times to call func.
-    * @returns The relation ship refregex_time/regex_time*100 in percent.
+    * @returns The relation ship refRegex_time/regex_time*100 in percent.
     */
-    function compare(regex: RegExp, refRegex: RegExp, count = BASE_COUNT): number {
+    function compare(regex: RegExp | FastRegex, refRegex: RegExp, count = BASE_COUNT): number {
         // Throw away first measure.
         measure(/.*/, count);
 
@@ -125,6 +172,11 @@ suite('Performance', () => {
         test('regexLabelColon', () => {
             const speed = compare(re.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
             console.log('regexLabelColon: ', speed + '% speed');
+        });
+
+        test('regexLabelColonNew', () => {
+            const speed = compare(re.regexLabelColonNew(), RefRegexes.regexLabelColon(), BASE_COUNT);
+            console.log('regexLabelColonNew: ', speed + '% speed');
         });
 
         test('regexLabelWithoutColon', () => {
@@ -154,57 +206,87 @@ suite('Performance', () => {
 
 
         test('regexLabelColonForWord', () => {
-            const speed = compare(re.regexLabelColonForWord('ulabel'), RefRegexes.regexLabelColonForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexLabelColonForWord('pause'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
             console.log('regexLabelColonForWord: ', speed + '% speed');
         });
 
         test('regexLabelWithoutColonForWord', () => {
-            const speed = compare(re.regexLabelWithoutColonForWord('ulabel'), RefRegexes.regexLabelWithoutColonForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexLabelWithoutColonForWord('pause'), RefRegexes.regexLabelWithoutColonForWord('pause'), BASE_COUNT);
             console.log('regexLabelWithoutColonForWord: ', speed + '% speed');
         });
 
         test('regexModuleForWord', () => {
-            const speed = compare(re.regexModuleForWord('ulabel'), RefRegexes.regexModuleForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexModuleForWord('pause'), RefRegexes.regexModuleForWord('pause'), BASE_COUNT);
             console.log('regexModuleForWord: ', speed + '% speed');
         });
 
         test('regexMacroForWord', () => {
-            const speed = compare(re.regexMacroForWord('ulabel'), RefRegexes.regexMacroForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexMacroForWord('pause'), RefRegexes.regexMacroForWord('pause'), BASE_COUNT);
             console.log('regexMacroForWord: ', speed + '% speed');
         });
 
         test('regexStructForWord', () => {
-            const speed = compare(re.regexStructForWord('ulabel'), RefRegexes.regexStructForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexStructForWord('pause'), RefRegexes.regexStructForWord('pause'), BASE_COUNT);
             console.log('regexStructForWord: ', speed + '% speed');
         });
 
+        test('regexAnyReferenceForWord short word', () => {
+            const speed = compare(re.regexAnyReferenceForWord('a'), RefRegexes.regexAnyReferenceForWord('a'), BASE_COUNT);
+            console.log('regexAnyReferenceForWord short word: ', speed + '% speed');
+        });
+
         test('regexAnyReferenceForWord', () => {
-            const speed = compare(re.regexAnyReferenceForWord('ulabel'), RefRegexes.regexAnyReferenceForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexAnyReferenceForWord('pause'), RefRegexes.regexAnyReferenceForWord('pause'), BASE_COUNT);
             console.log('regexAnyReferenceForWord: ', speed + '% speed');
         });
 
+        test('regexAnyReferenceForWordGlobal short word', () => {
+            const speed = compare(re.regexAnyReferenceForWordGlobal('a'), RefRegexes.regexAnyReferenceForWordGlobal('a'), BASE_COUNT);
+            console.log('regexAnyReferenceForWordGlobal short word: ', speed + '% speed');
+        });
+
         test('regexAnyReferenceForWordGlobal', () => {
-            const speed = compare(re.regexAnyReferenceForWordGlobal('ulabel'), RefRegexes.regexAnyReferenceForWordGlobal('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexAnyReferenceForWordGlobal('pause'), RefRegexes.regexAnyReferenceForWordGlobal('pause'), BASE_COUNT);
             console.log('regexAnyReferenceForWordGlobal: ', speed + '% speed');
         });
 
+        test('regexEveryLabelColonForWord short word', () => {
+            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
+            console.log('regexEveryLabelColonForWord short word: ', speed + '% speed');
+        });
+
         test('regexEveryLabelColonForWord', () => {
-            const speed = compare(re.regexEveryLabelColonForWord('ulabel'), RefRegexes.regexEveryLabelColonForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
             console.log('regexEveryLabelColonForWord: ', speed + '% speed');
         });
 
+        test('regexEveryLabelWithoutColonForWord short word', () => {
+            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
+            console.log('regexEveryLabelWithoutColonForWord short word: ', speed + '% speed');
+        });
+
         test('regexEveryLabelWithoutColonForWord', () => {
-            const speed = compare(re.regexEveryLabelWithoutColonForWord('ulabel'), RefRegexes.regexEveryLabelWithoutColonForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
             console.log('regexEveryLabelWithoutColonForWord: ', speed + '% speed');
         });
 
+        test('regexEveryModuleForWord short word', () => {
+            const speed = compare(re.regexEveryModuleForWordForCompletion('a'), RefRegexes.regexEveryModuleForWordForCompletion('a'), BASE_COUNT);
+            console.log('regexEveryModuleForWord short word: ', speed + '% speed');
+        });
+
         test('regexEveryModuleForWord', () => {
-            const speed = compare(re.regexEveryModuleForWord('ulabel'), RefRegexes.regexEveryModuleForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexEveryModuleForWordForCompletion('TestSuite_Fill'), RefRegexes.regexEveryModuleForWordForCompletion('TestSuite_Fill'), BASE_COUNT);
             console.log('regexEveryModuleForWord: ', speed + '% speed');
         });
 
+        test('regexEveryMacroForWord short word', () => {
+            const speed = compare(re.regexEveryMacroForWordForCompletion('a'), RefRegexes.regexEveryMacroForWordForCompletion('a'), BASE_COUNT);
+            console.log('regexEveryMacroForWord short word: ', speed + '% speed');
+        });
+
         test('regexEveryMacroForWord', () => {
-            const speed = compare(re.regexEveryMacroForWord('ulabel'), RefRegexes.regexEveryMacroForWord('ulabel'), BASE_COUNT);
+            const speed = compare(re.regexEveryMacroForWordForCompletion('WAIT_SPACE'), RefRegexes.regexEveryMacroForWordForCompletion('WAIT_SPACE'), BASE_COUNT);
             console.log('regexEveryMacroForWord: ', speed + '% speed');
         });
 

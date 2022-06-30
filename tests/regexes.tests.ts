@@ -146,7 +146,7 @@ suite('RegExes', () => {
                 "39+ 6017           endmodule ", true,
                 "29    0012  D3 FE  endmodule", true,
                 "625++C4D1          endmodule ", true,
-                "626++C4D1 FE 10    endmodule", true, 
+                "626++C4D1 FE 10    endmodule", true,
             ];
 
             checkResultsMatch(regex, insOuts);
@@ -632,13 +632,13 @@ suite('RegExes', () => {
                     "label", "626++C4D1 FE 10    @label:", true, "626++C4D1 FE 10    @",
                 ];
 
-                checkResultsSearchWord(re.regexEveryLabelColonForWord, insOuts);
+                checkResultsSearchWord(re.regexEveryLabelColonForWordForCompletion, insOuts);
                 done();
             });
 
 
             test('start index', (done) => {
-                const regex = re.regexEveryLabelColonForWord('fill_memory');
+                const regex = re.regexEveryLabelColonForWordForCompletion('fill_memory');
 
                 let match = regex.exec("24 + 600F              fill_memory:");
                 // Calculate start index
@@ -653,7 +653,7 @@ suite('RegExes', () => {
         });
 
 
-        test('regexEveryLabelWithoutColonForWord', (done) => {
+        test('regexEveryLabelWithoutColonForWordForCompletion', (done) => {
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "label", "label", true, "",
@@ -694,12 +694,12 @@ suite('RegExes', () => {
                 "label", "LaBeL", true, "",
             ];
 
-            checkResultsSearchWord(re.regexEveryLabelWithoutColonForWord, insOuts);
+            checkResultsSearchWord(re.regexEveryLabelWithoutColonForWordForCompletion, insOuts);
             done();
         });
 
 
-        test('regexEveryModuleForWord', (done) => {
+        test('regexEveryModuleForWordForCompletion', (done) => {
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "m", "module m", false, "",
@@ -721,12 +721,12 @@ suite('RegExes', () => {
                 "m", "626++C4D1 FE 10    module m", true, "626++C4D1 FE 10    module ",
             ];
 
-            checkResultsSearchWord(re.regexEveryModuleForWord, insOuts);
+            checkResultsSearchWord(re.regexEveryModuleForWordForCompletion, insOuts);
             done();
         });
 
 
-        test('regexEveryMacroForWord', (done) => {
+        test('regexEveryMacroForWordForCompletion', (done) => {
             const insOuts = [
                 "m", "macro m", false, "",
                 "m", " macro m", true, " macro ",
@@ -747,7 +747,7 @@ suite('RegExes', () => {
                 "m", "626++C4D1 FE 10    macro m", true, "626++C4D1 FE 10    macro ",
             ];
 
-            checkResultsSearchWord(re.regexEveryMacroForWord, insOuts);
+            checkResultsSearchWord(re.regexEveryMacroForWordForCompletion, insOuts);
             done();
         });
 
