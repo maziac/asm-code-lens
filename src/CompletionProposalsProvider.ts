@@ -4,6 +4,7 @@ import {Config} from './config';
 import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
 import {CompletionRegexes} from './regexes/completionregexes';
 import {PackageInfo} from './whatsnew/packageinfo';
+import {AllowedLanguageIds} from './languageId';
 
 
 /// All additional completions like Z80 instructions and assembler
@@ -149,15 +150,16 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const fuzzySearchWord = CommonRegexes.regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon
-        const regexes = CompletionRegexes.regexesEveryLabelForWord(fuzzySearchWord, this.config);
+        const languageId = document.languageId as AllowedLanguageIds;
+        const regexes = CompletionRegexes.regexesEveryLabelForWord(fuzzySearchWord, this.config, languageId);
         // Find all sjasmplus MODULEs in the document
-        const searchSjasmModule = CompletionRegexes. regexEveryModuleForWord(fuzzySearchWord);
+        const searchSjasmModule = CompletionRegexes. regexEveryModuleForWord(fuzzySearchWord, languageId);
         regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
-        const searchSjasmMacro = CompletionRegexes.regexEveryMacroForWord(fuzzySearchWord);
+        const searchSjasmMacro = CompletionRegexes.regexEveryMacroForWord(fuzzySearchWord, languageId);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);
+        const locations = await grepMultiple(regexes, this.config.rootFolder, languageId);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(locations, document.fileName, position, true, false);
         // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)

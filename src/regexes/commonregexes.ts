@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './../languageId';
 import {RegexIndexOf} from './extendedregex';
 
 
@@ -63,7 +64,7 @@ export class CommonRegexes {
         return regexes;
     }
 
-    
+
     /**
      * Checks for an INCLUDE directive.
      * E.g. 'include "something"' or ' include "something"'.
@@ -119,9 +120,14 @@ export class CommonRegexes {
      * Capture groups:
      *  1 = preceding characters before 'searchWord'.
      * Used by DefinitionProvider.
+	 * @param languageId either "asm-collection" or "asm-list-file".
+	 * A different regex is returned dependent on languageId.
      */
-    public static regexLabelColonForWord(searchWord: string): RegExp {
-        //return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+    public static regexLabelColonForWord(searchWord: string, languageId: AllowedLanguageIds): RegExp {
+        if (languageId == 'asm-list-file') {
+            return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+        }
+		// "asm-collection"
         return new RegExp('(^|^.*?\\s)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
     }
 
@@ -142,16 +148,18 @@ export class CommonRegexes {
      * Returns an array of regexes with 1 or 2 regexes.
      * @param labelsWithColons Add regex with colons
      * @param labelsWithoutColons Add regex without colons
+	 * @param languageId either "asm-collection" or "asm-list-file".
+	 * A different regex is returned dependent on languageId.
      */
-    public static regexesLabelForWord(searchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
+    public static regexesLabelForWord(searchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}, languageId: AllowedLanguageIds): RegExp[] {
         const regexes: RegExp[] = [];
         // Find all "some.thing:" (labels) in the document
         if (cfg.labelsWithColons) {
-            const searchRegex = CommonRegexes.regexLabelColonForWord(searchWord);
+            const searchRegex = CommonRegexes.regexLabelColonForWord(searchWord, languageId);
             regexes.push(searchRegex);
         }
         // Find all sjasmplus labels without ":" in the document
-        if (cfg.labelsWithoutColons) {
+        if (cfg.labelsWithoutColons && languageId == 'asm-collection') {
             const searchRegex2 = CommonRegexes.regexLabelWithoutColonForWord(searchWord);
             regexes.push(searchRegex2);
         }

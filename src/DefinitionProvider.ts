@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import { DefinitionRegexes } from './regexes/definitionregexes';
 import * as vscode from 'vscode';
@@ -85,7 +86,8 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             return [];  // Abort
 
         // Find all "something:" (labels) in the document, also labels without colon.
-        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config);
+        const languageId = document.languageId as AllowedLanguageIds;
+        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config, languageId);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = CommonRegexes.regexModuleForWord(searchWord);
         regexes.push(searchSjasmModule);

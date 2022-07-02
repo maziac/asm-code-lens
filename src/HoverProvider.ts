@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
@@ -58,10 +59,11 @@ export class HoverProvider implements vscode.HoverProvider {
         }
 
         // It is a non local label
+        const languageId = document.languageId as AllowedLanguageIds;
         const range = document.getWordRangeAtPosition(position);
         const searchWord = document.getText(range);
         // regexes for labels with and without colon
-        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config);
+        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config, languageId);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = CommonRegexes.regexModuleForWord(searchWord);
         regexes.push(searchSjasmModule);
@@ -69,7 +71,7 @@ export class HoverProvider implements vscode.HoverProvider {
         const searchSjasmMacro = CommonRegexes.regexMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);
+        const locations = await grepMultiple(regexes, this.config.rootFolder, languageId);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
 

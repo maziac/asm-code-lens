@@ -1,10 +1,9 @@
-
+import {AllowedLanguageIds} from '../languageId';
 
 /**
  * All regexes that are used for the completion provider.
  */
 export class CompletionRegexes {
-
 
 	/**
 	 * Returns an array of regexes with 1 or 2 regexes.
@@ -12,15 +11,15 @@ export class CompletionRegexes {
 	 * @param {labelsWithColons, labelsWithoutColons} Add regex with colons /
 	 * Add regex without colons
 	 */
-	public static regexesEveryLabelForWord(fuzzySearchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
+	public static regexesEveryLabelForWord(fuzzySearchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}, languageId: AllowedLanguageIds): RegExp[] {
 		const regexes: RegExp[] = [];
 		// Find all "some.thing:" (labels) in the document
 		if (cfg.labelsWithColons) {
-			const searchRegex = this.regexEveryLabelColonForWord(fuzzySearchWord);
+			const searchRegex = this.regexEveryLabelColonForWord(fuzzySearchWord, languageId);
 			regexes.push(searchRegex);
 		}
 		// Find all sjasmplus labels without ":" in the document
-		if (cfg.labelsWithoutColons) {
+		if (cfg.labelsWithoutColons && languageId == 'asm-collection') {
 			const searchRegex2 = this.regexEveryLabelWithoutColonForWord(fuzzySearchWord);
 			regexes.push(searchRegex2);
 		}
@@ -53,11 +52,16 @@ export class CompletionRegexes {
 	 *  1 = preceding characters before 'searchWord'.
 	 * Used by CompletionProposalsProvider.
 	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
+	 * @param languageId either "asm-collection" or "asm-list-file".
+	 * A different regex is returned dependent on languageId.
 	 */
-	protected static regexEveryLabelColonForWord(fuzzySearchWord: string): RegExp {
-		//return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
-		//return new RegExp('(^@?[\\w\\.]*|^.*\\s@?[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
-		return new RegExp('(^@?[\\w\\.]*|^.*\\s@?[\\w\\.]*)\\b' + fuzzySearchWord + '[\\w\\.]*:', 'i');
+	protected static regexEveryLabelColonForWord(fuzzySearchWord: string, languageId: AllowedLanguageIds): RegExp {
+		if (languageId == 'asm-list-file') {
+			return new RegExp('^(\\s*[\\w\\.]*)\\b' + fuzzySearchWord + '[\\w\\.]*:', 'i');
+		}
+		// "asm-collection"
+		return new RegExp('(^@?[\\w\\.]*|^.*\\s@?[\\w\\.]*)\\b' +
+		fuzzySearchWord + '[\\w\\.]*:', 'i');
 	}
 
 
@@ -69,11 +73,16 @@ export class CompletionRegexes {
 	 *  1 = preceding characters before 'searchWord'.
 	 * Used by CompletionProposalsProvider.
 	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
+	 * @param languageId either "asm-collection" or "asm-list-file".
+	 * A different regex is returned dependent on languageId.
 	 */
-	public static regexEveryModuleForWord(fuzzySearchWord: string): RegExp {
-		return new RegExp('^(.*?\\s+(MODULE)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+	public static regexEveryModuleForWord(fuzzySearchWord: string, languageId: AllowedLanguageIds): RegExp {
+		if (languageId == 'asm-list-file') {
+			return new RegExp('^(.*?\\s+(MODULE)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+		}
+		// "asm-collection"
+		return new RegExp('^(\\s+(MODULE)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
 	}
-
 
 
 	/**
@@ -84,12 +93,15 @@ export class CompletionRegexes {
 	 *  1 = preceding characters before 'searchWord'.
 	 * Used by CompletionProposalsProvider.
 	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
+	 * @param languageId either "asm-collection" or "asm-list-file".
+	 * A different regex is returned dependent on languageId.
 	 */
-	public static regexEveryMacroForWord(fuzzySearchWord: string): RegExp {
-		//return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
-		const regex = new RegExp('^(.*?\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
-		return regex;
+	public static regexEveryMacroForWord(fuzzySearchWord: string, languageId: AllowedLanguageIds): RegExp {
+		if (languageId == 'asm-list-file') {
+			return new RegExp('^(\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+		}
+		// "asm-collection"
+		return new RegExp('^(.*?\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
 	}
-
 }
 

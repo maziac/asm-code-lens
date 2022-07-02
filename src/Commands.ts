@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -22,7 +23,7 @@ export class Commands {
      * (config.rootFolder The search is limited to the root / project
      * folder. This needs to contain a trailing '/'.)
      */
-    public static async findLabelsWithNoReference(config: Config, languageId: string): Promise<void> {
+    public static async findLabelsWithNoReference(config: Config, languageId: AllowedLanguageIds): Promise<void> {
         // Get regexes
         const regexes = CommonRegexes.regexesLabel(config);
         // Get all label definition (locations)
@@ -41,7 +42,7 @@ export class Commands {
      * @param locLabels A list of GrepLocations.
      * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
      */
-    protected static async findLabels(locLabels, rootFolder: string, languageId: string): Promise<void> {
+    protected static async findLabels(locLabels, rootFolder: string, languageId: AllowedLanguageIds): Promise<void> {
         const baseName = path.basename(rootFolder);
         output.appendLine("Unreferenced labels, " + baseName + ":");
         output.show(true);

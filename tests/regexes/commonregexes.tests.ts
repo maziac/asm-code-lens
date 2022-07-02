@@ -462,11 +462,11 @@ suite('CommonRegexes', () => {
 
         let match = regex.exec("24 + 600F              fill_memory:");
         // Calculate start index
-        assert.equal(CommonRegexes.calcStartIndex(match!), 23);
+        assert.equal(CommonRegexes.calcStartIndex(match), 23);
 
         match = regex.exec("fill_memory:");
         // Calculate start index
-        assert.equal(CommonRegexes.calcStartIndex(match!), 0);
+        assert.equal(CommonRegexes.calcStartIndex(match), 0);
         done();
     });
 

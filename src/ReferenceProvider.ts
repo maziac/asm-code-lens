@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import { grep, reduceLocations } from './grep';
@@ -47,7 +48,8 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         const searchWord = document.getText(document.getWordRangeAtPosition(position));
         const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
 
-        const locations = await grep(searchRegex, this.rootFolder, document.languageId);
+        const languageId = document.languageId as AllowedLanguageIds;
+        const locations = await grep(searchRegex, this.rootFolder, languageId);
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
         return reducedLocations;
     }

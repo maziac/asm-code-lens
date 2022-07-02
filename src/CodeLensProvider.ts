@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
@@ -106,7 +107,8 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const pos = codeLens.range.start;
         //const line = pos.line;
 
-        const locations = await grep(searchRegex, this.config.rootFolder, doc.languageId);
+        const languageId = doc.languageId as AllowedLanguageIds;
+        const locations = await grep(searchRegex, this.config.rootFolder, languageId);
         // Remove any locations because of module information (dot notation)
         const reducedLocations = await reduceLocations(locations, doc.fileName, pos, true, false);
         // create title
