@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { grep, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
 import { regexInclude } from './regexes/regexes';
-import {RenameRegexes} from './regexes/RenameRegexes';
+import {RenameRegexes} from './regexes/RenameRegexesren';
 
 
 

@@ -1,8 +1,8 @@
 import {FastRegex} from '../src/regexes/fastregex';
-import {CompletionRegexes} from '../src/regexes/CompletionRegexesren';
+import {CompletionRegexes} from '../src/regexes/completionregexes';
 import * as fs from 'fs';
 import * as re from '../src/regexes/regexes';
-import {RenameRegexes} from '../src/regexes/RenameRegexes';
+import {RenameRegexes} from '../src/regexes/RenameRegexesren';
 
 
 // For access to protected functions.

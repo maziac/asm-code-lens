@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as re from '../src/regexes/regexes';
-import {RenameRegexes} from '../src/regexes/RenameRegexes';
-import {CompletionRegexes} from '../src/regexes/CompletionRegexesren';
+import {RenameRegexes} from '../src/regexes/RenameRegexesren';
+import {CompletionRegexes} from '../src/regexes/completionregexes';
 
 
 // For access to protected functions.
