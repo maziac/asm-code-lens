@@ -245,32 +245,3 @@ export function regexPrepareFuzzy(searchWord: string): string {
 
 
 
-/**
- * Searches for a (sjasmplus) MODULE that contains the given word.
- * The label can be everywhere. I.e. it can be a middle part of a dot
- * notated label.
- * Capture groups:
- *  1 = preceding characters before 'searchWord'.
- * Used by CompletionProposalsProvider.
- * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
- */
-export function regexEveryModuleForWordForCompletion(fuzzySearchWord: string): RegExp {
-    return new RegExp('^(.*?\\s+(MODULE)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
-}
-
-
-/**
- * Searches for a (sjasmplus) MACRO that contains the given word.
- * The label can be everywhere. I.e. it can be a middle part of a dot
- * notated label.
- * Capture groups:
- *  1 = preceding characters before 'searchWord'.
- * Used by CompletionProposalsProvider.
- * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
- */
-export function regexEveryMacroForWordForCompletion(fuzzySearchWord: string): RegExp {
-    //return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
-    const regex = new RegExp('^(.*?\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
-    return regex;
-}
-

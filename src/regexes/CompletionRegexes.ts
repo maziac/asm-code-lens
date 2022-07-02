@@ -12,16 +12,16 @@ export class CompletionRegexes {
 	 * @param {labelsWithColons, labelsWithoutColons} Add regex with colons /
 	 * Add regex without colons
 	 */
-	public static regexesEveryLabelForWordForCompletion(fuzzySearchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
+	public static regexesEveryLabelForWord(fuzzySearchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}): RegExp[] {
 		const regexes: RegExp[] = [];
 		// Find all "some.thing:" (labels) in the document
 		if (cfg.labelsWithColons) {
-			const searchRegex = this.regexEveryLabelColonForWordForCompletion(fuzzySearchWord);
+			const searchRegex = this.regexEveryLabelColonForWord(fuzzySearchWord);
 			regexes.push(searchRegex);
 		}
 		// Find all sjasmplus labels without ":" in the document
 		if (cfg.labelsWithoutColons) {
-			const searchRegex2 = this.regexEveryLabelWithoutColonForWordForCompletion(fuzzySearchWord);
+			const searchRegex2 = this.regexEveryLabelWithoutColonForWord(fuzzySearchWord);
 			regexes.push(searchRegex2);
 		}
 		return regexes;
@@ -38,7 +38,7 @@ export class CompletionRegexes {
 	 * Used by CompletionProposalsProvider.
 	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
 	 */
-	protected static regexEveryLabelWithoutColonForWordForCompletion(fuzzySearchWord: string): RegExp {
+	protected static regexEveryLabelWithoutColonForWord(fuzzySearchWord: string): RegExp {
 		//searchWord=searchWord.replace(/\./g, '\\.');
 		return new RegExp('^(([^0-9 ][\\w\\.]*)?)\\b' + fuzzySearchWord + '[\\w\\.]*\\b(?![:\\w\\.])', 'i');
 	}
@@ -54,10 +54,42 @@ export class CompletionRegexes {
 	 * Used by CompletionProposalsProvider.
 	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
 	 */
-	protected static regexEveryLabelColonForWordForCompletion(fuzzySearchWord: string): RegExp {
+	protected static regexEveryLabelColonForWord(fuzzySearchWord: string): RegExp {
 		//return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
 		//return new RegExp('(^@?[\\w\\.]*|^.*\\s@?[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
 		return new RegExp('(^@?[\\w\\.]*|^.*\\s@?[\\w\\.]*)\\b' + fuzzySearchWord + '[\\w\\.]*:', 'i');
 	}
+
+
+	/**
+	 * Searches for a (sjasmplus) MODULE that contains the given word.
+	 * The label can be everywhere. I.e. it can be a middle part of a dot
+	 * notated label.
+	 * Capture groups:
+	 *  1 = preceding characters before 'searchWord'.
+	 * Used by CompletionProposalsProvider.
+	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
+	 */
+	public static regexEveryModuleForWord(fuzzySearchWord: string): RegExp {
+		return new RegExp('^(.*?\\s+(MODULE)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+	}
+
+
+
+	/**
+	 * Searches for a (sjasmplus) MACRO that contains the given word.
+	 * The label can be everywhere. I.e. it can be a middle part of a dot
+	 * notated label.
+	 * Capture groups:
+	 *  1 = preceding characters before 'searchWord'.
+	 * Used by CompletionProposalsProvider.
+	 * @param fuzzySearchWord Is a fuzzy search word, e.g. "\\w*s\\w*n\\w*d" for snd.
+	 */
+	public static regexEveryMacroForWord(fuzzySearchWord: string): RegExp {
+		//return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
+		const regex = new RegExp('^(.*?\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+		return regex;
+	}
+
 }
 

@@ -1,8 +1,8 @@
-import { CompletionRegexes } from './regexes/CompletionRegexes';
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
-import {regexEveryMacroForWordForCompletion, regexEveryModuleForWordForCompletion, regexPrepareFuzzy} from './regexes/regexes';
+import {CompletionRegexes} from './regexes/CompletionRegexes';
+import {regexPrepareFuzzy} from './regexes/regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 
@@ -149,12 +149,12 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const fuzzySearchWord = regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon
-        const regexes = CompletionRegexes.regexesEveryLabelForWordForCompletion(fuzzySearchWord, this.config);
+        const regexes = CompletionRegexes.regexesEveryLabelForWord(fuzzySearchWord, this.config);
         // Find all sjasmplus MODULEs in the document
-        const searchSjasmModule = regexEveryModuleForWordForCompletion(fuzzySearchWord);
+        const searchSjasmModule = CompletionRegexes. regexEveryModuleForWord(fuzzySearchWord);
         regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
-        const searchSjasmMacro = regexEveryMacroForWordForCompletion(fuzzySearchWord);
+        const searchSjasmMacro = CompletionRegexes.regexEveryMacroForWord(fuzzySearchWord);
         regexes.push(searchSjasmMacro);
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);

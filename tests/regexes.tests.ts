@@ -726,7 +726,7 @@ suite('RegExes', () => {
                 "m", "626++C4D1 FE 10    module m", true, "626++C4D1 FE 10    module ",
             ];
 
-            checkResultsSearchWord(re.regexEveryModuleForWordForCompletion, insOuts);
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryModuleForWordForCompletion, insOuts);
             done();
         });
 
@@ -752,7 +752,7 @@ suite('RegExes', () => {
                 "m", "626++C4D1 FE 10    macro m", true, "626++C4D1 FE 10    macro ",
             ];
 
-            checkResultsSearchWord(re.regexEveryMacroForWordForCompletion, insOuts);
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryMacroForWordForCompletion, insOuts);
             done();
         });
 

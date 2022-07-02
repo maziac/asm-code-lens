@@ -275,22 +275,22 @@ suite('Performance', () => {
         });
 
         test('regexEveryModuleForWord short word', () => {
-            const speed = compare(re.regexEveryModuleForWordForCompletion('a'), RefRegexes.regexEveryModuleForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWordForCompletion('a'), RefRegexes.regexEveryModuleForWordForCompletion('a'), BASE_COUNT);
             console.log('regexEveryModuleForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryModuleForWord', () => {
-            const speed = compare(re.regexEveryModuleForWordForCompletion('TestSuite_Fill'), RefRegexes.regexEveryModuleForWordForCompletion('TestSuite_Fill'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWordForCompletion('TestSuite_Fill'), RefRegexes.regexEveryModuleForWordForCompletion('TestSuite_Fill'), BASE_COUNT);
             console.log('regexEveryModuleForWord: ', speed + '% speed');
         });
 
         test('regexEveryMacroForWord short word', () => {
-            const speed = compare(re.regexEveryMacroForWordForCompletion('a'), RefRegexes.regexEveryMacroForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWordForCompletion('a'), RefRegexes.regexEveryMacroForWordForCompletion('a'), BASE_COUNT);
             console.log('regexEveryMacroForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryMacroForWord', () => {
-            const speed = compare(re.regexEveryMacroForWordForCompletion('WAIT_SPACE'), RefRegexes.regexEveryMacroForWordForCompletion('WAIT_SPACE'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWordForCompletion('WAIT_SPACE'), RefRegexes.regexEveryMacroForWordForCompletion('WAIT_SPACE'), BASE_COUNT);
             console.log('regexEveryMacroForWord: ', speed + '% speed');
         });
 
