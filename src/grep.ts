@@ -1,10 +1,10 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {FuncCache} from './funccache';
-import {calcStartIndex, regexEndModuleStruct, regexModuleStruct, regexPrepareFuzzy} from './regexes/regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 
@@ -379,7 +379,7 @@ export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileM
                 break;
 
             // Found: get start and end
-            const start = calcStartIndex(match);
+            const start = CommonRegexes.calcStartIndex(match);
             const end = match.index + match[0].length;
 
 
@@ -464,7 +464,7 @@ export function getRegExFromLabel(label: string): RegExp {
     }
 
     // Change last part
-    const lastRegexStr = regexPrepareFuzzy(lastPart) + '\\w*';
+    const lastRegexStr = CommonRegexes.regexPrepareFuzzy(lastPart) + '\\w*';
     let regexStr = prefix.replace(/(\.)/g, '\\.');  // Make sure to convert . to \. for regular expression.
     regexStr += lastRegexStr;
 
@@ -698,8 +698,8 @@ export function getNonLocalLabel(lines: Array<string>, index: number): string {
  * @returns A string like 'audio.samples'.
  */
 export function getModule(lines: Array<string>, len: number): string {
-    const regexModule = regexModuleStruct();
-    const regexEndmodule = regexEndModuleStruct();
+    const regexModule = CommonRegexes.regexModuleStruct();
+    const regexEndmodule = CommonRegexes.regexEndModuleStruct();
     const modules: Array<string> = [];
     for (let row = 0; row < len; row++) {
         const lineContents = lines[row];

@@ -1,8 +1,9 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {FileMatch, grep, grepMultiple, reduceLocations} from './grep';
-import {regexAnyReferenceForWord, regexesLabel, regexLabelEquOrMacro} from './regexes/regexes';
+import {CommandsRegexes} from './regexes/commandsregexes';
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -23,7 +24,7 @@ export class Commands {
      */
     public static async findLabelsWithNoReference(config: Config, languageId: string): Promise<void> {
         // Get regexes
-        const regexes = regexesLabel(config);
+        const regexes = CommonRegexes.regexesLabel(config);
         // Get all label definition (locations)
         const labelLocations = await grepMultiple(regexes, config.rootFolder, languageId);
 
@@ -48,7 +49,7 @@ export class Commands {
         try {
             let labelsCount = locLabels.length;
             let unrefLabels = 0;
-            const regexEqu = regexLabelEquOrMacro();
+            const regexEqu = CommandsRegexes.regexLabelEquOrMacro();
             for (const locLabel of locLabels) {
                 // Skip all EQU and MACRO
                 const fm: FileMatch = locLabel.fileMatch;
@@ -69,7 +70,7 @@ export class Commands {
                 const fileName = fm.filePath;
 
                 // And search for references
-                const regex = regexAnyReferenceForWord(searchLabel);
+                const regex = CommonRegexes.regexAnyReferenceForWord(searchLabel);
                 const locations = await grep(regex, rootFolder, languageId);
                 // Remove any locations because of module information (dot notation)
                 const reducedLocations = await reduceLocations(locations, fileName, pos, true, false);

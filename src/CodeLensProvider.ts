@@ -1,6 +1,6 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
-import {regexAnyReferenceForWord, regexesLabel} from './regexes/regexes';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
 
@@ -59,7 +59,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
         // Find all code lenses
         const codeLenses: Array<vscode.CodeLens> = [];
-        const regexes = regexesLabel(this.config);
+        const regexes = CommonRegexes.regexesLabel(this.config);
         const matches = grepTextDocumentMultiple(document, regexes);
         // Loop all matches and create code lenses
         for (const fmatch of matches) {
@@ -100,7 +100,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
     public async resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Promise<vscode.CodeLens> {
         // Search the references
         const searchWord = codeLens.symbol;
-        const searchRegex = regexAnyReferenceForWord(searchWord);
+        const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
 
         const doc = codeLens.document;
         const pos = codeLens.range.start;

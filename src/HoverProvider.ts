@@ -1,6 +1,6 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
-import {regexModuleForWord, regexMacroForWord, regexesLabelForWord} from './regexes/regexes';
 import * as fs from 'fs';
 import {Config} from './config';
 import {readCommentsForLine} from './comments';
@@ -61,12 +61,12 @@ export class HoverProvider implements vscode.HoverProvider {
         const range = document.getWordRangeAtPosition(position);
         const searchWord = document.getText(range);
         // regexes for labels with and without colon
-        const regexes = regexesLabelForWord(searchWord, this.config);
+        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config);
         // Find all sjasmplus MODULEs in the document
-        const searchSjasmModule = regexModuleForWord(searchWord);
+        const searchSjasmModule = CommonRegexes.regexModuleForWord(searchWord);
         regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
-        const searchSjasmMacro = regexMacroForWord(searchWord);
+        const searchSjasmMacro = CommonRegexes.regexMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);

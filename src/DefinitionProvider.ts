@@ -1,7 +1,7 @@
+import { CommonRegexes } from './regexes/commonregexes';
+import { DefinitionRegexes } from './regexes/definitionregexes';
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
-//import { resolve } from 'path';
-import {regexInclude, regexModuleForWord, regexMacroForWord, regexStructForWord, regexesLabelForWord} from './regexes/regexes';
 import {Config} from './config';
 
 
@@ -39,7 +39,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             return []; // Path is wrong.
         // Check for 'include "..."'
         const lineContents = document.lineAt(position.line).text;
-        const match = regexInclude().exec(lineContents);
+        const match = CommonRegexes.regexInclude().exec(lineContents);
         if (match) {
             // INCLUDE found
             return this.getInclude(match[1]);
@@ -85,15 +85,15 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
             return [];  // Abort
 
         // Find all "something:" (labels) in the document, also labels without colon.
-        const regexes = regexesLabelForWord(searchWord, this.config);
+        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config);
         // Find all sjasmplus MODULEs in the document
-        const searchSjasmModule = regexModuleForWord(searchWord);
+        const searchSjasmModule = CommonRegexes.regexModuleForWord(searchWord);
         regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
-        const searchSjasmMacro = regexMacroForWord(searchWord);
+        const searchSjasmMacro = CommonRegexes.regexMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
         // Find all sjasmplus STRUCTs in the document
-        const searchSjasmStruct = regexStructForWord(searchWord);
+        const searchSjasmStruct = DefinitionRegexes.regexStructForWord(searchWord);
         regexes.push(searchSjasmStruct);
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);

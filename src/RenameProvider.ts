@@ -1,8 +1,8 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import { grep, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
-import { regexInclude } from './regexes/regexes';
-import {RenameRegexes} from './regexes/RenameRegexesren';
+import {RenameRegexes} from './regexes/renameregexes';
 
 
 
@@ -117,7 +117,7 @@ export class RenameProvider implements vscode.RenameProvider {
         const lines = linesData.split('\n');
 
         // Process all changes
-        const regex = regexInclude();
+        const regex = CommonRegexes.regexInclude();
         for(const range of changes) {
             const row = range.start.line;
             const clmn = range.start.character;

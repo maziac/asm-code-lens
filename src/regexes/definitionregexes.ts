@@ -14,5 +14,4 @@ export class DefinitionRegexes {
 		//return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
 		return new RegExp('^(.*?\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
 	}
-
 }

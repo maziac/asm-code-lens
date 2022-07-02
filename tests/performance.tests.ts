@@ -1,8 +1,9 @@
-import {FastRegex} from '../src/regexes/fastregex';
+import { CommonRegexes } from '../src/regexes/commonregexes';
+import { DefinitionRegexes } from './../src/regexes/definitionregexes';
 import {CompletionRegexes} from '../src/regexes/completionregexes';
 import * as fs from 'fs';
-import * as re from '../src/regexes/regexes';
-import {RenameRegexes} from '../src/regexes/RenameRegexesren';
+import {RenameRegexes} from '../src/regexes/renameregexes';
+import {CommandsRegexes} from '../src/regexes/commandsregexes';
 
 
 // For access to protected functions.
@@ -76,16 +77,16 @@ class RefRegexes {
     public static regexAnyReferenceForWordGlobal(searchWord: string): RegExp {
         return new RegExp('(.*?)\\b' + searchWord + '\\b', 'g');
     }
-    public static regexEveryLabelColonForWordForCompletion(searchWord: string): RegExp {
+    public static regexEveryLabelColonForWord(searchWord: string): RegExp {
         return new RegExp('^(\\s*[\\w\\.]*)\\b' + searchWord + '[\\w\\.]*:', 'i');
     }
-    public static regexEveryLabelWithoutColonForWordForCompletion(searchWord: string): RegExp {
+    public static regexEveryLabelWithoutColonForWord(searchWord: string): RegExp {
         return new RegExp('^(([^0-9 ][\\w\\.]*)?)\\b' + searchWord + '[\\w\\.]*\\b(?![:\\w\\.])', 'i');
     }
-    public static regexEveryModuleForWordForCompletion(searchWord: string): RegExp {
+    public static regexEveryModuleForWord(searchWord: string): RegExp {
         return new RegExp('^(\\s+(MODULE)\\s+)' + searchWord + '[\\w\\.]*', 'i');
     }
-    public static regexEveryMacroForWordForCompletion(searchWord: string): RegExp {
+    public static regexEveryMacroForWord(searchWord: string): RegExp {
         return new RegExp('^(\\s+(MACRO)\\s+)' + searchWord + '[\\w\\.]*', 'i');
     }
 }
@@ -114,7 +115,7 @@ suite('Performance', () => {
      * @param count The number of times to call func.
      * @returns The duration in ms.
      */
-    function measure(regex: RegExp | FastRegex, count = BASE_COUNT): number {
+    function measure(regex: RegExp, count = BASE_COUNT): number {
         /*
         if (regex instanceof FastRegex) {
             const prevTime = Date.now();
@@ -157,7 +158,7 @@ suite('Performance', () => {
     * @param count The number of times to call func.
     * @returns The relation ship refRegex_time/regex_time*100 in percent.
     */
-    function compare(regex: RegExp | FastRegex, refRegex: RegExp, count = BASE_COUNT): number {
+    function compare(regex: RegExp, refRegex: RegExp, count = BASE_COUNT): number {
         // Throw away first measure.
         measure(/.*/, count);
 
@@ -175,73 +176,73 @@ suite('Performance', () => {
     suite('regexes', () => {
 
         test('regexLabelColon', () => {
-            const speed = compare(re.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
             console.log('regexLabelColon: ', speed + '% speed');
         });
 
         test('regexLabelColonNew', () => {
-            const speed = compare(re.regexLabelColonNew(), RefRegexes.regexLabelColon(), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelColonNew(), RefRegexes.regexLabelColon(), BASE_COUNT);
             console.log('regexLabelColonNew: ', speed + '% speed');
         });
 
         test('regexLabelWithoutColon', () => {
-            const speed = compare(re.regexLabelWithoutColon(), RefRegexes.regexLabelWithoutColon(), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelWithoutColon(), RefRegexes.regexLabelWithoutColon(), BASE_COUNT);
             console.log('regexLabelWithoutColon: ', speed + '% speed');
         });
 
         test('regexLabelEquOrMacro', () => {
-            const speed = compare(re.regexLabelEquOrMacro(), RefRegexes.regexLabelEquOrMacro(), BASE_COUNT);
+            const speed = compare(CommandsRegexes.regexLabelEquOrMacro(), RefRegexes.regexLabelEquOrMacro(), BASE_COUNT);
             console.log('regexLabelEquOrMacro: ', speed + '% speed');
         });
 
         test('regexInclude', () => {
-            const speed = compare(re.regexInclude(), RefRegexes.regexInclude(), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexInclude(), RefRegexes.regexInclude(), BASE_COUNT);
             console.log('regexInclude: ', speed + '% speed');
         });
 
         test('regexModuleStruct', () => {
-            const speed = compare(re.regexModuleStruct(), RefRegexes.regexModuleStruct(), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexModuleStruct(), RefRegexes.regexModuleStruct(), BASE_COUNT);
             console.log('regexModuleStruct: ', speed + '% speed');
         });
 
         test('regexEndModuleStruct', () => {
-            const speed = compare(re.regexEndModuleStruct(), RefRegexes.regexEndModuleStruct(), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexEndModuleStruct(), RefRegexes.regexEndModuleStruct(), BASE_COUNT);
             console.log('regexEndModuleStruct: ', speed + '% speed');
         });
 
 
         test('regexLabelColonForWord', () => {
-            const speed = compare(re.regexLabelColonForWord('pause'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelColonForWord('pause'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
             console.log('regexLabelColonForWord: ', speed + '% speed');
         });
 
         test('regexLabelWithoutColonForWord', () => {
-            const speed = compare(re.regexLabelWithoutColonForWord('pause'), RefRegexes.regexLabelWithoutColonForWord('pause'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelWithoutColonForWord('pause'), RefRegexes.regexLabelWithoutColonForWord('pause'), BASE_COUNT);
             console.log('regexLabelWithoutColonForWord: ', speed + '% speed');
         });
 
         test('regexModuleForWord', () => {
-            const speed = compare(re.regexModuleForWord('pause'), RefRegexes.regexModuleForWord('pause'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexModuleForWord('pause'), RefRegexes.regexModuleForWord('pause'), BASE_COUNT);
             console.log('regexModuleForWord: ', speed + '% speed');
         });
 
         test('regexMacroForWord', () => {
-            const speed = compare(re.regexMacroForWord('pause'), RefRegexes.regexMacroForWord('pause'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexMacroForWord('pause'), RefRegexes.regexMacroForWord('pause'), BASE_COUNT);
             console.log('regexMacroForWord: ', speed + '% speed');
         });
 
         test('regexStructForWord', () => {
-            const speed = compare(re.regexStructForWord('pause'), RefRegexes.regexStructForWord('pause'), BASE_COUNT);
+            const speed = compare(DefinitionRegexes.regexStructForWord('pause'), RefRegexes.regexStructForWord('pause'), BASE_COUNT);
             console.log('regexStructForWord: ', speed + '% speed');
         });
 
         test('regexAnyReferenceForWord short word', () => {
-            const speed = compare(re.regexAnyReferenceForWord('a'), RefRegexes.regexAnyReferenceForWord('a'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexAnyReferenceForWord('a'), RefRegexes.regexAnyReferenceForWord('a'), BASE_COUNT);
             console.log('regexAnyReferenceForWord short word: ', speed + '% speed');
         });
 
         test('regexAnyReferenceForWord', () => {
-            const speed = compare(re.regexAnyReferenceForWord('pause'), RefRegexes.regexAnyReferenceForWord('pause'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexAnyReferenceForWord('pause'), RefRegexes.regexAnyReferenceForWord('pause'), BASE_COUNT);
             console.log('regexAnyReferenceForWord: ', speed + '% speed');
         });
 
@@ -256,42 +257,42 @@ suite('Performance', () => {
         });
 
         test('regexEveryLabelColonForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('a'), RefRegexes.regexEveryLabelWithoutColonForWord('a'), BASE_COUNT);
             console.log('regexEveryLabelColonForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryLabelColonForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('pause'), RefRegexes.regexEveryLabelWithoutColonForWord('pause'), BASE_COUNT);
             console.log('regexEveryLabelColonForWord: ', speed + '% speed');
         });
 
         test('regexEveryLabelWithoutColonForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('a'), RefRegexes.regexEveryLabelWithoutColonForWord('a'), BASE_COUNT);
             console.log('regexEveryLabelWithoutColonForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryLabelWithoutColonForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('pause'), RefRegexes.regexEveryLabelWithoutColonForWord('pause'), BASE_COUNT);
             console.log('regexEveryLabelWithoutColonForWord: ', speed + '% speed');
         });
 
         test('regexEveryModuleForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryModuleForWordForCompletion('a'), RefRegexes.regexEveryModuleForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('a'), RefRegexes.regexEveryModuleForWord('a'), BASE_COUNT);
             console.log('regexEveryModuleForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryModuleForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryModuleForWordForCompletion('TestSuite_Fill'), RefRegexes.regexEveryModuleForWordForCompletion('TestSuite_Fill'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('TestSuite_Fill'), RefRegexes.regexEveryModuleForWord('TestSuite_Fill'), BASE_COUNT);
             console.log('regexEveryModuleForWord: ', speed + '% speed');
         });
 
         test('regexEveryMacroForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryMacroForWordForCompletion('a'), RefRegexes.regexEveryMacroForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('a'), RefRegexes.regexEveryMacroForWord('a'), BASE_COUNT);
             console.log('regexEveryMacroForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryMacroForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryMacroForWordForCompletion('WAIT_SPACE'), RefRegexes.regexEveryMacroForWordForCompletion('WAIT_SPACE'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('WAIT_SPACE'), RefRegexes.regexEveryMacroForWord('WAIT_SPACE'), BASE_COUNT);
             console.log('regexEveryMacroForWord: ', speed + '% speed');
         });
 

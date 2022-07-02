@@ -1,8 +1,8 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
 import {CompletionRegexes} from './regexes/completionregexes';
-import {regexPrepareFuzzy} from './regexes/regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 
@@ -146,7 +146,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 
         // Search
         const searchWord = document.getText(document.getWordRangeAtPosition(position));
-        const fuzzySearchWord = regexPrepareFuzzy(searchWord);
+        const fuzzySearchWord = CommonRegexes.regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon
         const regexes = CompletionRegexes.regexesEveryLabelForWord(fuzzySearchWord, this.config);

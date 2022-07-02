@@ -1,6 +1,6 @@
+import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import { grep, reduceLocations } from './grep';
-import { regexAnyReferenceForWord } from './regexes/regexes';
 
 
 
@@ -45,7 +45,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      */
     protected async search(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Location[]> {
         const searchWord = document.getText(document.getWordRangeAtPosition(position));
-        const searchRegex = regexAnyReferenceForWord(searchWord);
+        const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
 
         const locations = await grep(searchRegex, this.rootFolder, document.languageId);
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
