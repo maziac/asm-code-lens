@@ -1,7 +1,8 @@
+import { CompletionRegexes } from './regexes/CompletionRegexes';
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
-import {regexEveryMacroForWordForCompletion, regexEveryModuleForWordForCompletion, regexPrepareFuzzy, regexesEveryLabelForWordForCompletion} from './regexes/regexes';
+import {regexEveryMacroForWordForCompletion, regexEveryModuleForWordForCompletion, regexPrepareFuzzy} from './regexes/regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 
@@ -148,7 +149,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const fuzzySearchWord = regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon
-        const regexes = regexesEveryLabelForWordForCompletion(fuzzySearchWord, this.config);
+        const regexes = CompletionRegexes.regexesEveryLabelForWordForCompletion(fuzzySearchWord, this.config);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = regexEveryModuleForWordForCompletion(fuzzySearchWord);
         regexes.push(searchSjasmModule);

@@ -1,7 +1,11 @@
-import { FastRegex } from '../src/regexes/fastregex';
-
+import {FastRegex} from '../src/regexes/fastregex';
+import {CompletionRegexes} from './../src/regexes/CompletionRegexes';
 import * as fs from 'fs';
 import * as re from '../src/regexes/regexes';
+
+
+// For access to protected functions.
+const CompletionRegexesMock = CompletionRegexes as any;
 
 
 /**
@@ -251,22 +255,22 @@ suite('Performance', () => {
         });
 
         test('regexEveryLabelColonForWord short word', () => {
-            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
             console.log('regexEveryLabelColonForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryLabelColonForWord', () => {
-            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
             console.log('regexEveryLabelColonForWord: ', speed + '% speed');
         });
 
         test('regexEveryLabelWithoutColonForWord short word', () => {
-            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('a'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('a'), BASE_COUNT);
             console.log('regexEveryLabelWithoutColonForWord short word: ', speed + '% speed');
         });
 
         test('regexEveryLabelWithoutColonForWord', () => {
-            const speed = compare(re.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion('pause'), RefRegexes.regexEveryLabelWithoutColonForWordForCompletion('pause'), BASE_COUNT);
             console.log('regexEveryLabelWithoutColonForWord: ', speed + '% speed');
         });
 

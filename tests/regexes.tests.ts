@@ -1,5 +1,10 @@
 import * as assert from 'assert';
 import * as re from '../src/regexes/regexes';
+import {CompletionRegexes} from './../src/regexes/CompletionRegexes';
+
+
+// For access to protected functions.
+const CompletionRegexesMock = CompletionRegexes as any;
 
 
 suite('RegExes', () => {
@@ -632,13 +637,13 @@ suite('RegExes', () => {
                     "label", "626++C4D1 FE 10    @label:", true, "626++C4D1 FE 10    @",
                 ];
 
-                checkResultsSearchWord(re.regexEveryLabelColonForWordForCompletion, insOuts);
+                checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelColonForWordForCompletion, insOuts);
                 done();
             });
 
 
             test('start index', (done) => {
-                const regex = re.regexEveryLabelColonForWordForCompletion('fill_memory');
+                const regex = CompletionRegexesMock.regexEveryLabelColonForWordForCompletion('fill_memory');
 
                 let match = regex.exec("24 + 600F              fill_memory:");
                 // Calculate start index
@@ -694,7 +699,7 @@ suite('RegExes', () => {
                 "label", "LaBeL", true, "",
             ];
 
-            checkResultsSearchWord(re.regexEveryLabelWithoutColonForWordForCompletion, insOuts);
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelWithoutColonForWordForCompletion, insOuts);
             done();
         });
 
