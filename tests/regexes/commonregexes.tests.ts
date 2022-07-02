@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './../../src/languageId';
 import * as assert from 'assert';
 import {CommonRegexes} from '../../src/regexes/commonregexes';
 import {CompletionRegexes} from './../../src/regexes/completionregexes';
@@ -278,7 +279,7 @@ suite('CommonRegexes', () => {
 
 
     // insOuts: search-word, input-line, should-match, found-prefix
-    function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string | boolean)[]) {
+    function checkResultsSearchWord(func: (string, languageId?) => RegExp, insOuts: (string | boolean)[], languageId?: AllowedLanguageIds) {
         try {
             // Check the test
             const count = insOuts.length;
@@ -289,7 +290,7 @@ suite('CommonRegexes', () => {
                 const input = insOuts[i + 1] as string;
                 const shouldMatch = insOuts[i + 2];
                 const prefix = insOuts[i + 3];
-                const regex = func(searchWord);
+                const regex = func(searchWord, languageId);
                 const result = regex.exec(input);
                 if (result) {
                     assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i / div) + ", searched for: '" + searchWord + "' in '" + input + "'");
@@ -308,7 +309,7 @@ suite('CommonRegexes', () => {
 
     suite('RegEx with search-word', () => {
 
-        test('regexLabelColonForWord', (done) => {
+        test('regexLabelColonForWord asm', (done) => {
             const insOuts = [
                 "label", "xxx.label:", true, "",
 
@@ -335,9 +336,15 @@ suite('CommonRegexes', () => {
                 "label", "labely:", false, "",
                 "label", "xxx.xlabel:", false, "",
                 "label", "xlabel.yyy:", false, "",
+            ];
 
+            checkResultsSearchWord(CommonRegexes.regexLabelColonForWord, insOuts, 'asm-collection');
+            done();
+        });
 
-                // For list file
+        test('regexLabelColonForWord list', (done) => {
+            const insOuts = [
+                 // For list file
                 "label", "6017.R11 00 AF     label:", true, "6017.R11 00 AF     ",
                 "label", "39+ 6017           label:", true, "39+ 6017           ",
                 "label", "29    0012  D3 FE  label:", true, "29    0012  D3 FE  ",
@@ -345,7 +352,7 @@ suite('CommonRegexes', () => {
                 "label", "626++C4D1 FE 10    label:", true, "626++C4D1 FE 10    ",
             ];
 
-            checkResultsSearchWord(CommonRegexes.regexLabelColonForWord, insOuts);
+            checkResultsSearchWord(CommonRegexes.regexLabelColonForWord, insOuts, 'asm-list-file');
             done();
         });
 

@@ -212,7 +212,12 @@ suite('Performance', () => {
 
 
         test('regexLabelColonForWord', () => {
-            const speed = compare(CommonRegexes.regexLabelColonForWord('pause'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelColonForWord('pause', 'asm-collection'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
+            console.log('regexLabelColonForWord: ', speed + '% speed');
+        });
+
+        test('regexLabelColonForWord', () => {
+            const speed = compare(CommonRegexes.regexLabelColonForWord('pause', 'asm-list-file'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
             console.log('regexLabelColonForWord: ', speed + '% speed');
         });
 
