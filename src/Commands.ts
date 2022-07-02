@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {FileMatch, grep, grepMultiple, reduceLocations} from './grep';
-import {regexAnyReferenceForWord, regexesLabel, regexLabelEquOrMacro} from './regexes';
+import {regexAnyReferenceForWord, regexesLabel, regexLabelEquOrMacro} from './regexes/regexes';
 
 
 /// Output to the vscode "OUTPUT" tab.

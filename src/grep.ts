@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {FuncCache} from './funccache';
-import {calcStartIndex, regexEndModuleStruct, regexModuleStruct, regexPrepareFuzzy} from './regexes';
+import {calcStartIndex, regexEndModuleStruct, regexModuleStruct, regexPrepareFuzzy} from './regexes/regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 

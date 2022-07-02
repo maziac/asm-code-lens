@@ -1,7 +1,7 @@
-import { FastRegex } from './../src/fastregex';
+import { FastRegex } from '../src/regexes/fastregex';
 
 import * as fs from 'fs';
-import * as re from '../src/regexes';
+import * as re from '../src/regexes/regexes';
 
 
 /**

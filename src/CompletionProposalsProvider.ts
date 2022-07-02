@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
-import {regexEveryMacroForWordForCompletion, regexEveryModuleForWordForCompletion, regexPrepareFuzzy, regexesEveryLabelForWordForCompletion} from './regexes';
+import {regexEveryMacroForWordForCompletion, regexEveryModuleForWordForCompletion, regexPrepareFuzzy, regexesEveryLabelForWordForCompletion} from './regexes/regexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 
 

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { grep, reduceLocations } from './grep';
-import { regexAnyReferenceForWord } from './regexes';
+import { regexAnyReferenceForWord } from './regexes/regexes';
 
 
 

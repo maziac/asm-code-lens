@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { grepMultiple, reduceLocations } from './grep';
 //import { resolve } from 'path';
-import {regexInclude, regexModuleForWord, regexMacroForWord, regexStructForWord, regexesLabelForWord} from './regexes';
+import {regexInclude, regexModuleForWord, regexMacroForWord, regexStructForWord, regexesLabelForWord} from './regexes/regexes';
 import {Config} from './config';
 
 

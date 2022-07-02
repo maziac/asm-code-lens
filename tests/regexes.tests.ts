@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as re from '../src/regexes';
+import * as re from '../src/regexes/regexes';
 
 
 suite('RegExes', () => {

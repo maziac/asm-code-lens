@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
-import {regexModuleForWord, regexMacroForWord, regexesLabelForWord} from './regexes';
+import {regexModuleForWord, regexMacroForWord, regexesLabelForWord} from './regexes/regexes';
 import * as fs from 'fs';
 import {Config} from './config';
 import {readCommentsForLine} from './comments';

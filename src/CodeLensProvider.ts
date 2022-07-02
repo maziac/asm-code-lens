@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
-import {regexAnyReferenceForWord, regexesLabel} from './regexes';
+import {regexAnyReferenceForWord, regexesLabel} from './regexes/regexes';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
 
