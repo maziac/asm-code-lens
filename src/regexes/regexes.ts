@@ -1,4 +1,4 @@
-import { RegexIdexOf as RegexIndexOf } from './extendedregex';
+import {RegexIndexOf} from './extendedregex';
 
 /**
  * Checks for a label with a colon, e.g.
@@ -216,17 +216,6 @@ export function regexAnyReferenceForWord(searchWord: string): RegExp {
 
 
 
-/**
- * Searches any reference for a given word (label).
- * Capture groups:
- *  1 = preceding characters before 'searchWord'.
- * Used by RenameProvider.
- */
-export function regexAnyReferenceForWordGlobal(searchWord: string): RegExp {
-    return new RegexIndexOf(searchWord, new RegExp('(.*?)\\b' + searchWord + '\\b', 'g'));
-}
-
-
 
 /**
  * Prepares a string for fuzzy search.
@@ -239,9 +228,4 @@ export function regexPrepareFuzzy(searchWord: string): string {
     const replaced = searchWord.replace(/(.)/g,'\\w*$1');
     return replaced;
 }
-
-
-
-
-
 

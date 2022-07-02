@@ -16,7 +16,7 @@
 /**
  * Does a check for string.indexOf(...) before the regex.
  */
-export class RegexIdexOf extends RegExp {
+export class RegexIndexOf extends RegExp {
 
 	// The first checked string.
 	protected find: string;

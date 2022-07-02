@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as re from '../src/regexes/regexes';
-import {CompletionRegexes} from './../src/regexes/CompletionRegexes';
+import {RenameRegexes} from '../src/regexes/RenameRegexes';
+import {CompletionRegexes} from '../src/regexes/CompletionRegexesren';
 
 
 // For access to protected functions.
@@ -567,7 +568,7 @@ suite('RegExes', () => {
                 "label", "label: djnz sound.label", 2, "", ": djnz sound.",
             ];
 
-            checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
+            checkResultsSearchWordGlobal(RenameRegexes.regexAnyReferenceForWordGlobal, insOuts);
             done();
         });
     });
@@ -865,7 +866,7 @@ suite('RegExes', () => {
                 "label", "label: djnz sound.label", 2, "", ": djnz sound.",
             ];
 
-            checkResultsSearchWordGlobal(re.regexAnyReferenceForWordGlobal, insOuts);
+            checkResultsSearchWordGlobal(RenameRegexes.regexAnyReferenceForWordGlobal, insOuts);
             done();
         });
     });

@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { grep, reduceLocations, getTextDocument } from './grep';
 import * as fs from 'fs';
-import { regexInclude, regexAnyReferenceForWordGlobal } from './regexes/regexes';
+import { regexInclude } from './regexes/regexes';
+import {RenameRegexes} from './regexes/RenameRegexes';
 
 
 
@@ -49,7 +50,7 @@ export class RenameProvider implements vscode.RenameProvider {
      */
     public async rename(document: vscode.TextDocument, position: vscode.Position, newName: string): Promise<vscode.WorkspaceEdit> {
         const oldName = document.getText(document.getWordRangeAtPosition(position));
-        const searchRegex = regexAnyReferenceForWordGlobal(oldName);
+        const searchRegex = RenameRegexes.regexAnyReferenceForWordGlobal(oldName);
 
         const locations = await grep(searchRegex, this.rootFolder, document.languageId);
         const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);

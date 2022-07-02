@@ -1,7 +1,8 @@
 import {FastRegex} from '../src/regexes/fastregex';
-import {CompletionRegexes} from './../src/regexes/CompletionRegexes';
+import {CompletionRegexes} from '../src/regexes/CompletionRegexesren';
 import * as fs from 'fs';
 import * as re from '../src/regexes/regexes';
+import {RenameRegexes} from '../src/regexes/RenameRegexes';
 
 
 // For access to protected functions.
@@ -245,12 +246,12 @@ suite('Performance', () => {
         });
 
         test('regexAnyReferenceForWordGlobal short word', () => {
-            const speed = compare(re.regexAnyReferenceForWordGlobal('a'), RefRegexes.regexAnyReferenceForWordGlobal('a'), BASE_COUNT);
+            const speed = compare(RenameRegexes.regexAnyReferenceForWordGlobal('a'), RefRegexes.regexAnyReferenceForWordGlobal('a'), BASE_COUNT);
             console.log('regexAnyReferenceForWordGlobal short word: ', speed + '% speed');
         });
 
         test('regexAnyReferenceForWordGlobal', () => {
-            const speed = compare(re.regexAnyReferenceForWordGlobal('pause'), RefRegexes.regexAnyReferenceForWordGlobal('pause'), BASE_COUNT);
+            const speed = compare(RenameRegexes.regexAnyReferenceForWordGlobal('pause'), RefRegexes.regexAnyReferenceForWordGlobal('pause'), BASE_COUNT);
             console.log('regexAnyReferenceForWordGlobal: ', speed + '% speed');
         });
 
