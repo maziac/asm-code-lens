@@ -44,7 +44,8 @@ export class Commands {
      */
     protected static async findLabels(locLabels, rootFolder: string, languageId: AllowedLanguageIds): Promise<void> {
         const baseName = path.basename(rootFolder);
-        output.appendLine("Unreferenced labels, " + baseName + ":");
+        const typename = (languageId == 'asm-list-file') ? 'list' : 'asm';
+        output.appendLine("Unreferenced labels for " + typename + " files, " + baseName + ":");
         output.show(true);
 
         try {

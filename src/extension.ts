@@ -58,26 +58,39 @@ export function activate(context: vscode.ExtensionContext) {
         configure(context, event);
     }));
 
-    // Register command once.
+    // Register commands.
     vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
-        // Get current text editor to get current project/root folder.
-        const editorPath = vscode.window.activeTextEditor?.document.uri.fsPath || '';
-        // Get all workspace folders
-        const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
-        const config = getLabelsConfig();
-        // Check in which workspace folder the path is included
-        for (const rootFolder of wsFolders) {
-            if (editorPath.includes(rootFolder)) {
-                // Add root folder
-                config.rootFolder = rootFolder;
-                // Found. Find labels
-                Commands.findLabelsWithNoReference(config, 'asm-collection');
-                // TODO: Also for asm-list-file ?
-                // Stop loop
-                break;
-            }
-        }
+        findLabelsWithNoReferenceAllRootFolders();
     });
+}
+
+
+/**
+ * Finds labels with no reference for all root folders.
+ */
+function findLabelsWithNoReferenceAllRootFolders() {
+    // Get current text editor to get current project/root folder.
+    const editor = vscode.window.activeTextEditor;
+    if (!editor)
+        return;
+    const languageId = editor.document.languageId;
+    if (languageId != 'asm-collection' && languageId != 'asm-list-file')
+        return;
+    const editorPath =editor.document.uri.fsPath;
+    // Get all workspace folders
+    const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
+    const config = getLabelsConfig();
+    // Check in which workspace folder the path is included
+    for (const rootFolder of wsFolders) {
+        if (editorPath.includes(rootFolder)) {
+            // Add root folder
+            config.rootFolder = rootFolder;
+            // Found. Find labels
+            Commands.findLabelsWithNoReference(config, languageId);
+            // Stop loop
+            break;
+        }
+    }
 }
 
 
