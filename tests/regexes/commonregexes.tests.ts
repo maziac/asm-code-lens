@@ -62,7 +62,7 @@ suite('CommonRegexes', () => {
             }
         }
 
-        test('regexInclude', (done) => {
+        test('regexInclude asm', (done) => {
             const regex = CommonRegexes.regexInclude();
             const insOuts = [
                 // input-line, match, found-file
@@ -70,7 +70,16 @@ suite('CommonRegexes', () => {
                 '  INCLUDE "src/sound.asm"', true, "src/sound.asm",
                 'include   abcd ', false, "",
                 'includeX   "sound.asm" ', false, "",
+            ];
 
+            checkResultsMatchFound(regex, insOuts);
+            done();
+        });
+
+
+        test('regexInclude list', (done) => {
+            const regex = CommonRegexes.regexInclude(); // TODO: Check regex if really independent
+            const insOuts = [
                 // For list file
                 '6017.R11 00 AF     include   "sound.asm" ', true, "sound.asm",
                 '39+ 6017           include   "sound.asm" ', true, "sound.asm",
@@ -84,7 +93,7 @@ suite('CommonRegexes', () => {
         });
 
 
-        test('regexModuleStruct', (done) => {
+        test('regexModuleStruct asm', (done) => {
             const regex = CommonRegexes.regexModuleStruct();
             const insOuts = [
                 // input-line, match, found-file
@@ -95,7 +104,15 @@ suite('CommonRegexes', () => {
                 '  module  m.aa.b', true, "m.aa.b",
                 ' module   ', false, "",
                 ' module', false, "",
+            ];
 
+            checkResultsMatchFound(regex, insOuts, 2);
+            done();
+        });
+
+        test('regexModuleStruct list', (done) => {
+            const regex = CommonRegexes.regexModuleStruct();
+            const insOuts = [
                 // For list file
                 "6017.R11 00 AF     module mod", true, "mod",
                 "39+ 6017           module mod", true, "mod",
@@ -108,7 +125,7 @@ suite('CommonRegexes', () => {
             done();
         });
 
-        test('regexEndModuleStruct', (done) => {
+        test('regexEndModuleStruct asm', (done) => {
             const regex = CommonRegexes.regexEndModuleStruct();
             const insOuts = [
                 // input-line, match, found-file
@@ -117,7 +134,15 @@ suite('CommonRegexes', () => {
                 ' ends', true,
                 'endmodule', false,
                 ' endmodule   mm', true,  // Is also found although this is not 100% correct
+            ];
 
+            checkResultsMatch(regex, insOuts);
+            done();
+        });
+
+        test('regexEndModuleStruct list', (done) => {
+            const regex = CommonRegexes.regexEndModuleStruct();
+            const insOuts = [
                 // For list file
                 "6017.R11 00 AF     endmodule", true,
                 "39+ 6017           endmodule ", true,
@@ -209,7 +234,7 @@ suite('CommonRegexes', () => {
             }
         }
 
-        test('regexLabelColon', (done) => {
+        test('regexLabelColon asm', (done) => {
             const regex = CommonRegexes.regexLabelColon();
             const insOuts = [
                 // input-line, found-prefix, found-label
@@ -232,7 +257,16 @@ suite('CommonRegexes', () => {
                 ".label:", "", "",
                 " .label:", "", "",
                 " .label: ", "", "",
+            ];
 
+            checkResults1Capture(regex, insOuts);
+            done();
+        });
+
+
+        test('regexLabelColon list', (done) => {
+            const regex = CommonRegexes.regexLabelColon();
+            const insOuts = [
                 // For list file
                 "6017.R11 00 AF     label:", "6017.R11 00 AF     ", "label",
                 "39+ 6017           label:", "39+ 6017           ", "label",

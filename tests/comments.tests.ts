@@ -264,7 +264,7 @@ suite('comments', () => {
         });
 
 
-        test('before label', () => {
+        test('before label asm', () => {
             let result = readCommentsForLine([
                 ' ; Bla1 ',
                 ' ; Bla2 ',
@@ -305,9 +305,11 @@ suite('comments', () => {
                 'label: ',
             ], 3);
             assert.equal(result.length, 0);
+        });
 
+        test('before label list', () => {
             // For list file
-            result = readCommentsForLine([
+            let result = readCommentsForLine([
                 '39+  6017              ; Bla1 ',
                 '6017.R11 00 AF         ;  Bla2 ',
                 '7002 00 70             ; Bla3 ',

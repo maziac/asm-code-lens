@@ -37,7 +37,7 @@ suite('DefinitionRegexes', () => {
     }
 
 
-    test('regexStructForWord', (done) => {
+    test('regexStructForWord asm', (done) => {
         const insOuts = [
             // search-word, input-line, should-match, found-prefix
             "m", "struct m", false, "",
@@ -45,7 +45,14 @@ suite('DefinitionRegexes', () => {
             "m", " STRUCT m", true, " STRUCT ",
             "m", " struct x", false, "",
             "Mm_0123456789", "  struct Mm_0123456789;", true, "  struct ",
+        ];
 
+        checkResultsSearchWord(DefinitionRegexes.regexStructForWord, insOuts);
+        done();
+    });
+
+    test('regexStructForWord list', (done) => {
+        const insOuts = [
             // For list file
             "m", "6017.R11 00 AF     struct m", true, "6017.R11 00 AF     struct ",
             "m", "39+ 6017           struct m", true, "39+ 6017           struct ",

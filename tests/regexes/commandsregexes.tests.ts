@@ -29,7 +29,7 @@ suite('CommandsRegexes', () => {
     }
 
 
-    test('regexLabelEquOrMacro', (done) => {
+    test('regexLabelEquOrMacro asm', (done) => {
         const regex = CommandsRegexes.regexLabelEquOrMacro();
         const insOuts = [
             // input-line, match
@@ -45,7 +45,15 @@ suite('CommandsRegexes', () => {
             "label equ;", true,
             "equ  ", false,
             " equ  ", false,
+        ];
 
+        checkResultsMatch(regex, insOuts);
+        done();
+    });
+
+    test('regexLabelEquOrMacro list', (done) => {
+        const regex = CommandsRegexes.regexLabelEquOrMacro();
+        const insOuts = [
             // For list file
             "6017.R11 00 AF     label: equ ", true,
             "39+ 6017           label: macro", true,
