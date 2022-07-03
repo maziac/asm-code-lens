@@ -1,3 +1,4 @@
+import { AllowedLanguageIds } from './../../src/languageId';
 import * as assert from 'assert';
 import {CommonRegexes} from './../../src/regexes/commonregexes';
 import {CompletionRegexes} from './../../src/regexes/completionregexes';
@@ -11,7 +12,7 @@ suite('CompletionRegexes', () => {
     suite('RegEx with search-word middle, ignore case', () => {
 
         // insOuts: search-word, input-line, should-match, found-prefix
-        function checkResultsSearchWord(func: (string) => RegExp, insOuts: (string | boolean)[]) {
+        function checkResultsSearchWord(func: (string, languagId?: AllowedLanguageIds) => RegExp, insOuts: (string | boolean)[], languageId: AllowedLanguageIds) {
             try {
                 // Check the test
                 const count = insOuts.length;
@@ -22,7 +23,7 @@ suite('CompletionRegexes', () => {
                     const input = insOuts[i + 1] as string;
                     const shouldMatch = insOuts[i + 2];
                     const prefix = insOuts[i + 3];
-                    const regex = func(searchWord);
+                    const regex = func(searchWord, languageId);
                     const result = regex.exec(input);
                     if (result) {
                         assert.ok(shouldMatch, "A match was found although no match should be found. Line " + (i / div) + ", searched for: '" + searchWord + "' in '" + input + "'");
@@ -41,10 +42,11 @@ suite('CompletionRegexes', () => {
 
         suite('regexEveryLabelColonForWord', () => {
 
-            test('find label', (done) => {
+            test('find label asm', (done) => {
                 const insOuts = [
                     // search-word, input-line, should-match, found-prefix
                     "label", "label:", true, "",
+                    "\\w*l\\w*b\\w*l", "label:", true, "",  // fuzzy
                     "label", "label: ", true, "",
                     "label", "label:;", true, "",
                     "label", "  label:", true, "  ",
@@ -78,10 +80,18 @@ suite('CompletionRegexes', () => {
                     "label", "LaBeL:", true, "",
 
                     "label", "@Label:", true, "@",
+                ];
 
+                checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelColonForWord, insOuts, 'asm-collection');
+                done();
+            });
+
+            test('find label list', (done) => {
+                const insOuts = [
                     // List file
                     "label", "  label:", true, "  ",
                     "label", "6017.R11 00 AF     label:", true, "6017.R11 00 AF     ",
+                    "\\w*l\\w*b\\w*l", "6017.R11 00 AF     label:", true, "6017.R11 00 AF     ",    // fuzzy
                     "label", "39+  6017          label:", true, "39+  6017          ",
                     "label", "7002 00 70         label:", true, "7002 00 70         ",
                     "label", "29    0012  D3 FE  label:", true, "29    0012  D3 FE  ",
@@ -97,11 +107,9 @@ suite('CompletionRegexes', () => {
                     "label", "626++C4D1 FE 10    @label:", true, "626++C4D1 FE 10    @",
                 ];
 
-                checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelColonForWord, insOuts);
+                checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelColonForWord, insOuts, 'asm-list-file');
                 done();
             });
-
-
         });
 
 
@@ -146,12 +154,13 @@ suite('CompletionRegexes', () => {
                 "label", "LaBeL", true, "",
             ];
 
-            checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelWithoutColonForWord, insOuts);
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelWithoutColonForWord, insOuts, 'asm-collection');
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryLabelWithoutColonForWord, insOuts, 'asm-list-file');
             done();
         });
 
 
-        test('regexEveryModuleForWord', (done) => {
+        test('regexEveryModuleForWord asm', (done) => {
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "m", "module m", false, "",
@@ -164,7 +173,15 @@ suite('CompletionRegexes', () => {
                 "m", " module maaa.bb", true, " module ",
                 "m", " module ma.b.c", true, " module ",
                 "m", " module a.m", false, "",
+            ];
 
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryModuleForWord, insOuts, 'asm-collection');
+            done();
+        });
+
+
+        test('regexEveryModuleForWord list', (done) => {
+            const insOuts = [
                 // For list file
                 "m", "6017.R11 00 AF     module m", true, "6017.R11 00 AF     module ",
                 "m", "39+ 6017           module m", true, "39+ 6017           module ",
@@ -173,12 +190,12 @@ suite('CompletionRegexes', () => {
                 "m", "626++C4D1 FE 10    module m", true, "626++C4D1 FE 10    module ",
             ];
 
-            checkResultsSearchWord(CompletionRegexesMock.regexEveryModuleForWord, insOuts);
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryModuleForWord, insOuts, 'asm-list-file');
             done();
         });
 
 
-        test('regexEveryMacroForWord', (done) => {
+        test('regexEveryMacroForWord asm', (done) => {
             const insOuts = [
                 "m", "macro m", false, "",
                 "m", " macro m", true, " macro ",
@@ -190,16 +207,28 @@ suite('CompletionRegexes', () => {
                 "m", " macro maaa.bb", true, " macro ",
                 "m", " macro ma.b.c", true, " macro ",
                 "m", " macro a.m", false, "",
-
-                // For list file
-                "m", "6017.R11 00 AF     macro m", true, "6017.R11 00 AF     macro ",
-                "m", "39+ 6017           macro m", true, "39+ 6017           macro ",
-                "m", "29    0012  D3 FE  macro m", true, "29    0012  D3 FE  macro ",
-                "m", "625++C4D1          macro m", true, "625++C4D1          macro ",
-                "m", "626++C4D1 FE 10    macro m", true, "626++C4D1 FE 10    macro ",
             ];
 
-            checkResultsSearchWord(CompletionRegexesMock.regexEveryMacroForWord, insOuts);
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryMacroForWord, insOuts, 'asm-collection');
+            done();
+        });
+
+
+        test('regexEveryMacroForWord list', (done) => {
+            const insOuts = [
+                "m", "macro m", false, "",
+                "m", " macro m", true, " macro ",
+                "m", " MACRO m", true, " MACRO ",
+                "m", " macro x", false, "",
+                "Mm_0123456789", "  macro Mm_0123456789;", true, "  macro ",
+                "m", "  macro  maaa", true, "  macro  ",
+                "m", " macro m.aaa", true, " macro ",
+                "m", " macro maaa.bb", true, " macro ",
+                "m", " macro ma.b.c", true, " macro ",
+                "m", " macro a.m", false, "",
+            ];
+
+            checkResultsSearchWord(CompletionRegexesMock.regexEveryMacroForWord, insOuts, 'asm-list-file');
             done();
         });
 
@@ -225,7 +254,8 @@ suite('CompletionRegexes', () => {
                 "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
             ];
 
-            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts);
+            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-collection');
+            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-list-file');
             done();
         });
     });

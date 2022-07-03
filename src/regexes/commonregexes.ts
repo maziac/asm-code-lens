@@ -124,11 +124,11 @@ export class CommonRegexes {
 	 * A different regex is returned dependent on languageId.
      */
     public static regexLabelColonForWord(searchWord: string, languageId: AllowedLanguageIds): RegExp {
-        if (languageId == 'asm-list-file') {
-            return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+        if (languageId == 'asm-list-file') { //TODO:optimize
+            return new RegExp('^(.*?\\s)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
         }
 		// "asm-collection"
-        return new RegExp('(^|^.*?\\s)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+        return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
     }
 
 

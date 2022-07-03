@@ -279,7 +279,7 @@ suite('CommonRegexes', () => {
 
 
     // insOuts: search-word, input-line, should-match, found-prefix
-    function checkResultsSearchWord(func: (string, languageId?) => RegExp, insOuts: (string | boolean)[], languageId?: AllowedLanguageIds) {
+    function checkResultsSearchWord(func: (string, languageId?) => RegExp, insOuts: (string | boolean)[], languageId: AllowedLanguageIds) {
         try {
             // Check the test
             const count = insOuts.length;
@@ -388,12 +388,12 @@ suite('CommonRegexes', () => {
                 "label", "xxx.label:", false, "",
             ];
 
-            checkResultsSearchWord(CommonRegexes.regexLabelWithoutColonForWord, insOuts);
+            checkResultsSearchWord(CommonRegexes.regexLabelWithoutColonForWord, insOuts, 'asm-collection');
             done();
         });
 
 
-        test('regexModuleForWord', (done) => {
+        test('regexModuleForWord asm', (done) => {
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "m", "module m", false, "",
@@ -401,7 +401,14 @@ suite('CommonRegexes', () => {
                 "m", " MODULE m", true, " MODULE ",
                 "m", " module x", false, "",
                 "Mm_0123456789", "  module Mm_0123456789;", true, "  module ",
+            ];
 
+            checkResultsSearchWord(CommonRegexes.regexModuleForWord, insOuts, 'asm-collection');
+            done();
+        });
+
+        test('regexModuleForWord list', (done) => {
+            const insOuts = [
                 // For list file
                 "m", "6017.R11 00 AF     module m", true, "6017.R11 00 AF     module ",
                 "m", "39+ 6017           module m", true, "39+ 6017           module ",
@@ -410,12 +417,12 @@ suite('CommonRegexes', () => {
                 "m", "626++C4D1 FE 10    module m", true, "626++C4D1 FE 10    module ",
             ];
 
-            checkResultsSearchWord(CommonRegexes.regexModuleForWord, insOuts);
+            checkResultsSearchWord(CommonRegexes.regexModuleForWord, insOuts, 'asm-list-file');
             done();
         });
 
 
-        test('regexMacroForWord', (done) => {
+        test('regexMacroForWord asm', (done) => {
             const insOuts = [
                 // search-word, input-line, should-match, found-prefix
                 "m", "macro m", false, "",
@@ -423,7 +430,14 @@ suite('CommonRegexes', () => {
                 "m", " MACRO m", true, " MACRO ",
                 "m", " macro x", false, "",
                 "Mm_0123456789", "  macro Mm_0123456789;", true, "  macro ",
+            ];
 
+            checkResultsSearchWord(CommonRegexes.regexMacroForWord, insOuts, 'asm-collection');
+            done();
+        });
+
+        test('regexMacroForWord list', (done) => {
+            const insOuts = [
                 // For list file
                 "m", "6017.R11 00 AF     macro m", true, "6017.R11 00 AF     macro ",
                 "m", "39+ 6017           macro m", true, "39+ 6017           macro ",
@@ -432,7 +446,7 @@ suite('CommonRegexes', () => {
                 "m", "626++C4D1 FE 10    macro m", true, "626++C4D1 FE 10    macro ",
             ];
 
-            checkResultsSearchWord(CommonRegexes.regexMacroForWord, insOuts);
+            checkResultsSearchWord(CommonRegexes.regexMacroForWord, insOuts, 'asm-list-file');
             done();
         });
 
@@ -458,7 +472,8 @@ suite('CommonRegexes', () => {
                 "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
             ];
 
-            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts);
+            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-collection');
+            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-list-file');
             done();
         });
     });
