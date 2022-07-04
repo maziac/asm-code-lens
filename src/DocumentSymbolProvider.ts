@@ -1,6 +1,8 @@
+import { AllowedLanguageIds } from './languageId';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {Config} from './config';
+import {DocSymbolRegexes} from './regexes/docsymbolregexes';
 
 
 
@@ -44,24 +46,27 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // a code-relative-label, an const-label (EQU) or a
         // data-label and creates symbols for each.
         // Those symbols are returned.
+        const languageId = document.languageId as AllowedLanguageIds;
         let symbols = new Array<vscode.DocumentSymbol>();
-        //const regexLabel = /^([.a-z_@][\w.]*\b)(:?)/i;
         let regexLabel;
         if (this.config.labelsWithColons && this.config.labelsWithoutColons)
-            regexLabel = /^(((@?)([a-z_][\w\.]*))(:?))/i;   // With or without colon
+            regexLabel = DocSymbolRegexes.regexLabelWithAndWithoutColon(languageId);
         else {
             if (this.config.labelsWithColons)
-                regexLabel = /^(((@?)([a-z_][\w\.]*)):)/i;   // With colon
-            else
-                regexLabel = /^(((@?)([a-z_][\w\.]*)))(?:\s|$)/i;   // Without colon
+                regexLabel = DocSymbolRegexes.regexLabelWithColon(languageId);
+            else {
+                if (languageId == 'asm-list-file')
+                    return undefined as any; // In list files labels without colons are not supported.
+                regexLabel = DocSymbolRegexes.regexLabelWithoutColon();
+            }
         }
 
-        const regexModule = /\s+\b(module\s+([a-z_][\w\.]*)|endmodule.*)/i;
-        const regexStruct = /\s+\b(struct\s+([a-z_][\w\.]*)|ends.*)/i;
+        const regexModule = DocSymbolRegexes.regexModuleLabel();
+        const regexStruct = DocSymbolRegexes.regexStructLabel();
         //const regexNotLabels = /^(include|if|endif|else|elif)$/i;
         const excludes = ['include', ...this.config.labelsExcludes];
-        const regexConst = /\b(equ)\s+(.*)/i;
-        const regexData = /\b(d[bcdghmsw]|def[bdghmsw])\b\s*(.*)/i;
+        const regexConst = DocSymbolRegexes.regexConst();
+        const regexData = DocSymbolRegexes.regexData();
         let lastSymbol;
         let lastSymbols = new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;
@@ -196,7 +201,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                         // It's something else than code
                         for (const elem of lastSymbols) {
                             elem.kind = kind;
-                            elem.detail = match![1] + ' ' + match![2].trimRight();
+                            elem.detail = match![1] + ' ' + match![2].trimEnd();
                         }
                         defaultSymbolKind = kind;
                     }
