@@ -1,7 +1,11 @@
 # Changelog
 
-# 1.11.0
-- +++++ disasm.lists support, somehow
+# 2.0.0
+- A lot of internal refactorimg and test cases.
+- List files and asm files are more separated now.
+- New language ID for list files. List file support for completion, rename, etc. added.
+- "asm-code-lens.includeFiles" removed. Not necessary anymore.
+- Better list file syntax highlighting.
 
 # 1.10.2
 - Multiline comments support (/* ... */)

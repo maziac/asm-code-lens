@@ -143,15 +143,17 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
 
     // Set search paths.
-    setGrepGlobPatterns(settings.includeFiles, settings.excludeFiles);
+    setGrepGlobPatterns(settings.excludeFiles);
 
     // Get some settings.
     const configWoRoot = getLabelsConfig();
 
 
-    // Note: don't add 'language' property, otherwise other extension with similar file pattern may not work.
-    // If the identifier is missing it also doesn't help to define it in package.json. And if "id" would be used it clashes again with other extensions.
-    const asmFiles: vscode.DocumentSelector = {scheme: "file", pattern: settings.includeFiles};
+    // Both "languages": asm files and list files.
+    const asmListFiles: vscode.DocumentSelector = [
+        {scheme: "file", language: 'asm-collection'},
+        {scheme: "file", language: 'asm-list-file'}
+    ];
 
     // Multiroot: do for all root folders:
     for (const rootFolder of wsFolders) {
@@ -164,51 +166,49 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         if (settings.enableCodeLenses) {
             // Register
             const codeLensProvider = new CodeLensProvider(config);
-            const provider = vscode.languages.registerCodeLensProvider('asm-collection', codeLensProvider);
-            const provider2 = vscode.languages.registerCodeLensProvider('asm-list-file', codeLensProvider);
-            regCodeLensProviders.set(rootFolder, provider); // TODO: provider2 cannot be stored yet.
+            const provider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
+            regCodeLensProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
-            context.subscriptions.push(provider2);
         }
 
         if (settings.enableHovering) {
             // Register
-            const provider = vscode.languages.registerHoverProvider(asmFiles, new HoverProvider(config));
+            const provider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider(config));
             regHoverProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
 
         if (settings.enableCompletions) {
             // Register
-            const provider = vscode.languages.registerCompletionItemProvider(asmFiles, new CompletionProposalsProvider(config));
+            const provider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider(config));
             regCompletionProposalsProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
 
         if (settings.enableGotoDefinition) {
             // Register
-            const provider = vscode.languages.registerDefinitionProvider(asmFiles, new DefinitionProvider(config));
+            const provider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider(config));
             regDefinitionProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
 
         if (settings.enableFindAllReferences) {
             // Register
-            const provider = vscode.languages.registerReferenceProvider(asmFiles, new ReferenceProvider(rootFolder));
+            const provider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider(rootFolder));
             regReferenceProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
 
         if (settings.enableRenaming) {
             // Register
-            const provider = vscode.languages.registerRenameProvider(asmFiles, new RenameProvider(rootFolder));
+            const provider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider(rootFolder));
             regRenameProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
 
         if (settings.enableOutlineView) {
             // Register
-            const provider = vscode.languages.registerDocumentSymbolProvider(asmFiles, new DocumentSymbolProvider(config));
+            const provider = vscode.languages.registerDocumentSymbolProvider(asmListFiles, new DocumentSymbolProvider(config));
             regDocumentSymbolProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }

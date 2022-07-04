@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
@@ -95,15 +94,11 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
 
 /**
  * Sets the glob patterns to check for files while grepping.
- * @param globInclude Include pattern
  * @param globExclude Exclude pattern
  */
-// TODO: change/remove
-export function setGrepGlobPatterns(globInclude: string, globExclude: string) {
-    grepGlobInclude = globInclude;
+export function setGrepGlobPatterns(globExclude: string) {
     grepGlobExclude = globExclude;
 }
-export let grepGlobInclude;
 export let grepGlobExclude;
 
 
@@ -119,7 +114,6 @@ export let grepGlobExclude;
 export async function grep(regex: RegExp, rootFolder: string, languageId: AllowedLanguageIds): Promise<GrepLocation[]> {
     const allMatches = new Map();
 
-    assert(grepGlobInclude);
     try {
         const globInclude = LanguageId.getGlobalIncludeForLanguageId(languageId);
         const uris = await vscode.workspace.findFiles(globInclude, grepGlobExclude);

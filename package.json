@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "1.11.0",
+    "version": "2.0.0",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -111,12 +111,6 @@
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable the possibility to rename labels. You need to reload the extension to take effect."
-                },
-                "asm-code-lens.includeFiles": {
-                    "scope": "window",
-                    "type": "string",
-                    "default": "**/*.{asm,inc,s,a80}",
-                    "markdownDescription": "Choose what files to include e.g `**/*.{asm,inc,s,a80,z80}`. If your assembler sources suffix is different then you can change it here."
                 },
                 "asm-code-lens.excludeFiles": {
                     "scope": "window",
