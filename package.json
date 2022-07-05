@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "2.0.0",
+    "version": "2.0.0-rc1",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -150,7 +150,7 @@
                 },
                 "asm-code-lens.labels.colon": {
                     "scope": "window",
-                    "markdownDescription": "Determines if labels with or without or both should be recognized.",
+                    "markdownDescription": "Determines if labels with or without or both should be recognized.\nPlease note: labels without colons cannot be determined in list files.",
                     "type": "string",
                     "enum": [
                         "Both",
