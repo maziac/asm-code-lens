@@ -25,7 +25,7 @@ export class Commands {
      */
     public static async findLabelsWithNoReference(config: Config, languageId: AllowedLanguageIds): Promise<void> {
         // Get regexes
-        const regexes = CommonRegexes.regexesLabel(config);
+        const regexes = CommonRegexes.regexesLabel(config, languageId);
         // Get all label definition (locations)
         const labelLocations = await grepMultiple(regexes, config.rootFolder, languageId);
 

@@ -235,7 +235,7 @@ suite('CommonRegexes', () => {
         }
 
         test('regexLabelColon asm', (done) => {
-            const regex = CommonRegexes.regexLabelColon();
+            const regex = CommonRegexes.regexLabelColon("asm-collection");
             const insOuts = [
                 // input-line, found-prefix, found-label
                 "label1:", "", "label1",
@@ -250,13 +250,13 @@ suite('CommonRegexes', () => {
                 "label ", "", "",
 
                 "label", "", "",
-                "  label2:", "  ", "label2",
-                "  label2: ", "  ", "label2",
-                "   label2:defw 898; comm", "   ", "label2",
-                "   label2.loop:", "   ", "label2.loop",
+                "@label2:", "@", "label2",
+                "label2: ", "", "label2",
+                " label2: ", "", "",
+                "label2:defw 898; comm", "", "label2",
+                "label2.loop:", "", "label2.loop",
                 ".label:", "", "",
                 " .label:", "", "",
-                " .label: ", "", "",
             ];
 
             checkResults1Capture(regex, insOuts);
@@ -265,7 +265,7 @@ suite('CommonRegexes', () => {
 
 
         test('regexLabelColon list', (done) => {
-            const regex = CommonRegexes.regexLabelColon();
+            const regex = CommonRegexes.regexLabelColon("asm-list-file");
             const insOuts = [
                 // For list file
                 "6017.R11 00 AF     label:", "6017.R11 00 AF     ", "label",
@@ -273,6 +273,9 @@ suite('CommonRegexes', () => {
                 "29    0012  D3 FE  label:", "29    0012  D3 FE  ", "label",
                 "625++C4D1          label:", "625++C4D1          ", "label",
                 "626++C4D1 FE 10    label:", "626++C4D1 FE 10    ", "label",
+                "626++C4D1 FE 10    @label:", "626++C4D1 FE 10    @", "label",
+                "626++C4D1 FE 10    label.la:", "626++C4D1 FE 10    ", "label.la",
+                "626++C4D1 FE 10    .la:", "", "",
             ];
 
             checkResults1Capture(regex, insOuts);

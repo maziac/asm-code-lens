@@ -175,14 +175,14 @@ suite('Performance', () => {
 
     suite('regexes', () => {
 
-        test('regexLabelColon', () => {
-            const speed = compare(CommonRegexes.regexLabelColon(), RefRegexes.regexLabelColon(), BASE_COUNT);
-            console.log('regexLabelColon: ', speed + '% speed');
+        test('regexLabelColon asm', () => {
+            const speed = compare(CommonRegexes.regexLabelColon("asm-collection"), RefRegexes.regexLabelColon(), BASE_COUNT);
+            console.log('regexLabelColon asm: ', speed + '% speed');
         });
 
-        test('regexLabelColonNew', () => {
-            const speed = compare(CommonRegexes.regexLabelColonNew(), RefRegexes.regexLabelColon(), BASE_COUNT);
-            console.log('regexLabelColonNew: ', speed + '% speed');
+        test('regexLabelColon list', () => {
+            const speed = compare(CommonRegexes.regexLabelColon("asm-list-file"), RefRegexes.regexLabelColon(), BASE_COUNT);
+            console.log('regexLabelColon list: ', speed + '% speed');
         });
 
         test('regexLabelWithoutColon', () => {
@@ -211,14 +211,14 @@ suite('Performance', () => {
         });
 
 
-        test('regexLabelColonForWord', () => {
+        test('regexLabelColonForWord asm', () => {
             const speed = compare(CommonRegexes.regexLabelColonForWord('pause', 'asm-collection'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
-            console.log('regexLabelColonForWord: ', speed + '% speed');
+            console.log('regexLabelColonForWord asm: ', speed + '% speed');
         });
 
-        test('regexLabelColonForWord', () => {
+        test('regexLabelColonForWord list', () => {
             const speed = compare(CommonRegexes.regexLabelColonForWord('pause', 'asm-list-file'), RefRegexes.regexLabelColonForWord('pause'), BASE_COUNT);
-            console.log('regexLabelColonForWord: ', speed + '% speed');
+            console.log('regexLabelColonForWord list: ', speed + '% speed');
         });
 
         test('regexLabelWithoutColonForWord', () => {

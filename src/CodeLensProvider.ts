@@ -59,8 +59,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         DonateInfo.checkDonateInfo();   // No need for 'await'.
 
         // Find all code lenses
+        const languageId = document.languageId as AllowedLanguageIds;
         const codeLenses: Array<vscode.CodeLens> = [];
-        const regexes = CommonRegexes.regexesLabel(this.config);
+        const regexes = CommonRegexes.regexesLabel(this.config, languageId);
         const matches = grepTextDocumentMultiple(document, regexes);
         // Loop all matches and create code lenses
         for (const fmatch of matches) {
