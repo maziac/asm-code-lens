@@ -133,10 +133,10 @@ export class CommonRegexes {
     public static regexLabelColonForWord(searchWord: string, languageId: AllowedLanguageIds): RegExp {
         if (languageId == 'asm-list-file') { //TODO:optimize
             //return new RegExp('^(.*?\\s)([[a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i');
-            return new RegexTwo(new RegExp(searchWord, 'i'), new RegExp('^(.*?\\s)([[a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i'));
+            return new RegexTwo(new RegExp(searchWord, 'i'), new RegExp('^(.*?\\s)([[a-zA-Z_\\.][\\w\\.]*)?\\b' + searchWord + ':'));
         }
 		// "asm-collection"
-        return new RegExp('^()([a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i');
+        return new RegExp('^()([a-zA-Z_\\.][\\w\\.]*)?\\b' + searchWord + ':');
     }
 
 
@@ -148,7 +148,7 @@ export class CommonRegexes {
      * Used by DefinitionProvider.
      */
     public static regexLabelWithoutColonForWord(searchWord: string): RegExp {
-        return new RegExp('^()([^0-9\\s][\\w\\.]*)?\\b' + searchWord + '\\b(?![:\\.])');
+        return new RegExp('^()([a-zA-Z_\\.][\\w\\.]*)?\\b' + searchWord + '\\b(?![:\\.])');
     }
 
 
@@ -184,6 +184,7 @@ export class CommonRegexes {
     public static regexModuleForWord(searchWord: string): RegExp {
         //return new RegExp('^(\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
         return new RegExp('^(.*?\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
+        //return new RegExp('^(.*?\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
     }
 
 
