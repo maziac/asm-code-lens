@@ -183,8 +183,8 @@ export class CommonRegexes {
      */
     public static regexModuleForWord(searchWord: string): RegExp {
         //return new RegExp('^(\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
-        return new RegExp('^(.*?\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
-        //return new RegExp('^(.*?\\s+(module|MODULE)\\s+)' + searchWord + '\\b');
+        return new RegexTwo(/module/i, new RegExp('^(.*\\s(module|MODULE)\\s+)' + searchWord + '\\b'));
+        //return new RegExp('^(.*\\s(module|MODULE)\\s+)' + searchWord + '\\b');
     }
 
 
@@ -196,7 +196,7 @@ export class CommonRegexes {
      */
     public static regexMacroForWord(searchWord: string): RegExp {
         //return new RegExp('^(\\s+(macro|MACRO)\\s+)' + searchWord + '\\b');
-        return new RegExp('^(.*?\\s+(macro|MACRO)\\s+)' + searchWord + '\\b');
+        return new RegexTwo(/macro/i, new RegExp('^(.*\\s(macro|MACRO)\\s+)' + searchWord + '\\b'));
     }
 
 

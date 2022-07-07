@@ -1,3 +1,4 @@
+import { RegexTwo } from './extendedregex';
 
 /**
  * All regexes that are used for the definition provider.
@@ -12,6 +13,7 @@ export class DefinitionRegexes {
 	 */
 	public static regexStructForWord(searchWord: string): RegExp {
 		//return new RegExp('^(\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
-		return new RegExp('^(.*?\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
+		//return new RegExp('^(.*?\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b');
+		return new RegexTwo(/struct/i, new RegExp('^(.*?\\s+(struct|STRUCT)\\s+)' + searchWord + '\\b'));
 	}
 }
