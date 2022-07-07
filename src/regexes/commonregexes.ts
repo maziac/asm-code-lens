@@ -1,5 +1,5 @@
 import { AllowedLanguageIds } from './../languageId';
-import {RegexIndexOf} from './extendedregex';
+import { RegexIndexOf, RegexTwo } from './extendedregex';
 
 
 
@@ -22,7 +22,8 @@ export class CommonRegexes {
      */
     public static regexLabelColon(languageId: AllowedLanguageIds): RegExp {
         if (languageId == 'asm-list-file') {
-            return new RegexIndexOf(':', /(^.*?\s+@?)\b([a-z_][\w\.]*)/);
+            return new RegexIndexOf(':', /(^.*\s@?)([a-z_][\w\.]*):/i);
+            //return new RegexIndexOf(':', /(^.*\s)(\w*)/);
         }
 		// "asm-collection"
         return /(^@?)\b([a-z_][\w\.]*):/i;
@@ -76,7 +77,8 @@ export class CommonRegexes {
      * Used by DefinitionProvider, RenameProvider.
      */
     public static regexInclude(): RegExp {
-        return /\s*INCLUDE\s+"(.*)"/i;
+        //return /\s*INCLUDE\s+"(.*)"/i;
+        return new RegexTwo(/INCLUDE/i, /\s*INCLUDE\s+"(.*)"/i);
     }
 
 
@@ -86,7 +88,8 @@ export class CommonRegexes {
      */
     public static regexModuleStruct(): RegExp {
         //return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
-        return /^.*?\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
+        //return /^.*\s(MODULE|STRUCT)\s+([\w\.]+)/i;
+        return new RegexTwo(/(MODULE|STRUCT)/i, /^.*\s(MODULE|STRUCT)\s+([\w\.]+)/i);
     }
 
 
@@ -95,7 +98,8 @@ export class CommonRegexes {
      * Used by getModule.
      */
     public static regexEndModuleStruct(): RegExp {
-        return /^.*?\s+(ENDMODULE|ENDS)\b/i;
+        //return /^.*?\s+(ENDMODULE|ENDS)\b/i;
+        return new RegexTwo(/(ENDMODULE|ENDS)/i, /^.*\s(ENDMODULE|ENDS)\b/i);
     }
 
 
@@ -128,10 +132,11 @@ export class CommonRegexes {
      */
     public static regexLabelColonForWord(searchWord: string, languageId: AllowedLanguageIds): RegExp {
         if (languageId == 'asm-list-file') { //TODO:optimize
-            return new RegExp('^(.*?\\s)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+            //return new RegExp('^(.*?\\s)([[a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i');
+            return new RegexTwo(new RegExp(searchWord, 'i'), new RegExp('^(.*?\\s)([[a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i'));
         }
 		// "asm-collection"
-        return new RegExp('^(\\s*)([^0-9\\s][\\w\\.]*)?\\b' + searchWord + ':');
+        return new RegExp('^()([a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i');
     }
 
 

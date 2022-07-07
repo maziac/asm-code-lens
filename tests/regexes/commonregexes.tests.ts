@@ -239,6 +239,7 @@ suite('CommonRegexes', () => {
             const insOuts = [
                 // input-line, found-prefix, found-label
                 "label1:", "", "label1",
+                "LABEL1:", "", "LABEL1",
                 "label1:  defb 0 ; comment", "", "label1",
                 "Label1:", "", "Label1",
                 "label_0123456789: ", "", "label_0123456789",
@@ -246,6 +247,7 @@ suite('CommonRegexes', () => {
                 "0l:", "", "",
                 "_l: ", "", "_l",
                 "label.init: ", "", "label.init",
+                "_LABEL.INIT_: ", "", "_LABEL.INIT_",
                 "label._init:", "", "label._init",
                 "label ", "", "",
 
@@ -269,12 +271,14 @@ suite('CommonRegexes', () => {
             const insOuts = [
                 // For list file
                 "6017.R11 00 AF     label:", "6017.R11 00 AF     ", "label",
+                "6017.R11 00 AF     LABEL:", "6017.R11 00 AF     ", "LABEL",
                 "39+ 6017           label:", "39+ 6017           ", "label",
                 "29    0012  D3 FE  label:", "29    0012  D3 FE  ", "label",
                 "625++C4D1          label:", "625++C4D1          ", "label",
                 "626++C4D1 FE 10    label:", "626++C4D1 FE 10    ", "label",
                 "626++C4D1 FE 10    @label:", "626++C4D1 FE 10    @", "label",
                 "626++C4D1 FE 10    label.la:", "626++C4D1 FE 10    ", "label.la",
+                "626++C4D1 FE 10    _LABEL.LA_:", "626++C4D1 FE 10    ", "_LABEL.LA_",
                 "626++C4D1 FE 10    .la:", "", "",
             ];
 
@@ -287,6 +291,7 @@ suite('CommonRegexes', () => {
             const regex = CommonRegexes.regexLabelWithoutColon();
             const insOuts = [
                 "label1", "", "label1",
+                "LABEL1", "", "LABEL1",
                 "label1  defb 0 ; comment", "", "label1",
                 "Label1", "", "Label1",
                 "label_0123456789 ", "", "label_0123456789",
@@ -294,6 +299,7 @@ suite('CommonRegexes', () => {
                 "0l", "", "",
                 "_l ", "", "_l",
                 "label.init ", "", "label.init",
+                "_LABEL.INIT_ ", "", "_LABEL.INIT_",
                 "label._init", "", "label._init",
                 "label ", "", "label",
 
@@ -354,9 +360,9 @@ suite('CommonRegexes', () => {
                 "label", "label:", true, "",
                 "label", "label: ", true, "",
                 "label", "label:;", true, "",
-                "label", "  label:", true, "  ",
-                "label", "   label: ", true, "   ",
-                "label", " label:;", true, " ",
+                "label", "  label:", false, "  ",
+                "label", "   label: ", false, "   ",
+                "label", " label:;", false, " ",
                 "label", "label", false, "",
                 "label", "label ", false, "",
                 "label", "label;", false, "",
