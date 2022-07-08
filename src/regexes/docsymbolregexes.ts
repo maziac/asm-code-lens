@@ -11,9 +11,6 @@ export class DocSymbolRegexes {
 	 * Capture groups for "@label:"
 	 * 1 = "@label:"
 	 * 2 = "@label"
-	 * //3 = "@"
-	 * //4 = "label"
-	 * //5 = ":"	//TODO: Required?
 	 */
 	public static regexLabelWithAndWithoutColon(languageId: AllowedLanguageIds): RegExp {
 		if (languageId == 'asm-list-file')
@@ -27,8 +24,6 @@ export class DocSymbolRegexes {
 	 * Capture groups for "@label:"
 	 * 1 = "@label:"
 	 * 2 = "@label"
-	 * //3 = "@"
-	 * //4 = "label"
 	 */
 	public static regexLabelWithColon(languageId: AllowedLanguageIds): RegExp {
 		if (languageId == 'asm-list-file')
@@ -42,8 +37,6 @@ export class DocSymbolRegexes {
 	 * Capture groups for "@label:"
 	 * 1 = "@label"
 	 * 2 = "@label"
-	 * //3 = "@"
-	 * //4 = "label"
 	 * Note: there is no version for list files as labels without colons cannot be
 	 * safely determined.
 	 */

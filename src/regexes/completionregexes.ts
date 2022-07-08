@@ -99,10 +99,10 @@ export class CompletionRegexes {
 	 */
 	public static regexEveryMacroForWord(fuzzySearchWord: string, languageId: AllowedLanguageIds): RegExp {
 		if (languageId == 'asm-list-file') {
-			return new RegExp('^(\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+			return new RegExp('^(.*?\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\._]*', 'i');
 		}
 		// "asm-collection"
-		return new RegExp('^(.*?\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\.]*', 'i');
+		return new RegExp('^(\\s+(MACRO)\\s+)' + fuzzySearchWord + '[\\w\\._]*', 'i');
 	}
 }
 

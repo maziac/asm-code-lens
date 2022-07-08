@@ -64,7 +64,7 @@ export class RegexTwo extends RegExp {
 	 * @param regex Is evaluated is simlpeRegex finds a match.
 	 */
 	constructor(simpleRegex: RegExp, regex: RegExp) {
-		super(regex);
+		super(regex);	// The last regex needs to be the "real" one to ensure that also 'index' and 'global' can be used.
 		this.simpleRegex = simpleRegex;
 	}
 

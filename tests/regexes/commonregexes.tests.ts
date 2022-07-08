@@ -78,7 +78,7 @@ suite('CommonRegexes', () => {
 
 
         test('regexInclude list', (done) => {
-            const regex = CommonRegexes.regexInclude(); // TODO: Check regex if really independent
+            const regex = CommonRegexes.regexInclude();
             const insOuts = [
                 // For list file
                 '6017.R11 00 AF     include   "sound.asm" ', true, "sound.asm",
@@ -280,6 +280,7 @@ suite('CommonRegexes', () => {
                 "626++C4D1 FE 10    label.la:", "626++C4D1 FE 10    ", "label.la",
                 "626++C4D1 FE 10    _LABEL.LA_:", "626++C4D1 FE 10    ", "_LABEL.LA_",
                 "626++C4D1 FE 10    .la:", "", "",
+                "# file closed: main.asm", "", ""
             ];
 
             checkResults1Capture(regex, insOuts);
@@ -513,6 +514,8 @@ suite('CommonRegexes', () => {
                 "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
                 "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
                 "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
+
+                "main", "# file closed: main.asm", false, "",
             ];
 
             checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-collection');

@@ -1,5 +1,3 @@
-
-
 import * as assert from 'assert';
 import {readCommentsForLine, setCustomCommentPrefix, stripAllComments} from '../src/comments';
 

@@ -103,6 +103,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         // Search the references
         const searchWord = codeLens.symbol;
         const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
+        console.log('searchWord', searchWord);
 
         const doc = codeLens.document;
         const pos = codeLens.range.start;

@@ -1,6 +1,5 @@
 import { AllowedLanguageIds } from './../../src/languageId';
 import * as assert from 'assert';
-import {CommonRegexes} from './../../src/regexes/commonregexes';
 import {CompletionRegexes} from './../../src/regexes/completionregexes';
 
 
@@ -229,33 +228,6 @@ suite('CompletionRegexes', () => {
             ];
 
             checkResultsSearchWord(CompletionRegexesMock.regexEveryMacroForWord, insOuts, 'asm-list-file');
-            done();
-        });
-
-
-        test('regexAnyReferenceForWord', (done) => {  // NOSONAR
-            const insOuts = [
-                // search-word, input-line, should-match, found-prefix
-                "label", "label ", true, "",
-                "label", " label", true, " ",
-                "label", " jr label", true, " jr ",
-                "label", " jr label2", false, "",
-                "label", " jr zlabel", false, "",
-
-                "label", "  jr nz,label", true, "  jr nz,",
-                "label", "  jr nz,label.init", true, "  jr nz,",
-                "label", "  jr nz,init.label.l3", true, "  jr nz,init.",
-                "label", "  jr nz,init.label", true, "  jr nz,init.",
-                "label", "  ld a,(init.label)", true, "  ld a,(init.",
-
-                "label", "  ld a,(ix+init.label)", true, "  ld a,(ix+init.",
-                "label", "  ld a,(ix-init.label)", true, "  ld a,(ix-init.",
-                "label", "  ld a,(5+init.label)", true, "  ld a,(5+init.",
-                "label", "  ld a,(5-init.label*8)", true, "  ld a,(5-init.",
-            ];
-
-            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-collection');
-            checkResultsSearchWord(CommonRegexes.regexAnyReferenceForWord, insOuts, 'asm-list-file');
             done();
         });
     });

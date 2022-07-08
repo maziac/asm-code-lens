@@ -1,4 +1,4 @@
-import {RegexIndexOf} from "./extendedregex";
+import {RegexTwo} from "./extendedregex";
 
 
 /**
@@ -13,7 +13,8 @@ export class RenameRegexes {
 	 * Used by RenameProvider.
 	 */
 	public static regexAnyReferenceForWordGlobal(searchWord: string): RegExp {
-		return new RegexIndexOf(searchWord, new RegExp('(.*?)\\b' + searchWord + '\\b', 'g'));
+		//return new RegexIndexOf(searchWord, new RegExp('(.*?)\\b' + searchWord + '\\b', 'g'));
+		return new RegexTwo(new RegExp('\\b' + searchWord + '\\b'), new RegExp('(.*?)\\b' + searchWord + '\\b', 'g'));
 	}
 
 }

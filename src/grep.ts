@@ -349,7 +349,7 @@ export function getLastLabelPart(label: string): string {
  * Changes the last part of the label into a regex that
  * allows various other letters in between.
  * E.g. 'sound.initial' will become 'sound.\\w*i\\w*n\\w*i\\w*t\\w*a\\w*l\\w*
- * so that the regular exception would also match if not all
+ * so that the regular expression would also match if not all
  * characters are in the right order.
  * E.g. this would match: 'sound.initialize'.
  * @param label  E.g. 'explosion.init' or 'check_all'
@@ -486,7 +486,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
     let regexModuleLabel;
 
     // Check for full name
-    if (!checkFullName) {
+    if (!checkFullName) { // TODO= false for Code Lenses ?
         // Do not care
         //searchLabel.label = searchLabel.label.toLowerCase();
         //searchLabel.moduleLabel = searchLabel.moduleLabel.toLowerCase();

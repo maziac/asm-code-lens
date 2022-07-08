@@ -273,23 +273,33 @@ suite('Performance', () => {
         });
 
         test('regexAnyReferenceForWordGlobal short word', () => {
-            const speed = compare(RenameRegexes.regexAnyReferenceForWordGlobal('a'), RefRegexes.regexAnyReferenceForWordGlobal('a'), true, true, BASE_COUNT);
+            const speed = compare(RenameRegexes.regexAnyReferenceForWordGlobal('a'), RefRegexes.regexAnyReferenceForWordGlobal('a'), true, true, BASE_COUNT/10);
             console.log('regexAnyReferenceForWordGlobal short word: ', speed + '% speed');
         });
 
         test('regexAnyReferenceForWordGlobal', () => {
-            const speed = compare(RenameRegexes.regexAnyReferenceForWordGlobal('pause'), RefRegexes.regexAnyReferenceForWordGlobal('pause'), true, true, BASE_COUNT);
+            const speed = compare(RenameRegexes.regexAnyReferenceForWordGlobal('pause'), RefRegexes.regexAnyReferenceForWordGlobal('pause'), true, true, BASE_COUNT/10);
             console.log('regexAnyReferenceForWordGlobal: ', speed + '% speed');
         });
 
-        test('regexEveryLabelColonForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('a'), RefRegexes.regexEveryLabelWithoutColonForWord('a'), true, true, BASE_COUNT);
-            console.log('regexEveryLabelColonForWord short word: ', speed + '% speed');
+        test('regexEveryLabelColonForWord short word asm', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('a'), RefRegexes.regexEveryLabelWithoutColonForWord('a'), true, false, BASE_COUNT);
+            console.log('regexEveryLabelColonForWord short word asm: ', speed + '% speed');
         });
 
-        test('regexEveryLabelColonForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('pause'), RefRegexes.regexEveryLabelWithoutColonForWord('pause'), true, true, BASE_COUNT);
-            console.log('regexEveryLabelColonForWord: ', speed + '% speed');
+        test('regexEveryLabelColonForWord asm', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('pause'), RefRegexes.regexEveryLabelWithoutColonForWord('pause'), true, false, BASE_COUNT);
+            console.log('regexEveryLabelColonForWord asm: ', speed + '% speed');
+        });
+
+        test('regexEveryLabelColonForWord short word list', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('a'), RefRegexes.regexEveryLabelWithoutColonForWord('a'), false, true, BASE_COUNT);
+            console.log('regexEveryLabelColonForWord short word list: ', speed + '% speed');
+        });
+
+        test('regexEveryLabelColonForWord list', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryLabelWithoutColonForWord('pause'), RefRegexes.regexEveryLabelWithoutColonForWord('pause'), false, true, BASE_COUNT);
+            console.log('regexEveryLabelColonForWord list: ', speed + '% speed');
         });
 
         test('regexEveryLabelWithoutColonForWord short word', () => {
@@ -302,24 +312,44 @@ suite('Performance', () => {
             console.log('regexEveryLabelWithoutColonForWord: ', speed + '% speed');
         });
 
-        test('regexEveryModuleForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('a'), RefRegexes.regexEveryModuleForWord('a'), true, true, BASE_COUNT);
-            console.log('regexEveryModuleForWord short word: ', speed + '% speed');
+        test('regexEveryModuleForWord short word asm', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('a'), RefRegexes.regexEveryModuleForWord('a'), true, false, BASE_COUNT);
+            console.log('regexEveryModuleForWord short word asm: ', speed + '% speed');
         });
 
-        test('regexEveryModuleForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('TestSuite_Fill'), RefRegexes.regexEveryModuleForWord('TestSuite_Fill'), true, true, BASE_COUNT);
-            console.log('regexEveryModuleForWord: ', speed + '% speed');
+        test('regexEveryModuleForWord asm', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('TestSuite_Fill'), RefRegexes.regexEveryModuleForWord('TestSuite_Fill'), true, false, BASE_COUNT);
+            console.log('regexEveryModuleForWord asm: ', speed + '% speed');
         });
 
-        test('regexEveryMacroForWord short word', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('a'), RefRegexes.regexEveryMacroForWord('a'), true, true, BASE_COUNT);
-            console.log('regexEveryMacroForWord short word: ', speed + '% speed');
+        test('regexEveryModuleForWord short word list', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('a'), RefRegexes.regexEveryModuleForWord('a'), false, true, BASE_COUNT);
+            console.log('regexEveryModuleForWord short word list: ', speed + '% speed');
         });
 
-        test('regexEveryMacroForWord', () => {
-            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('WAIT_SPACE'), RefRegexes.regexEveryMacroForWord('WAIT_SPACE'), true, true, BASE_COUNT);
-            console.log('regexEveryMacroForWord: ', speed + '% speed');
+        test('regexEveryModuleForWord list', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryModuleForWord('TestSuite_Fill'), RefRegexes.regexEveryModuleForWord('TestSuite_Fill'), false, true, BASE_COUNT);
+            console.log('regexEveryModuleForWord list: ', speed + '% speed');
+        });
+
+        test('regexEveryMacroForWord short word asm', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('a'), RefRegexes.regexEveryMacroForWord('a'), true, false, BASE_COUNT);
+            console.log('regexEveryMacroForWord short word asm: ', speed + '% speed');
+        });
+
+        test('regexEveryMacroForWord asm', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('WAIT_SPACE'), RefRegexes.regexEveryMacroForWord('WAIT_SPACE'), true, false, BASE_COUNT);
+            console.log('regexEveryMacroForWord asm: ', speed + '% speed');
+        });
+
+        test('regexEveryMacroForWord short word list', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('a'), RefRegexes.regexEveryMacroForWord('a'), false, true, BASE_COUNT);
+            console.log('regexEveryMacroForWord short word list: ', speed + '% speed');
+        });
+
+        test('regexEveryMacroForWord list', () => {
+            const speed = compare(CompletionRegexesMock.regexEveryMacroForWord('WAIT_SPACE'), RefRegexes.regexEveryMacroForWord('WAIT_SPACE'), false, true, BASE_COUNT);
+            console.log('regexEveryMacroForWord list: ', speed + '% speed');
         });
     });
 });

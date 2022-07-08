@@ -22,8 +22,7 @@ export class CommonRegexes {
      */
     public static regexLabelColon(languageId: AllowedLanguageIds): RegExp {
         if (languageId == 'asm-list-file') {
-            return new RegexIndexOf(':', /(^.*\s@?)([a-z_][\w\.]*):/i);
-            //return new RegexIndexOf(':', /(^.*\s)(\w*)/);
+            return new RegexIndexOf(':', /(^[^#]*\s@?)([a-z_][\w\.]*):/i);
         }
 		// "asm-collection"
         return /(^@?)\b([a-z_][\w\.]*):/i;
@@ -131,8 +130,7 @@ export class CommonRegexes {
 	 * A different regex is returned dependent on languageId.
      */
     public static regexLabelColonForWord(searchWord: string, languageId: AllowedLanguageIds): RegExp {
-        if (languageId == 'asm-list-file') { //TODO:optimize
-            //return new RegExp('^(.*?\\s)([[a-z_\\.][\\w\\.]*)?\\b' + searchWord + ':', 'i');
+        if (languageId == 'asm-list-file') {
             return new RegexTwo(new RegExp(searchWord, 'i'), new RegExp('^(.*?\\s)([[a-zA-Z_\\.][\\w\\.]*)?\\b' + searchWord + ':'));
         }
 		// "asm-collection"
@@ -207,7 +205,7 @@ export class CommonRegexes {
      * Used by resolveCodeLens.
      */
     public static regexAnyReferenceForWord(searchWord: string): RegExp {
-        return new RegexIndexOf(searchWord, new RegExp('^(.*)\\b' + searchWord + '\\b'));
+        return new RegexIndexOf(searchWord, new RegExp('^([^#]*)\\b' + searchWord + '\\b'));
     }
 
 

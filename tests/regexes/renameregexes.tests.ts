@@ -43,7 +43,7 @@ suite('RenameRegexes', () => {
     }
 
 
-    test('regexAnyReferenceForWordGlobal', (done) => {  // NOSONAR
+    test('regexAnyReferenceForWordGlobal', () => {  // NOSONAR
         const insOuts = [
             // search-word, input-line, should-match, found-prefix
             "label", "label ", 1, "",
@@ -67,6 +67,5 @@ suite('RenameRegexes', () => {
         ];
 
         checkResultsSearchWordGlobal(RenameRegexes.regexAnyReferenceForWordGlobal, insOuts);
-        done();
     });
 });
