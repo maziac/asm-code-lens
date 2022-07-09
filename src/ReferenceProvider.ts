@@ -1,3 +1,4 @@
+import { Config } from './config';
 import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
@@ -9,18 +10,19 @@ import { grep, reduceLocations } from './grep';
  * ReferenceProvider for assembly language.
  */
 export class ReferenceProvider implements vscode.ReferenceProvider {
-    protected rootFolder: string;   // The root folder of the project.
+
+    // The configuration to use.
+    protected config: Config;
 
 
     /**
      * Constructor.
-     * @param rootFolder Stores the root folder for multiroot projects.
+     * @param config The configuration (preferences) to use.
      */
-    constructor(rootFolder: string) {
+    constructor(config: Config) {
         // Store
-        this.rootFolder = rootFolder;
+        this.config = config;
     }
-
 
     /**
      * Called from vscode if the user selects "Find all references".
@@ -32,7 +34,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
     public async provideReferences(document: vscode.TextDocument, position: vscode.Position, options: {includeDeclaration: boolean}, token: vscode.CancellationToken): Promise<vscode.Location[]> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.rootFolder) < 0)
+        if (docPath.indexOf(this.config.rootFolder) < 0)
                 return [];   // Skip because path belongs to different workspace
         // Path is from right project -> search
         return this.search(document, position);
@@ -49,8 +51,9 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
 
         const languageId = document.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.rootFolder, languageId);
-        const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
+        const locations = await grep(searchRegex, this.config.rootFolder, languageId);
+        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         return reducedLocations;
     }
 

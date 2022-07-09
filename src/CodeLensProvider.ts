@@ -6,6 +6,7 @@ import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
 
 
+
 /**
  * A CodeLens for the assembler files.
  * Extends CodeLens by the TextDocument.
@@ -91,6 +92,10 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         return codeLenses;
     }
 
+    // TODO: REMOVE
+    protected async delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     /**
      * Called by vscode if the codelens should be resolved (displayed).
@@ -100,10 +105,14 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token
      */
     public async resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Promise<vscode.CodeLens> {
+        await this.delay(500);
+
+        //console.log('*****************************************');
+        //console.log('resolveCodeLens start: ', codeLens.document.uri.fsPath);
         // Search the references
         const searchWord = codeLens.symbol;
         const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
-        console.log('searchWord', searchWord);
+        //console.log('searchWord', searchWord);
 
         const doc = codeLens.document;
         const pos = codeLens.range.start;
@@ -112,7 +121,8 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const languageId = doc.languageId as AllowedLanguageIds;
         const locations = await grep(searchRegex, this.config.rootFolder, languageId);
         // Remove any locations because of module information (dot notation)
-        const reducedLocations = await reduceLocations(locations, doc.fileName, pos, true, true);
+        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const reducedLocations = await reduceLocations(regexLbls, locations, doc.fileName, pos, true, true);
         // create title
         const count = reducedLocations.length;
         let title = count + ' reference';
@@ -128,6 +138,8 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 reducedLocations //reference locations
             ]
         };
+        //console.log('resolveCodeLens end: ', codeLens.document.uri.fsPath);
+        //console.log('#####');
         return codeLens;
     }
 

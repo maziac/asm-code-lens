@@ -1,3 +1,4 @@
+import { Config } from './config';
 import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
@@ -12,16 +13,18 @@ import {RenameRegexes} from './regexes/renameregexes';
  * User selects "Rename symbol".
  */
 export class RenameProvider implements vscode.RenameProvider {
-    protected rootFolder: string;   // The root folder of the project.
+
+    // The configuration to use.
+    protected config: Config;
 
 
     /**
      * Constructor.
-     * @param rootFolder Stores the root folder for multiroot projects.
+     * @param config The configuration (preferences) to use.
      */
-    constructor(rootFolder: string) {
+    constructor(config: Config) {
         // Store
-        this.rootFolder = rootFolder;
+        this.config = config;
     }
 
 
@@ -35,7 +38,7 @@ export class RenameProvider implements vscode.RenameProvider {
     public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit|undefined> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.rootFolder)) {
+        if (!docPath.includes(this.config.rootFolder)) {
             // Skip because path belongs to different workspace
             return undefined;
         }
@@ -54,8 +57,9 @@ export class RenameProvider implements vscode.RenameProvider {
         const searchRegex = RenameRegexes.regexAnyReferenceForWordGlobal(oldName);
 
         const languageId = document.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.rootFolder, languageId);
-        const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
+        const locations = await grep(searchRegex, this.config.rootFolder, languageId);
+        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
 
         // Change to WorkSpaceEdits.
         // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.

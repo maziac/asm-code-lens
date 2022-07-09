@@ -149,6 +149,7 @@ suite('CommonRegexes', () => {
                 "29    0012  D3 FE  endmodule", true,
                 "625++C4D1          endmodule ", true,
                 "626++C4D1 FE 10    endmodule", true,
+                "626++C4D1 FE 10    ends", true,
             ];
 
             checkResultsMatch(regex, insOuts);

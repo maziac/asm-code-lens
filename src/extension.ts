@@ -194,14 +194,14 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
         if (settings.enableFindAllReferences) {
             // Register
-            const provider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider(rootFolder));
+            const provider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider(config));
             regReferenceProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }
 
         if (settings.enableRenaming) {
             // Register
-            const provider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider(rootFolder));
+            const provider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider(config));
             regRenameProviders.set(rootFolder, provider);
             context.subscriptions.push(provider);
         }

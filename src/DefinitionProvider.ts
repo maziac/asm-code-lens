@@ -99,7 +99,8 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         regexes.push(searchSjasmStruct);
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);
-        const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, /\w/);
+        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         // There should be only one location.
         // Anyhow return the whole array.
         return reducedLocations;

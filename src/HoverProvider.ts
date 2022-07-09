@@ -73,7 +73,8 @@ export class HoverProvider implements vscode.HoverProvider {
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, languageId);
         // Reduce the found locations.
-        const reducedLocations = await reduceLocations(locations, document.fileName, position, false, true, regexEnd);
+        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, regexEnd);
 
         // Now read the comment lines above the document.
         // Normally there is only one but e.g. if there are 2 modules with the same name there could be more.

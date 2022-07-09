@@ -409,12 +409,14 @@ function concatenateModuleAndLabel(module: string, label: string): string {
  * 3. The document is parsed from begin to position for 'MODULE' info.
  * 4. The MODULE info is added to the original label (this is now the searchLabel).
  * 4. Both are returned.
+ * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
  * @param fileName The filename of the document.
  * @param pos The position that points to the label.
  * @param documents All dirty vscode.TextDocuments.
  * @returns { label, module.label }
  */
-export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
+export function getLabelAndModuleLabel(regexLbls: RegExp[], fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
+    //console.log('getLabelAndModuleLabel start: ', fileName);
     // Get line/column
     const row = pos.line;
     const clmn = pos.character;
@@ -438,25 +440,32 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
     // 1. Get original label
     const line = lines[row];
     let {label, preString} = getCompleteLabel(line, clmn, regexEnd);
+    //console.log('getLabelAndModuleLabel: label=' + label + ', preString=' + preString);
 
     // 2. If local label: The document is parsed from position to begin for a non-local label.
     if (label.startsWith('.')) {
         // Local label, e.g. ".loop"
-        const nonLocalLabel = getNonLocalLabel(lines, row);
-        label = nonLocalLabel + label;
+        const nonLocalLabel = getNonLocalLabel(regexLbls, lines, row);
+        if(nonLocalLabel)
+            label = nonLocalLabel + label;
     }
 
     // 3. The document is parsed from begin to 'pos' for 'MODULE' info.
     const module = getModule(lines, row);
+    //console.log('getLabelAndModuleLabel: module="' + module+'"');
 
     // 4. The MODULE info is added to the original label
     const moduleLabel = concatenateModuleAndLabel(module, label);
+    //console.log('getLabelAndModuleLabel: moduleLabel="' + moduleLabel+'"');
 
-    // Check that no character is preceding the label.
-    if (preString.length == 0) {
+    // Check that no character is preceding the label or label ends with ':' (for list files)
+    const k = preString.length + label.length;
+    if (preString.length == 0 || line[k] == ':')
+    {
         // It's the definition of a label, so moduleLabel is the only possible label.
         label = moduleLabel;
     }
+    //console.log('getLabelAndModuleLabel end: ', fileName);
     return {label, moduleLabel};
 }
 
@@ -469,6 +478,7 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
  * 3. 'searchLabel' is compared with all labels.
  * 4. If 'searchLabel' is not equal to the direct label and not equal to the
  *    concatenated label it is removed from 'locations'
+ * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
  * @param locations An array with found locations of grepped labels.
  * @param document The document of the original label.
  * @param position The position inside the document with the original label.
@@ -476,20 +486,18 @@ export function getLabelAndModuleLabel(fileName: string, pos: vscode.Position, d
  * @param checkFullName true (default) = During label check the full name is checked. false (e.g.
  * for CompletionProvider) = It is checked with 'startsWith'.
  */
-export async function reduceLocations(locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
+export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
+    //console.log('reduceLocations');
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
     // 1. Get module label
-    const searchLabel = getLabelAndModuleLabel(docFileName, position, docs, regexEnd);
+    const searchLabel = getLabelAndModuleLabel(regexLbls, docFileName, position, docs, regexEnd);
 
     // For item completion:
     let regexLabel;
     let regexModuleLabel;
 
     // Check for full name
-    if (!checkFullName) { // TODO= false for Code Lenses ?
-        // Do not care
-        //searchLabel.label = searchLabel.label.toLowerCase();
-        //searchLabel.moduleLabel = searchLabel.moduleLabel.toLowerCase();
+    if (!checkFullName) {
         regexLabel = getRegExFromLabel(searchLabel.label);
         regexModuleLabel = getRegExFromLabel(searchLabel.moduleLabel);
     }
@@ -517,7 +525,7 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
             continue;
         }
 
-        const mLabel = getLabelAndModuleLabel(fileName, pos, docs, regexEnd);
+        const mLabel = getLabelAndModuleLabel(regexLbls, fileName, pos, docs, regexEnd);
         // Assign to location
         loc.label = mLabel.label;
         loc.moduleLabel = mLabel.moduleLabel;
@@ -565,35 +573,34 @@ export async function reduceLocations(locations: GrepLocation[], docFileName: st
 /**
  * Searches 'lines' from 'index' to 0 and returns the
  * first non local label.
+ * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
  * @param lines An array of strings containing the complete text.
  * @param index The starting line (the line where the label was found.
  * @returns A string like 'check_collision'. undefined if nothing found.
  */
-export function getNonLocalLabel(lines: Array<string>, index: number): string {
+export function getNonLocalLabel(regexLbls: RegExp[], lines: Array<string>, index: number): string {
     // Find all "something:" (labels)
-    const regex = /^\s*\b([a-z_][\w\.]*):/i;
+    //const regex = /^\s*\b([a-z_][\w\.]*):/i;
     // Find all sjasmplus labels without ":"
-    const regex2 = /^([a-z_][\w\.]*)\b(?!:)/i;
+    //const regex2 = /^([a-z_][\w\.]*)\b(?!:)/i;
 
     // Loop
     let match;
+    const regexesLenIndex = regexLbls.length - 1;
     for (; index >= 0; index--) {
         const line = lines[index];
-        match = regex.exec(line);
-        if (match)
-            break;
-        match = regex2.exec(line);
-        if (match)
-            break;
+        for (let k = regexesLenIndex; k >= 0; k--) {
+            const regex = regexLbls[k];
+            match = regex.exec(line);
+            if (match) {
+                const label = match[2];
+                return label;
+            }
+        }
     }
 
     // Out of bounds check
-    if (!match)
-        return undefined as any;
-
-    // Return
-    const label = match[1];
-    return label;
+    return undefined as any;
 }
 
 

@@ -140,9 +140,11 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         //console.log('Completions for: '+ label);
 
         // Get the first non-local label
+        const languageId = document.languageId as AllowedLanguageIds;
+        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
         let nonLocalLabel;  // Only used for local labels
         if (label.startsWith('.')) {
-            nonLocalLabel = getNonLocalLabel(lines, row);
+            nonLocalLabel = getNonLocalLabel(regexLbls, lines, row);
         }
 
         // Search
@@ -150,7 +152,6 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const fuzzySearchWord = CommonRegexes.regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon
-        const languageId = document.languageId as AllowedLanguageIds;
         const regexes = CompletionRegexes.regexesEveryLabelForWord(fuzzySearchWord, this.config, languageId);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = CompletionRegexes. regexEveryModuleForWord(fuzzySearchWord, languageId);
@@ -161,7 +162,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 
         const locations = await grepMultiple(regexes, this.config.rootFolder, languageId);
         // Reduce the found locations.
-        const reducedLocations = await reduceLocations(locations, document.fileName, position, true, false);
+        const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, true, false);
         // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)
         const proposals = new Map<string, vscode.CompletionItem>();
 

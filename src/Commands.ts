@@ -32,7 +32,7 @@ export class Commands {
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
         // Convert this to an array of labels.
-        this.findLabels(labelLocations, config.rootFolder, languageId);
+        this.findLabels(labelLocations, config, languageId);
     }
 
 
@@ -42,8 +42,8 @@ export class Commands {
      * @param locLabels A list of GrepLocations.
      * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
      */
-    protected static async findLabels(locLabels, rootFolder: string, languageId: AllowedLanguageIds): Promise<void> {
-        const baseName = path.basename(rootFolder);
+    protected static async findLabels(locLabels, cfg: Config, languageId: AllowedLanguageIds): Promise<void> {
+        const baseName = path.basename(cfg.rootFolder);
         const typename = (languageId == 'asm-list-file') ? 'list' : 'asm';
         output.appendLine("Unreferenced labels for " + typename + " files, " + baseName + ":");
         output.show(true);
@@ -52,6 +52,7 @@ export class Commands {
             let labelsCount = locLabels.length;
             let unrefLabels = 0;
             const regexEqu = CommandsRegexes.regexLabelEquOrMacro();
+            const regexLbls = CommonRegexes.regexesLabel(cfg, languageId);
             for (const locLabel of locLabels) {
                 // Skip all EQU and MACRO
                 const fm: FileMatch = locLabel.fileMatch;
@@ -73,9 +74,9 @@ export class Commands {
 
                 // And search for references
                 const regex = CommonRegexes.regexAnyReferenceForWord(searchLabel);
-                const locations = await grep(regex, rootFolder, languageId);
+                const locations = await grep(regex, cfg.rootFolder, languageId);
                 // Remove any locations because of module information (dot notation)
-                const reducedLocations = await reduceLocations(locations, fileName, pos, true, true);
+                const reducedLocations = await reduceLocations(regexLbls, locations, fileName, pos, true, true);
                 // Check count
                 const count = reducedLocations.length;
                 if (count == 0) {
@@ -101,4 +102,3 @@ export class Commands {
     }
 
 }
-

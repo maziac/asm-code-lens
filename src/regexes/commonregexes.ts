@@ -60,7 +60,7 @@ export class CommonRegexes {
             regexes.push(searchRegex);
         }
         // Find all sjasmplus labels without ":" in the document
-        if (cfg.labelsWithoutColons) {
+        if (cfg.labelsWithoutColons && languageId == "asm-collection") {
             const searchRegex2 = CommonRegexes.regexLabelWithoutColon();
             regexes.push(searchRegex2);
         }
