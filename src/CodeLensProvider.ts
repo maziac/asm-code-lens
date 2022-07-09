@@ -92,10 +92,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         return codeLenses;
     }
 
-    // TODO: REMOVE
-    protected async delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
 
     /**
      * Called by vscode if the codelens should be resolved (displayed).
@@ -105,8 +101,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param token
      */
     public async resolveCodeLens?(codeLens: AsmCodeLens, token: vscode.CancellationToken): Promise<vscode.CodeLens> {
-        await this.delay(500);
-
         //console.log('*****************************************');
         //console.log('resolveCodeLens start: ', codeLens.document.uri.fsPath);
         // Search the references
