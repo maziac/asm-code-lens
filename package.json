@@ -9,6 +9,7 @@
     },
     "license": "MIT",
     "keywords": [
+        "asm-code-lens",
         "assembler",
         "references",
         "code lens",

@@ -22,7 +22,7 @@ export class DonateInfo extends DonateInfoInner {
 	 * @param items The items to choose from.
 	 */
 	public static async showInfoMessage(message: string, ...items: string[]): Promise<string | undefined> {
-		return vscode.window.showErrorMessage(message, ...items);
+		return vscode.window.showInformationMessage(message, ...items);
 	}
 
 
