@@ -6,6 +6,7 @@
 - New language ID for list files. List file support for completion, rename, etc. added.
 - Setting "asm-code-lens.includeFiles" removed. Not necessary anymore.
 - Better list file syntax highlighting.
+- Embedded markdown list file syntax highlighting (~~~list}.
 
 # 1.10.2
 - Multiline comments support (/* ... */)

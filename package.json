@@ -228,6 +228,9 @@
             },
             {
                 "id": "asm-markdown-codeblock"
+            },
+            {
+                "id": "asm-list-markdown-codeblock"
             }
         ],
         "grammars": [
@@ -245,6 +248,14 @@
                 "language": "asm-markdown-codeblock",
                 "scopeName": "markdown.asm.codeblock",
                 "path": "./grammar/asm_markdown_codeblock.json",
+                "injectTo": [
+                    "text.html.markdown"
+                ]
+            },
+            {
+                "language": "asm-list-markdown-codeblock",
+                "scopeName": "markdown.asm.list.codeblock",
+                "path": "./grammar/asm_list_markdown_codeblock.json",
                 "injectTo": [
                     "text.html.markdown"
                 ]
