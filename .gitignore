@@ -1,4 +1,5 @@
 .DS_Store
+.VSCodeCounter
 node_modules/
 out/
 /*.vsix
