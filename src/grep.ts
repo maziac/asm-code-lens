@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
-import {concatenateModuleAndLabel, FileInfo, getCompleteLabel, getLabelAndModuleLabelFromFileInfo, getModuleFileInfo, getNonLocalLabel} from './grepextra';
+import {FileInfo, getCompleteLabel, getLabelAndModuleLabelFromFileInfo, getModuleFileInfo} from './grepextra';
 import {AllowedLanguageIds, LanguageId}  from './languageId';
 import {CommonRegexes} from './regexes/commonregexes';
 
