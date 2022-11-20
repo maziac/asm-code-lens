@@ -82,7 +82,7 @@ export class Commands {
                 if (count == 0) {
                     // No reference
                     unrefLabels++;
-                    output.appendLine(label + ", file://" + fileName + "#" + (pos.line + 1));
+                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1));
                 }
                 // Check for last search
                 labelsCount--;
