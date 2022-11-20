@@ -1,10 +1,11 @@
-import { CommonRegexes } from './regexes/commonregexes';
+import {CommonRegexes} from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {Config} from './config';
-import {getCompleteLabel, getModule, getNonLocalLabel, grepMultiple, reduceLocations} from './grep';
+import {getModule, grepMultiple, reduceLocations} from './grep';
 import {CompletionRegexes} from './regexes/completionregexes';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {AllowedLanguageIds} from './languageId';
+import {getCompleteLabel, getNonLocalLabel} from './grepextra';
 
 
 /// All additional completions like Z80 instructions and assembler

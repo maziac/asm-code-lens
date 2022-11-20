@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
+import {concatenateModuleAndLabel, FileInfo, getCompleteLabel, getLabelAndModuleLabelFromFileInfo, getModuleFileInfo, getNonLocalLabel} from './grepextra';
 import {AllowedLanguageIds, LanguageId}  from './languageId';
 import {CommonRegexes} from './regexes/commonregexes';
 
@@ -89,6 +90,31 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
         }
     }
     return foundDoc;
+}
+
+
+/**
+ * Returns an array of strings for the given file.
+ * Reads it either from the open editor or from the file itself.
+ * @param fileName The filename of the document.
+ * @param documents All dirty vscode.TextDocuments.
+ */
+function getLinesForFile(filePath: string, documents: vscode.TextDocument[]) {
+    // Check if file is opened in editor
+    let foundDoc = getTextDocument(filePath, documents);
+
+    let lines: Array<string>;
+    // Different handling: open text document or file on disk
+    if (foundDoc) {
+        // Doc is opened in text editor (and dirty).
+        lines = foundDoc.getText().split('\n');
+    }
+    else {
+        // Doc is read from disk.
+        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+        lines = linesData.split('\n');
+    }
+    return lines;
 }
 
 
@@ -384,93 +410,6 @@ export function getRegExFromLabel(label: string): RegExp {
 
 
 /**
- * Concatenates a module and a label.
- * @param module E.g. 'sound.effects'.
- * @param label  E.g. 'explosion'
- * @return E.g. sound.effects.explosion. If module is undefined or an empty string then label is returned unchanged.
- */
-function concatenateModuleAndLabel(module: string, label: string): string {
-    if (!module)
-        return label;
-    if (module.length == 0)
-        return label;
-
-    const mLabel = module + '.' + label;
-    return mLabel;
-}
-
-
-/**
- * Returns the label and the module label (i.e. module name + label) for a given
- * file and position.
- * The file may be on disk or opened in the editor.
- * 1. The original label is constructed from the document and position info.
- * 2. If local label: The document is parsed from position to begin for a non-local label.
- * 3. The document is parsed from begin to position for 'MODULE' info.
- * 4. The MODULE info is added to the original label (this is now the searchLabel).
- * 4. Both are returned.
- * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
- * @param fileName The filename of the document.
- * @param pos The position that points to the label.
- * @param documents All dirty vscode.TextDocuments.
- * @returns { label, module.label }
- */
-export function getLabelAndModuleLabel(regexLbls: RegExp[], fileName: string, pos: vscode.Position, documents: Array<vscode.TextDocument>, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
-    //console.log('getLabelAndModuleLabel start: ', fileName);
-    // Get line/column
-    const row = pos.line;
-    const clmn = pos.character;
-
-    // Check if file is opened in editor
-    const filePath = fileName;
-    let foundDoc = getTextDocument(filePath, documents);
-
-    let lines: Array<string>;
-    // Different handling: open text document or file on disk
-    if (foundDoc) {
-        // Doc is opened in text editor (and dirty).
-        lines = foundDoc.getText().split('\n');
-    }
-    else {
-        // Doc is read from disk.
-        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-        lines = linesData.split('\n');
-    }
-
-    // 1. Get original label
-    const line = lines[row];
-    let {label, preString} = getCompleteLabel(line, clmn, regexEnd);
-    //console.log('getLabelAndModuleLabel: label=' + label + ', preString=' + preString);
-
-    // 2. If local label: The document is parsed from position to begin for a non-local label.
-    if (label.startsWith('.')) {
-        // Local label, e.g. ".loop"
-        const nonLocalLabel = getNonLocalLabel(regexLbls, lines, row);
-        if(nonLocalLabel)
-            label = nonLocalLabel + label;
-    }
-
-    // 3. The document is parsed from begin to 'pos' for 'MODULE' info.
-    const module = getModule(lines, row);
-    //console.log('getLabelAndModuleLabel: module="' + module+'"');
-
-    // 4. The MODULE info is added to the original label
-    const moduleLabel = concatenateModuleAndLabel(module, label);
-    //console.log('getLabelAndModuleLabel: moduleLabel="' + moduleLabel+'"');
-
-    // Check that no character is preceding the label or label ends with ':' (for list files)
-    const k = preString.length + label.length;
-    if (preString.length == 0 || line[k] == ':')
-    {
-        // It's the definition of a label, so moduleLabel is the only possible label.
-        label = moduleLabel;
-    }
-    //console.log('getLabelAndModuleLabel end: ', fileName);
-    return {label, moduleLabel};
-}
-
-
-/**
  * Reduces the number of found 'locations'. Is used to get rid of wrong references
  * by checking the dot notation/module label.
  * 1. Get the module-label (=searchLabel).
@@ -490,7 +429,13 @@ export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocati
     //console.log('reduceLocations');
     const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
     // 1. Get module label
-    const searchLabel = getLabelAndModuleLabel(regexLbls, docFileName, position, docs, regexEnd);
+    const docLines = getLinesForFile(docFileName, docs);
+    const docModStructInfos = getModuleFileInfo(docLines);
+    const docFileInfo = {
+        lines: docLines,
+        modStructInfos: docModStructInfos
+    };
+    const searchLabel = getLabelAndModuleLabelFromFileInfo(regexLbls, docFileInfo, position.line, position.character, regexEnd);
 
     // For item completion:
     let regexLabel;
@@ -503,16 +448,31 @@ export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocati
     }
 
     // Copy locations
-    let redLocs = [...locations]
+    const redLocs = [...locations];
+
+    // Create map to cache files/module/label information
+    const filesInfo = new Map<string, FileInfo>();
 
     // 2. Get the module-labels for each found location and the corresponding file.
     let i = redLocs.length;
     //let removedSameLine = -1;
     while (i--) {    // loop backwards
-        // get fileName
+        // Get fileName
         const loc = redLocs[i];
         const fileName = loc.uri.fsPath;
         const pos = loc.range.start;
+
+        // Check if file was already analyze for modules and labels
+        let fileInfo = filesInfo[fileName];
+        if (!fileInfo) {
+            const lines = getLinesForFile(fileName, docs);
+            const modStructInfos = getModuleFileInfo(lines);
+            fileInfo = {
+                lines,
+                modStructInfos
+            };
+            filesInfo[fileName] = fileInfo;
+        }
 
         // Check if same location as searchLabel.
         if (removeOwnLocation
@@ -525,7 +485,7 @@ export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocati
             continue;
         }
 
-        const mLabel = getLabelAndModuleLabel(regexLbls, fileName, pos, docs, regexEnd);
+        const mLabel = getLabelAndModuleLabelFromFileInfo(regexLbls, fileInfo, pos.line, pos.character, regexEnd);
         // Assign to location
         loc.label = mLabel.label;
         loc.moduleLabel = mLabel.moduleLabel;
@@ -571,40 +531,6 @@ export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocati
 
 
 /**
- * Searches 'lines' from 'index' to 0 and returns the
- * first non local label.
- * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
- * @param lines An array of strings containing the complete text.
- * @param index The starting line (the line where the label was found.
- * @returns A string like 'check_collision'. undefined if nothing found.
- */
-export function getNonLocalLabel(regexLbls: RegExp[], lines: Array<string>, index: number): string {
-    // Find all "something:" (labels)
-    //const regex = /^\s*\b([a-z_][\w\.]*):/i;
-    // Find all sjasmplus labels without ":"
-    //const regex2 = /^([a-z_][\w\.]*)\b(?!:)/i;
-
-    // Loop
-    let match;
-    const regexesLenIndex = regexLbls.length - 1;
-    for (; index >= 0; index--) {
-        const line = lines[index];
-        for (let k = regexesLenIndex; k >= 0; k--) {
-            const regex = regexLbls[k];
-            match = regex.exec(line);
-            if (match) {
-                const label = match[2];
-                return label;
-            }
-        }
-    }
-
-    // Out of bounds check
-    return undefined as any;
-}
-
-
-/**
  * Searches 'lines' from beginning to 'len' and returns the (concatenated)
  * module label.
  * 'lines' are searched for 'MODULE' and 'ENDMODULE' to retrieve the module information.
@@ -640,51 +566,6 @@ export function getModule(lines: Array<string>, len: number): string {
 
     return mLabel;
 }
-
-
-/**
- * Returns the complete label around the 'startIndex'.
- * I.e. startIndex might point to the last part of the label then this
- * function returns the complete label.
- * @param lineContents The text of the line.
- * @param startIndex The index into the label.
- * @param regexEnd Defaults to /[\w\.]/ . I.e. the label is returned with all subparts.
- * Note: The HoverProvider might use /\w/ so that the sub parts are not returned.
- * @returns {label, preString} The found label and the part of the string that
- * is found before 'label'.
- */
-export function getCompleteLabel(lineContents: string, startIndex: number, regexEnd = /[\w\.]/): {label: string, preString: string} {
-    // Find end of label.
-    const len = lineContents.length;    // REMARK: This can lead to error: "length of undefined"
-    let k: number;
-    for (k = startIndex; k < len; k++) {
-        const s = lineContents.charAt(k);
-        // Allow [a-z0-9_]
-        const match = regexEnd.exec(s);
-        if (!match)
-            break;
-    }
-    // k points now after the label
-
-    // Find start of label.
-    let i;
-    for (i = startIndex - 1; i >= 0; i--) {
-        const s = lineContents.charAt(i);
-        // Allow [a-z0-9_.]
-        const match = /[\w\.]/.exec(s);
-        if (!match)
-            break;
-    }
-    // i points one before the start of the label
-    i++;
-
-    // Get complete string
-    const label = lineContents.substring(i, k);
-    const preString = lineContents.substring(0, i);
-
-    return {label, preString};
-}
-
 
 
 /**

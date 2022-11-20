@@ -1,10 +1,11 @@
 import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
-import {grepMultiple, reduceLocations, getCompleteLabel} from './grep';
+import {grepMultiple, reduceLocations} from './grep';
 import * as fs from 'fs';
 import {Config} from './config';
 import {readCommentsForLine} from './comments';
+import {getCompleteLabel} from './grepextra';
 
 
 /**
