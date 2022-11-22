@@ -1,5 +1,8 @@
 # Changelog
 
+# 2.0.1
+- Code lens: improved performance for pathologic source files.
+
 # 2.0.0
 - A lot of internal refactoring and test cases.
 - List files and asm files are more separated now.

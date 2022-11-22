@@ -83,6 +83,9 @@ export class Commands {
                     // No reference
                     unrefLabels++;
                     output.appendLine(label + ", file://" + fileName + "#" + (pos.line + 1));
+                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1) + ":1");
+                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1));
+                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1) + ":" + pos.character);
                 }
                 // Check for last search
                 labelsCount--;
