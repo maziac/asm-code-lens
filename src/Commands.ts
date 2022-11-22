@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import {Config} from './config';
 import {FileMatch, grep, grepMultiple, reduceLocations} from './grep';
 import {CommandsRegexes} from './regexes/commandsregexes';
+import * as os from 'node:os';
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -49,6 +50,7 @@ export class Commands {
         output.show(true);
 
         try {
+            const osName = os.platform();   // e.g. "win32", "darwin", "linux"
             let labelsCount = locLabels.length;
             let unrefLabels = 0;
             const regexEqu = CommandsRegexes.regexLabelEquOrMacro();
@@ -82,10 +84,10 @@ export class Commands {
                 if (count == 0) {
                     // No reference
                     unrefLabels++;
-                    output.appendLine(label + ", file://" + fileName + "#" + (pos.line + 1));
-                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1) + ":1");
-                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1));
-                    output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1) + ":" + pos.character);
+                    if(osName === "win32")
+                        output.appendLine(label + ", " + fileName + ":" + (pos.line + 1));
+                    else
+                        output.appendLine(label + ", file://" + fileName + "#" + (pos.line + 1));
                 }
                 // Check for last search
                 labelsCount--;
