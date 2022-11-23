@@ -1,7 +1,7 @@
 # ASM and List Files
 
 *.asm and *.list files are very similar.
-Normally the main difference is that a list has extra info of the binary assembly.
+Normally the main difference is that a list file has extra info of the binary assembly.
 I.e. the lines begin with the address and the bytes contents, followed by a copy from the line in the asm file.
 
 These also requires to handle them slightly different.
@@ -22,7 +22,7 @@ The corresponding line in the asm file could be:
 
 If the grammar of the asm file is now used for the list file a few unwanted effects could happen.
 
-E.g. the register AF in Z80 is also a valid hex number and e.g. the following list file line
+E.g. the register AF in Z80 is also a valid hex number and the following list file line
 ~~~asm
 28    0011  AF          	xor a
 ~~~

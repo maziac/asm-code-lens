@@ -99,7 +99,7 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
  * @param fileName The filename of the document.
  * @param documents All dirty vscode.TextDocuments.
  */
-function getLinesForFile(filePath: string, documents: vscode.TextDocument[]) {
+function getLinesForFile(filePath: string, documents: vscode.TextDocument[]): string[] {
     // Check if file is opened in editor
     let foundDoc = getTextDocument(filePath, documents);
 
@@ -114,6 +114,9 @@ function getLinesForFile(filePath: string, documents: vscode.TextDocument[]) {
         const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
         lines = linesData.split('\n');
     }
+
+    // Strip comments
+    stripAllComments(lines);
     return lines;
 }
 
