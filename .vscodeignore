@@ -8,4 +8,7 @@ src/**
 **/*.map
 .gitignore
 tsconfig.json
+.github
+design/
+notes.md
 

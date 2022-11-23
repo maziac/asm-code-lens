@@ -2,6 +2,7 @@
 
 # 2.0.1
 - Code lens: improved performance for pathologic source files.
+- File references in output window are now correctly formatted as links for Windows.
 
 # 2.0.0
 - A lot of internal refactoring and test cases.
