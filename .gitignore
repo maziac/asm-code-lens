@@ -7,3 +7,4 @@ out/
 logs/
 coverage/
 notes.md
+.vscode/settings.json
