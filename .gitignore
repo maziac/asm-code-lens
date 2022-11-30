@@ -3,6 +3,7 @@
 node_modules/
 out/
 /*.vsix
+**/*.zip
 logs/
 coverage/
 notes.md

@@ -1,5 +1,8 @@
 # Changelog
 
+# 2.0.2
+- Fixed #83: incorrect behavior "$problem-matcher-sjasmplus". Now also supports absolute paths.
+
 # 2.0.1
 - Code lens: improved performance for pathologic source files.
 - File references in output window are now correctly formatted as links for Windows.
