@@ -2,6 +2,7 @@
 
 # 2.0.2
 - Fixed #83: incorrect behavior "$problem-matcher-sjasmplus". Now also supports absolute paths.
+- Fixed #82: Another codepages. Hovering now honors the vscode code page settings of the file.
 
 # 2.0.1
 - Code lens: improved performance for pathologic source files.

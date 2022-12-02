@@ -11,4 +11,6 @@ tsconfig.json
 .github
 design/
 notes.md
+*.vsix
+*.vsix.zip
 

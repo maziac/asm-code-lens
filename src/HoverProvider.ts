@@ -2,7 +2,6 @@ import { AllowedLanguageIds } from './languageId';
 import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
 import {grepMultiple, reduceLocations} from './grep';
-import * as fs from 'fs';
 import {Config} from './config';
 import {readCommentsForLine} from './comments';
 import {getCompleteLabel} from './grepextra';
@@ -89,7 +88,8 @@ export class HoverProvider implements vscode.HoverProvider {
             // Get comments
             const lineNr = loc.range.start.line;
             const filePath = loc.uri.fsPath;
-            const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
+            const doc = await vscode.workspace.openTextDocument(filePath);
+            const linesData = doc.getText();
             const lines = linesData.split('\n');
 
             // Now find all comments above the found line
