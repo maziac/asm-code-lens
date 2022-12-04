@@ -13,21 +13,6 @@ import {RenameRegexes} from './regexes/renameregexes';
  * User selects "Rename symbol".
  */
 export class RenameProvider implements vscode.RenameProvider {
-
-    // The configuration to use.
-    protected config: Config;
-
-
-    /**
-     * Constructor.
-     * @param config The configuration (preferences) to use.
-     */
-    constructor(config: Config) {
-        // Store
-        this.config = config;
-    }
-
-
     /**
      * Called from vscode if the user selects "Rename symbol".
      * @param document The current document.
@@ -36,29 +21,24 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param token
      */
     public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit|undefined> {
-        // First check for right path
-        const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.wsFolderPath)) {
-            // Skip because path belongs to different workspace
-            return undefined;
+        // Check which workspace
+        const config = Config.getConfigForDoc(document);
+        if (!config) {
+            vscode.window.showWarningMessage("Document is in no workspace folder.");
+            return new vscode.WorkspaceEdit();  // Empty = no change
         }
-        // Path is from right project -> rename
-        return this.rename(document, position, newName);
-    }
+        if (!config.enableRenaming) {
+            vscode.window.showWarningMessage("Renaming is disabled for this workspace folder.");
+            return new vscode.WorkspaceEdit();  // Empty = no change
+        }
 
-
-    /**
-     * Searches for oldName in all files and replaces it with newName.
-     * @param oldName The name to replace.
-     * @param newName The new name.
-     */
-    public async rename(document: vscode.TextDocument, position: vscode.Position, newName: string): Promise<vscode.WorkspaceEdit> {
+        // Rename
         const oldName = document.getText(document.getWordRangeAtPosition(position));
         const searchRegex = RenameRegexes.regexAnyReferenceForWordGlobal(oldName);
 
         const languageId = document.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.config.wsFolderPath, languageId, this.config.excludeFiles);
-        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const locations = await grep(searchRegex, config.wsFolderPath, languageId, config.excludeFiles);
+        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
 
         // Change to WorkSpaceEdits.
