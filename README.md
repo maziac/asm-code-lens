@@ -24,7 +24,7 @@ It provides support for:
 - Outline view: View your labels (code, data, constants) in the outline view.
 - Rename symbols.
 - Code Lens: Above symbols the number of references is shown. Clicking it reveals the references.
-- Command: asm-code-lens.find-labels-with-no-reference to find all labels that are not EQU and are not referenced. Useful to find dead code.
+- Find all labels that are not EQU and are not referenced. Useful to find dead code.
 - Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and many other assemblers that use a standard notation for labels (e.g. "label:").
 
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
@@ -79,6 +79,15 @@ An outline view of the assembly can be shown like this:
 So be aware that it's decision might be wrong sometimes.
 
 Note: The outline view also supports sjasmplus MODULE information.
+
+
+## Find Dead Code
+
+With a right click on a text editor (an asm file) and by selecting 'Find Labels with no Reference'
+![](assets/find-labels-with-no-reference.jpg)
+you get a list of labels (in the OUTPUT pane) that are not referenced anywhere in all files.
+
+This can be useful to find any dead code because code or data that is not referenced is probably not used or the label is superfluous.
 
 
 ## Problem Matcher

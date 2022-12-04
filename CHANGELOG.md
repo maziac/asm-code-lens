@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.1.0
+- Fixed #84: Refactoring of all vscode providers. Especially the code lens provider. The way there were used did not work in all multiroot configurations. This should be fixed now.
+- 'Find Labels with no Reference' now only prints unused labels of the current workspace folder.
+
 # 2.0.2
 - Fixed #83: incorrect behavior "$problem-matcher-sjasmplus". Now also supports absolute paths.
 - Fixed #82: Another codepages. Hovering now honors the vscode code page settings of the file.
