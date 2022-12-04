@@ -80,7 +80,7 @@
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "Enable/disable the of showing information while hovering labels etc."
+                    "markdownDescription": "Enable/disable showing the comments while hovering labels etc."
                 },
                 "asm-code-lens.enableCompletions": {
                     "scope": "resource",

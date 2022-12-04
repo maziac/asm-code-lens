@@ -40,6 +40,10 @@ export class Config {
 	// true if code lenses should be enabled.
 	public static globalEnableOutlineView: boolean;
 
+	// The custom prefix to use for toggle line comment. Depends on language
+	// id and can therefore only be set globally.
+	public static globalToggleCommentPrefix: string;
+
 	// A map with the configs for all workspace folders
 	public static configs = new Map<string, Config>();
 
@@ -87,7 +91,11 @@ export class Config {
 	/** Loops through all workspace folders and gets there configuration.
 	 */
 	public static init() {
-		// Clear global variables
+		// Set global variables (variables with 'window' scope)
+		const globalSettings = PackageInfo.getConfiguration();
+		Config.globalToggleCommentPrefix = globalSettings.comments.toggleLineCommentPrefix;
+
+		// Clear global/local variables (variables with 'resource' scope)
 		Config.globalEnableCodeLenses = false;
 		Config.globalEnableHovering = false;
 		Config.globalEnableCompletions = false;
