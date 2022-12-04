@@ -10,21 +10,6 @@ import {DocSymbolRegexes} from './regexes/docsymbolregexes';
  * ReferenceProvider for assembly language.
  */
 export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
-
-    // The configuration to use.
-    protected config: Config;
-
-
-    /**
-     * Constructor.
-     * @param config The configuration (preferences) to use.
-     */
-    constructor(config: Config) {
-        // Store
-        this.config = config;
-    }
-
-
     /**
      * Called by vscode to provide symbol information for the given document.
      * I.e. returns all labels of a document.
@@ -35,10 +20,10 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
      * signaled by returning `undefined`, `null`, or an empty array.
      */
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
-        // First check for right path
-        const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.wsFolderPath))
-            return undefined as any; // Path is wrong.
+        // Check which workspace
+        const config = Config.getConfigForDoc(document);
+        if (!config?.enableOutlineView)
+            return undefined;   // Don't provide any outline
 
         // Loops through the whole document line by line and
         // extracts the labels.
@@ -49,10 +34,10 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         const languageId = document.languageId as AllowedLanguageIds;
         let symbols = new Array<vscode.DocumentSymbol>();
         let regexLabel;
-        if (this.config.labelsWithColons && this.config.labelsWithoutColons)
+        if (config.labelsWithColons && config.labelsWithoutColons)
             regexLabel = DocSymbolRegexes.regexLabelWithAndWithoutColon(languageId);
         else {
-            if (this.config.labelsWithColons)
+            if (config.labelsWithColons)
                 regexLabel = DocSymbolRegexes.regexLabelWithColon(languageId);
             else {
                 if (languageId == 'asm-list-file')
@@ -64,7 +49,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         const regexModule = DocSymbolRegexes.regexModuleLabel();
         const regexStruct = DocSymbolRegexes.regexStructLabel();
         //const regexNotLabels = /^(include|if|endif|else|elif)$/i;
-        const excludes = ['include', ...this.config.labelsExcludes];
+        const excludes = ['include', ...config.labelsExcludes];
         const regexConst = DocSymbolRegexes.regexConst();
         const regexData = DocSymbolRegexes.regexData();
         let lastSymbol;
