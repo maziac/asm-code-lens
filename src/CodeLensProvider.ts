@@ -1,6 +1,6 @@
-import { AllowedLanguageIds } from './languageId';
-import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
+import {AllowedLanguageIds} from './languageId';
+import { CommonRegexes } from './regexes/commonregexes';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
@@ -12,6 +12,7 @@ import {DonateInfo} from './donate/donateinfo';
  * Extends CodeLens by the TextDocument.
  */
 class AsmCodeLens extends vscode.CodeLens {
+    public config: any; // TODO
     public document: vscode.TextDocument;
     public symbol: string;  // The searched symbol (text).
 
@@ -21,8 +22,9 @@ class AsmCodeLens extends vscode.CodeLens {
      * @param range The range in the TextDocument.
      * @param matchedText The matchedText, i.e. the symbol.
      */
-    constructor(doc: vscode.TextDocument, range: vscode.Range, matchedText: string) {
+    constructor(config: any, doc: vscode.TextDocument, range: vscode.Range, matchedText: string) {
         super(range);
+        this.config = config;
         this.document = doc;
         this.symbol = matchedText;
     }
@@ -33,18 +35,12 @@ class AsmCodeLens extends vscode.CodeLens {
  * CodeLensProvider for assembly language.
  */
 export class CodeLensProvider implements vscode.CodeLensProvider {
-    // The configuration to use.
-    protected config: Config;
-
-
     /**
      * Constructor.
      * @param config The configuration (preferences) to use.
      */
-    constructor(config: Config) {
-        // Store
-        this.config = config;
-    }
+    //constructor() {
+    //}
 
 
     /**
@@ -55,14 +51,22 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param document The document to check.
      * @param token
      */
-    public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
+    public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[] | undefined> {
         // Show donate info
         DonateInfo.checkDonateInfo();   // No need for 'await'.
 
+        // Check which workspace
+        const config = Config.getConfigForDoc(document);
+        if (!config?.enableCodeLenses)
+            return undefined;   // Don't show code lenses at all.
+
         // Find all code lenses
         const languageId = document.languageId as AllowedLanguageIds;
+
+        const fsPath = document.uri.fsPath;
+        console.log(fsPath);
         const codeLenses: Array<vscode.CodeLens> = [];
-        const regexes = CommonRegexes.regexesLabel(this.config, languageId);
+        const regexes = CommonRegexes.regexesLabel(config, languageId);
         const matches = grepTextDocumentMultiple(document, regexes);
         // Loop all matches and create code lenses
         for (const fmatch of matches) {
@@ -78,12 +82,12 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
             }
             const trimmedMatchedText = matchedText.trim();
             // Check that label is not excluded
-            if (!this.config.labelsExcludes.includes(trimmedMatchedText.toLowerCase())) {
+            if (!config.labelsExcludes.includes(trimmedMatchedText.toLowerCase())) {
                 // Create code lens
                 const startPos = new vscode.Position(lineNr, colStart);
                 const endPos = new vscode.Position(lineNr, colEnd);
                 const range = new vscode.Range(startPos, endPos);
-                const codeLense = new AsmCodeLens(document, range, trimmedMatchedText);
+                const codeLense = new AsmCodeLens(config, document, range, trimmedMatchedText);
                 // Store
                 codeLenses.push(codeLense);
             }
@@ -110,12 +114,12 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
         const doc = codeLens.document;
         const pos = codeLens.range.start;
-        //const line = pos.line;
+        const config = codeLens.config;
 
         const languageId = doc.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.config.rootFolder, languageId);
+        const locations = await grep(searchRegex, config.wsFolderPath, languageId);
         // Remove any locations because of module information (dot notation)
-        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, doc.fileName, pos, true, true);
         // create title
         const count = reducedLocations.length;
@@ -132,9 +136,6 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
                 reducedLocations //reference locations
             ]
         };
-        //console.log('resolveCodeLens end: ', codeLens.document.uri.fsPath);
-        //console.log('#####');
         return codeLens;
     }
-
 }

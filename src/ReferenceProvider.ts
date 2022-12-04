@@ -34,7 +34,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
     public async provideReferences(document: vscode.TextDocument, position: vscode.Position, options: {includeDeclaration: boolean}, token: vscode.CancellationToken): Promise<vscode.Location[]> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (docPath.indexOf(this.config.rootFolder) < 0)
+        if (docPath.indexOf(this.config.wsFolderPath) < 0)
                 return [];   // Skip because path belongs to different workspace
         // Path is from right project -> search
         return this.search(document, position);
@@ -51,7 +51,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
 
         const languageId = document.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.config.rootFolder, languageId);
+        const locations = await grep(searchRegex, this.config.wsFolderPath, languageId);
         const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         return reducedLocations;

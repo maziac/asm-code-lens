@@ -37,7 +37,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.rootFolder))
+        if (!docPath.includes(this.config.wsFolderPath))
             return undefined as any; // Path is wrong.
 
         // Loops through the whole document line by line and

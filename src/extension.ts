@@ -8,13 +8,13 @@ import {RenameProvider} from './RenameProvider';
 import {DocumentSymbolProvider} from './DocumentSymbolProvider';
 import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
-import {setGrepGlobPatterns} from './grep';
+//import {setGrepGlobPatterns} from './grep';
 import {setCustomCommentPrefix} from './comments';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNewView} from './whatsnew/whatsnewview';
 import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
-import {getLabelsConfig} from './config';
+import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
 
 
@@ -79,18 +79,20 @@ function findLabelsWithNoReferenceAllRootFolders() {
     const editorPath =editor.document.uri.fsPath;
     // Get all workspace folders
     const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
+    /* TODO: Enable again
     const config = getLabelsConfig();
     // Check in which workspace folder the path is included
     for (const rootFolder of wsFolders) {
         if (editorPath.includes(rootFolder)) {
             // Add root folder
-            config.rootFolder = rootFolder;
+            config.wsFolderPath = rootFolder;
             // Found. Find labels
             Commands.findLabelsWithNoReference(config, languageId);
             // Stop loop
             break;
         }
     }
+    */
 }
 
 
@@ -98,14 +100,17 @@ function findLabelsWithNoReferenceAllRootFolders() {
  * Reads the configuration.
  */
 function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
-    // Note: All configuration preferences are scoped 'window' which means:
-    // user, workspace or remote.
-    // So, in multiroot configurations all folders share the same settings.
-    // There are no special settings for the different multiroot folders.
+    // Note: configuration preferences scopes
+    // - "window": user, workspace or remote.
+    // - "resource": user, workspace, folder or remote.
+    // - "application": user only.
+    // So in multiroot different workspaces have different settings.
+
     const settings = PackageInfo.getConfiguration();
 
     // Get all workspace folders
-    const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
+    const workspaceFolders = vscode.workspace.workspaceFolders || [];
+    const wsFolders = workspaceFolders.map(ws => ws.uri.fsPath + path.sep);
 
     // Check for the hex calculator params
     if (event) {
@@ -121,33 +126,21 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         }
     }
 
-    // Dispose (remove) all providers
-    for (const rootFolder of wsFolders) {
-        // Deregister
-        removeProvider(regCodeLensProviders.get(rootFolder), context);
-        removeProvider(regHoverProviders.get(rootFolder), context);
-        removeProvider(regCompletionProposalsProviders.get(rootFolder), context);
-        removeProvider(regDefinitionProviders.get(rootFolder), context);
-        removeProvider(regReferenceProviders.get(rootFolder), context);
-        removeProvider(regRenameProviders.get(rootFolder), context);
-        removeProvider(regDocumentSymbolProviders.get(rootFolder), context);
-
-    }
-    regCodeLensProviders.clear();
-    regHoverProviders.clear();
-    regCompletionProposalsProviders.clear();
-    regDefinitionProviders.clear();
-    regReferenceProviders.clear();
-    regRenameProviders.clear();
-    regDocumentSymbolProviders.clear();
+    // Dispose (remove, deregister) all providers
+    removeProvider(regCodeLensProvider, context);
+    removeProvider(regHoverProvider, context);
+    removeProvider(regCompletionProposalsProvider, context);
+    removeProvider(regDefinitionProvider, context);
+    removeProvider(regReferenceProvider, context);
+    removeProvider(regRenameProvider, context);
+    removeProvider(regDocumentSymbolProvider, context);
 
 
     // Set search paths.
-    setGrepGlobPatterns(settings.excludeFiles);
+    //  setGrepGlobPatterns(settings.excludeFiles); TODO
 
-    // Get some settings.
-    const configWoRoot = getLabelsConfig();
-
+    // Re-read settings for all workspaces.
+    Config.init();
 
     // Both "languages": asm files and list files.
     const asmListFiles: vscode.DocumentSelector = [
@@ -155,71 +148,47 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         {scheme: "file", language: 'asm-list-file'}
     ];
 
-    // Multiroot: do for all root folders:
-    for (const rootFolder of wsFolders) {
-        // Copy config
-        const config = {...configWoRoot};
-        // For multiroot
-        config.rootFolder = rootFolder;
+    // Multiroot: One provider for all workspace folders:
 
-        // Code Lenses
-        if (settings.enableCodeLenses) {
-            // Register
-            const codeLensProvider = new CodeLensProvider(config);
-            const provider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
-            regCodeLensProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
+    // Register
+    const codeLensProvider = new CodeLensProvider();
+    regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
+    context.subscriptions.push(regCodeLensProvider);
 
-        if (settings.enableHovering) {
-            // Register
-            const provider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider(config));
-            regHoverProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
+    /*
+    // Register
+    regHoverProvider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider(config));
+    context.subscriptions.push(regHoverProvider);
 
-        if (settings.enableCompletions) {
-            // Register
-            const provider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider(config));
-            regCompletionProposalsProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
+    // Register
+    regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider());
+    context.subscriptions.push(regCompletionProposalsProvider);
 
-        if (settings.enableGotoDefinition) {
-            // Register
-            const provider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider(config));
-            regDefinitionProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
+    // Register
+    regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider());
+    context.subscriptions.push(regDefinitionProvider);
 
-        if (settings.enableFindAllReferences) {
-            // Register
-            const provider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider(config));
-            regReferenceProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
+    // Register
+    regReferenceProvider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider());
+    context.subscriptions.push(regReferenceProvider);
 
-        if (settings.enableRenaming) {
-            // Register
-            const provider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider(config));
-            regRenameProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
+    // Register
+    regRenameProvider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider());
+    context.subscriptions.push(regRenameProvider);
 
-        if (settings.enableOutlineView) {
-            // Register
-            const provider = vscode.languages.registerDocumentSymbolProvider(asmListFiles, new DocumentSymbolProvider(config));
-            regDocumentSymbolProviders.set(rootFolder, provider);
-            context.subscriptions.push(provider);
-        }
-    }
+    // Register
+    regDocumentSymbolProvider = vscode.languages.registerDocumentSymbolProvider(asmListFiles, new DocumentSymbolProvider());
+    context.subscriptions.push(regDocumentSymbolProvider);
+*/
 
 
     // Toggle line Comment configuration
-    const toggleCommentPrefix = settings.get<string>("comments.toggleLineCommentPrefix") || ';';
+    const toggleCommentPrefix = settings.get<string>("comments.toggleLineCommentPrefix") || ';';    // TODO: global or per workspace?
     vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: toggleCommentPrefix}});
     // Store
     setCustomCommentPrefix(toggleCommentPrefix);
+
+    console.log(Config.configs);
 }
 
 
@@ -238,13 +207,13 @@ function removeProvider(pv: vscode.Disposable|undefined, context: vscode.Extensi
 
 let hexCalcExplorerProvider;
 let hexCalcDebugProvider;
-let regCodeLensProviders = new Map<string, vscode.Disposable>();
-let regHoverProviders = new Map<string, vscode.Disposable>();
-let regCompletionProposalsProviders = new Map<string, vscode.Disposable>();
-let regDefinitionProviders = new Map<string, vscode.Disposable>();
-let regReferenceProviders = new Map<string, vscode.Disposable>();
-let regRenameProviders = new Map<string, vscode.Disposable>();
-let regDocumentSymbolProviders = new Map<string, vscode.Disposable>();
+let regCodeLensProvider: vscode.Disposable;
+let regHoverProvider: vscode.Disposable;
+let regCompletionProposalsProvider: vscode.Disposable;
+let regDefinitionProvider: vscode.Disposable;
+let regReferenceProvider: vscode.Disposable;
+let regRenameProvider: vscode.Disposable;
+let regDocumentSymbolProvider: vscode.Disposable;
 
 
 

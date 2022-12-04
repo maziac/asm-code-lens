@@ -96,7 +96,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
     public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList>> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.rootFolder))
+        if (!docPath.includes(this.config.wsFolderPath))
             return undefined as any; // Path is wrong.
 
         // Get required length
@@ -161,7 +161,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const searchSjasmMacro = CompletionRegexes.regexEveryMacroForWord(fuzzySearchWord, languageId);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, this.config.rootFolder, languageId);
+        const locations = await grepMultiple(regexes, this.config.wsFolderPath, languageId);
         // Reduce the found locations.
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, true, false);
         // Now put all proposal texts in a map. (A map to make sure every item is listed only once.)

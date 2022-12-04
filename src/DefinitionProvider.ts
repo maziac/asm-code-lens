@@ -36,7 +36,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
     public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Location[]> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.rootFolder))
+        if (!docPath.includes(this.config.wsFolderPath))
             return []; // Path is wrong.
         // Check for 'include "..."'
         const lineContents = document.lineAt(position.line).text;
@@ -59,7 +59,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * Points to the first line of the file.
      */
     protected async getInclude(relPath: string): Promise<vscode.Location[]> {
-        const filePattern = new vscode.RelativePattern(this.config.rootFolder, '**/' + relPath);
+        const filePattern = new vscode.RelativePattern(this.config.wsFolderPath, '**/' + relPath);
         const uris = await vscode.workspace.findFiles(filePattern, null);
         const locations: vscode.Location[] = [];
         const pos = new vscode.Position(0, 0);
@@ -98,7 +98,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         const searchSjasmStruct = DefinitionRegexes.regexStructForWord(searchWord);
         regexes.push(searchSjasmStruct);
 
-        const locations = await grepMultiple(regexes, this.config.rootFolder, document.languageId);
+        const locations = await grepMultiple(regexes, this.config.wsFolderPath, document.languageId);
         const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         // There should be only one location.

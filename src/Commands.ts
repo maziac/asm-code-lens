@@ -28,7 +28,7 @@ export class Commands {
         // Get regexes
         const regexes = CommonRegexes.regexesLabel(config, languageId);
         // Get all label definition (locations)
-        const labelLocations = await grepMultiple(regexes, config.rootFolder, languageId);
+        const labelLocations = await grepMultiple(regexes, config.wsFolderPath, languageId);
 
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
@@ -44,7 +44,7 @@ export class Commands {
      * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
      */
     protected static async findLabels(locLabels, cfg: Config, languageId: AllowedLanguageIds): Promise<void> {
-        const baseName = path.basename(cfg.rootFolder);
+        const baseName = path.basename(cfg.wsFolderPath);
         const typename = (languageId == 'asm-list-file') ? 'list' : 'asm';
         output.appendLine("Unreferenced labels for " + typename + " files, " + baseName + ":");
         output.show(true);
@@ -76,7 +76,7 @@ export class Commands {
 
                 // And search for references
                 const regex = CommonRegexes.regexAnyReferenceForWord(searchLabel);
-                const locations = await grep(regex, cfg.rootFolder, languageId);
+                const locations = await grep(regex, cfg.wsFolderPath, languageId);
                 // Remove any locations because of module information (dot notation)
                 const reducedLocations = await reduceLocations(regexLbls, locations, fileName, pos, true, true);
                 // Check count

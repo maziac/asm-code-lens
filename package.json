@@ -71,7 +71,7 @@
                     "markdownDescription": "Enable/disable outline view for the active document."
                 },
                 "asm-code-lens.enableCodeLenses": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable the display of code lenses (references) above labels."
@@ -125,19 +125,19 @@
                     "default": true
                 },
                 "asm-code-lens.hexCalculator.showInDebug": {
-                    "scope": "window",
+                    "scope": "resource",
                     "markdownDescription": "Set to false to disable calculator in debug view.",
                     "type": "boolean",
                     "default": true
                 },
                 "asm-code-lens.hexCalculator.hexPrefix": {
-                    "scope": "window",
+                    "scope": "application",
                     "markdownDescription": "The prefix to use for hex values, e.g. `0x` or `$`",
                     "type": "string",
                     "default": "0x"
                 },
                 "asm-code-lens.donated": {
-                    "scope": "window",
+                    "scope": "application",
                     "markdownDescription": "If you donated (press the `Donate...` button in hex calculator to do so) you can hide the button by setting this parameter.",
                     "type": "boolean",
                     "default": false

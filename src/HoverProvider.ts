@@ -35,7 +35,7 @@ export class HoverProvider implements vscode.HoverProvider {
     public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.rootFolder))
+        if (!docPath.includes(this.config.wsFolderPath))
             return undefined as any; // Path is wrong.
         // Right path.
         return this.search(document, position);
@@ -71,7 +71,7 @@ export class HoverProvider implements vscode.HoverProvider {
         const searchSjasmMacro = CommonRegexes.regexMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, this.config.rootFolder, languageId);
+        const locations = await grepMultiple(regexes, this.config.wsFolderPath, languageId);
         // Reduce the found locations.
         const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, regexEnd);

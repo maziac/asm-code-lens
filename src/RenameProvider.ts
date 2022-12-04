@@ -38,7 +38,7 @@ export class RenameProvider implements vscode.RenameProvider {
     public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit|undefined> {
         // First check for right path
         const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.rootFolder)) {
+        if (!docPath.includes(this.config.wsFolderPath)) {
             // Skip because path belongs to different workspace
             return undefined;
         }
@@ -57,7 +57,7 @@ export class RenameProvider implements vscode.RenameProvider {
         const searchRegex = RenameRegexes.regexAnyReferenceForWordGlobal(oldName);
 
         const languageId = document.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.config.rootFolder, languageId);
+        const locations = await grep(searchRegex, this.config.wsFolderPath, languageId);
         const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
 
