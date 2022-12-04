@@ -117,7 +117,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const config = codeLens.config;
 
         const languageId = doc.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, config.wsFolderPath, languageId);
+        const locations = await grep(searchRegex, config.wsFolderPath, languageId, config.excludeFiles);
         // Remove any locations because of module information (dot notation)
         const regexLbls = CommonRegexes.regexesLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, doc.fileName, pos, true, true);

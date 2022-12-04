@@ -12,9 +12,6 @@ export class Config {
 	// The root folder of the workspace
 	public wsFolderPath: string;
 
-	// true if labels with colons should be searched.
-	public labelsWithColons: boolean;
-
 	// true if code lenses should be enabled.
 	public enableCodeLenses: boolean;
 
@@ -36,12 +33,17 @@ export class Config {
 	// true if code lenses should be enabled.
 	public enableOutlineView: boolean;
 
+	// true if labels with colons should be searched.
+	public labelsWithColons: boolean;
+
 	//  true if labels without colons should be searched.
 	public labelsWithoutColons: boolean;
 
-
 	// A list of strings with words to exclude from the found labels list.
 	public labelsExcludes: string[];
+
+	// Exclude files (glob pattern)
+	public excludeFiles: string[];
 
 
 	/** Loops through all workspace folders and gets there configuration.
@@ -57,13 +59,14 @@ export class Config {
 			const settings = PackageInfo.getConfiguration(workspaceFolder);
 			config.labelsWithColons = true;
 			config.labelsWithoutColons = true;
-			const labelsColon = (settings.get<string>('labels.colon') || '').toLowerCase();	// TODO: simpler access, eg. settings.labels.colon
+			const labelsColon = (settings.labels?.colon || '').toLowerCase();
 			if (labelsColon.startsWith('without '))
 				config.labelsWithColons = false;
 			else if (labelsColon.startsWith('with '))
 				config.labelsWithoutColons = false;
-			const labelsExcludesString = settings.get<string>('labels.excludes') || '';
+			const labelsExcludesString = settings.labels?.excludes || '';
 			config.labelsExcludes = labelsExcludesString.toLowerCase().split(';');
+			config.excludeFiles = settings.excludeFiles;
 			config.enableCodeLenses = settings.enableCodeLenses;
 			config.enableHovering = settings.enableHovering;
 			config.enableCompletions = settings.enableCompletions;

@@ -122,31 +122,21 @@ function getLinesForFile(filePath: string, documents: vscode.TextDocument[]): st
 
 
 /**
- * Sets the glob patterns to check for files while grepping.
- * @param globExclude Exclude pattern
- */
-export function setGrepGlobPatterns(globExclude: string) {
-    grepGlobExclude = globExclude;
-}
-export let grepGlobExclude;
-
-
-/**
  * Searches files according to opts.
  * opts includes the directory the glob pattern and the regular expression (the word) to
  * search for.
  * @param regex The regular expression to search for.
  * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
  * @param languageId Only files with the language ID are grepped. Is either "asm-collection" or "asm-list-file".
+ * @param globExcludeFiles The glob pattern to use to exclude files.
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(regex: RegExp, rootFolder: string, languageId: AllowedLanguageIds): Promise<GrepLocation[]> {
+export async function grep(regex: RegExp, rootFolder: string, languageId: AllowedLanguageIds, globExcludeFiles: string = ''): Promise<GrepLocation[]> { // TODO: make globExcludeFiles not optional
     const allMatches = new Map();
 
     try {
         const globInclude = LanguageId.getGlobalIncludeForLanguageId(languageId);
-        const uris = await vscode.workspace.findFiles(globInclude, grepGlobExclude);
-        //const urisUnfiltered = await vscode.workspace.findFiles('**/*.*', grepGlobExclude);
+        const uris = await vscode.workspace.findFiles(globInclude, globExcludeFiles);
         //const uris = urisUnfiltered.filter(uri => fileBelongsToLanguageId(uri.fsPath, languageId));
         const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty && doc.languageId == languageId);
 

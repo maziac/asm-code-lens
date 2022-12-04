@@ -113,7 +113,7 @@
                     "markdownDescription": "Enable/disable the possibility to rename labels. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.excludeFiles": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "string",
                     "default": "",
                     "markdownDescription": "Choose what files or directories to exclude e.g `**/*.{inc,s}`."
