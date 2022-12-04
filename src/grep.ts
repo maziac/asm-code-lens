@@ -131,7 +131,7 @@ function getLinesForFile(filePath: string, documents: vscode.TextDocument[]): st
  * @param globExcludeFiles The glob pattern to use to exclude files.
  * @returns An array of the vscode locations of the found expressions.
  */
-export async function grep(regex: RegExp, rootFolder: string, languageId: AllowedLanguageIds, globExcludeFiles: string = ''): Promise<GrepLocation[]> { // TODO: make globExcludeFiles not optional
+export async function grep(regex: RegExp, rootFolder: string, languageId: AllowedLanguageIds, globExcludeFiles: string): Promise<GrepLocation[]> {
     const allMatches = new Map();
 
     try {
@@ -251,14 +251,16 @@ export async function grep(regex: RegExp, rootFolder: string, languageId: Allowe
  * Simply calls 'grep' multiple times.
  * @param regexes Array of regexes.
  * @param rootFolder The search is limited to the root / project folder. This needs to contain a trailing '/'.
+ * @param languageId Only files with the language ID are grepped. Is either "asm-collection" or "asm-list-file".
+ * @param globExcludeFiles The glob pattern to use to exclude files.
  * @return An array with all regex search results.
  */
-export async function grepMultiple(regexes: RegExp[], rootFolder: string, languageId: AllowedLanguageIds): Promise<GrepLocation[]> {
+export async function grepMultiple(regexes: RegExp[], rootFolder: string, languageId: AllowedLanguageIds, globExcludeFiles: string): Promise<GrepLocation[]> {
     let allLocations: Array<GrepLocation> = [];
 
     // grep all regex
     for (const regex of regexes) {
-        const locations = await grep(regex, rootFolder, languageId);
+        const locations = await grep(regex, rootFolder, languageId, globExcludeFiles);
         // Add found locations
         allLocations.push(...locations);
     }

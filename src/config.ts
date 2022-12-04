@@ -43,7 +43,10 @@ export class Config {
 	public labelsExcludes: string[];
 
 	// Exclude files (glob pattern)
-	public excludeFiles: string[];
+	public excludeFiles: string;
+
+	// Required minimum length for completions.
+	public completionsRequiredLength: number;
 
 
 	/** Loops through all workspace folders and gets there configuration.
@@ -74,6 +77,9 @@ export class Config {
 			config.enableFindAllReferences = settings.enableFindAllReferences;
 			config.enableRenaming = settings.enableRenaming;
 			config.enableOutlineView = settings.enableOutlineView;
+			config.completionsRequiredLength = settings.completionsRequiredLength || 0;
+			if (config.completionsRequiredLength < 1)
+				config.completionsRequiredLength = 1;
 			// Store
 			Config.configs.set(fsPath, config);
 		}

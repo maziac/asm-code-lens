@@ -57,7 +57,7 @@ export class RenameProvider implements vscode.RenameProvider {
         const searchRegex = RenameRegexes.regexAnyReferenceForWordGlobal(oldName);
 
         const languageId = document.languageId as AllowedLanguageIds;
-        const locations = await grep(searchRegex, this.config.wsFolderPath, languageId);
+        const locations = await grep(searchRegex, this.config.wsFolderPath, languageId, this.config.excludeFiles);
         const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
 

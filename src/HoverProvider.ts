@@ -48,7 +48,7 @@ export class HoverProvider implements vscode.HoverProvider {
         const searchSjasmMacro = CommonRegexes.regexMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, config.wsFolderPath, languageId);
+        const locations = await grepMultiple(regexes, config.wsFolderPath, languageId, config.excludeFiles);
         // Reduce the found locations.
         const regexLbls = CommonRegexes.regexesLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, regexEnd);

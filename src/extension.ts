@@ -151,11 +151,11 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     regHoverProvider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider());
     context.subscriptions.push(regHoverProvider);
 
-    /*
     // Register
     regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider());
     context.subscriptions.push(regCompletionProposalsProvider);
 
+    /*
     // Register
     regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider());
     context.subscriptions.push(regDefinitionProvider);

@@ -28,7 +28,7 @@ export class Commands {
         // Get regexes
         const regexes = CommonRegexes.regexesLabel(config, languageId);
         // Get all label definition (locations)
-        const labelLocations = await grepMultiple(regexes, config.wsFolderPath, languageId);
+        const labelLocations = await grepMultiple(regexes, config.wsFolderPath, languageId, config.excludeFiles);
 
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
@@ -76,7 +76,7 @@ export class Commands {
 
                 // And search for references
                 const regex = CommonRegexes.regexAnyReferenceForWord(searchLabel);
-                const locations = await grep(regex, cfg.wsFolderPath, languageId);
+                const locations = await grep(regex, cfg.wsFolderPath, languageId, cfg.excludeFiles);
                 // Remove any locations because of module information (dot notation)
                 const reducedLocations = await reduceLocations(regexLbls, locations, fileName, pos, true, true);
                 // Check count

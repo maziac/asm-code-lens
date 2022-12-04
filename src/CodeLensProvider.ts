@@ -114,7 +114,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
         const doc = codeLens.document;
         const pos = codeLens.range.start;
-        const config = codeLens.config;
+        const config: Config = codeLens.config;
 
         const languageId = doc.languageId as AllowedLanguageIds;
         const locations = await grep(searchRegex, config.wsFolderPath, languageId, config.excludeFiles);
