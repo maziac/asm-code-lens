@@ -155,11 +155,11 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider());
     context.subscriptions.push(regCompletionProposalsProvider);
 
-    /*
     // Register
     regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider());
     context.subscriptions.push(regDefinitionProvider);
 
+    /*
     // Register
     regReferenceProvider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider());
     context.subscriptions.push(regReferenceProvider);

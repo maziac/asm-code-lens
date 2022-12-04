@@ -12,20 +12,6 @@ import {Config} from './config';
  * Called from vscode e.g. for "Goto definition".
  */
 export class DefinitionProvider implements vscode.DefinitionProvider {
-    // The configuration to use.
-    protected config: Config;
-
-
-    /**
-     * Constructor.
-     * @param config The configuration (preferences) to use.
-     */
-    constructor(config: Config) {
-        // Store
-        this.config = config;
-    }
-
-
     /**
      * Called from vscode if the user selects "Goto definition".
      * @param document The current document.
@@ -33,33 +19,39 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @param options
      * @param token
      */
-    public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Location[]> {
-        // First check for right path
-        const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.wsFolderPath))
-            return []; // Path is wrong.
+    public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Location[] | undefined> {
+        // Check which workspace
+        const config = Config.getConfigForDoc(document);
+        if (!config)
+            return undefined;   // doc not in any workspace folder
+        if (!config.enableGotoDefinition) {
+            vscode.window.showWarningMessage("Goto definitions are disabled for this workspace folder.");
+            return undefined;
+        }
+
         // Check for 'include "..."'
         const lineContents = document.lineAt(position.line).text;
         const match = CommonRegexes.regexInclude().exec(lineContents);
         if (match) {
             // INCLUDE found
-            return this.getInclude(match[1]);
+            return this.getInclude(config, match[1]);
         }
         else {
             // Normal definition
-            return this.search(document, position);
+            return this.search(config, document, position);
         }
     }
 
 
     /**
      * Searches the files that match the 'relPath' path.
+     * @param config The configuration (settings).
      * @param relPath E.g. 'util/zxspectrum.inc'
      * @returns A promise to an array with locations. Normally there is only one entry to the array.
      * Points to the first line of the file.
      */
-    protected async getInclude(relPath: string): Promise<vscode.Location[]> {
-        const filePattern = new vscode.RelativePattern(this.config.wsFolderPath, '**/' + relPath);
+    protected async getInclude(config: Config, relPath: string): Promise<vscode.Location[]> {
+        const filePattern = new vscode.RelativePattern(config.wsFolderPath, '**/' + relPath);
         const uris = await vscode.workspace.findFiles(filePattern, null);
         const locations: vscode.Location[] = [];
         const pos = new vscode.Position(0, 0);
@@ -74,20 +66,21 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
 
     /**
      * Does a search for a word. I.e. finds all references of the word.
+     * @param config The configuration (settings).
      * @param document The document that contains the word.
      * @param position The word position.
      * @returns A promise to an array with locations. Normally there is only one entry to the array.
      */
-    protected async search(document, position): Promise<vscode.Location[]> {
+    protected async search(config: Config, document, position): Promise<vscode.Location[] | undefined> {
         const searchWord = document.getText(document.getWordRangeAtPosition(position)); //, /[a-z0-9_.]+/i));
 
         // Check if search word is in the excludes
-        if (this.config.labelsExcludes.includes(searchWord))
-            return [];  // Abort
+        if (config.labelsExcludes.includes(searchWord))
+            return undefined;  // Abort
 
         // Find all "something:" (labels) in the document, also labels without colon.
         const languageId = document.languageId as AllowedLanguageIds;
-        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config, languageId);
+        const regexes = CommonRegexes.regexesLabelForWord(searchWord, config, languageId);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = CommonRegexes.regexModuleForWord(searchWord);
         regexes.push(searchSjasmModule);
@@ -98,8 +91,8 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
         const searchSjasmStruct = DefinitionRegexes.regexStructForWord(searchWord);
         regexes.push(searchSjasmStruct);
 
-        const locations = await grepMultiple(regexes, this.config.wsFolderPath, document.languageId);
-        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const locations = await grepMultiple(regexes, config.wsFolderPath, document.languageId, config.excludeFiles);
+        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         // There should be only one location.
         // Anyhow return the whole array.
