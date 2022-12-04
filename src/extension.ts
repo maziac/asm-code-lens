@@ -88,7 +88,6 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // - "application": user only.
     // So in multiroot different workspaces have different settings.
 
-    const settings = PackageInfo.getConfiguration();
     // Check for the hex calculator params
     if (event) {
         if (event.affectsConfiguration('asm-code-lens.hexCalculator.hexPrefix')
