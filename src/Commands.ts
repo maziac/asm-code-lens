@@ -92,8 +92,12 @@ export class Commands {
                 // Check for last search
                 labelsCount--;
                 // output.appendLine("labelCount="+labelsCount);
-                if (labelsCount == 0)
-                    output.appendLine("Done. " + unrefLabels + ' unreferenced label' + ((unrefLabels > 1) ? 's' : '') + ".");
+                if (labelsCount == 0) {
+                    let unrefText = unrefLabels + ' unreferenced label';
+                    if (unrefLabels != 1)
+                        unrefText += 's';
+                    output.appendLine("Done. " + unrefText + ((unrefLabels > 1) ? 's' : '') + ".");
+                }
             }
         }
         catch (e) {

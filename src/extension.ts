@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import {ReferenceProvider} from './ReferenceProvider';
 import {DefinitionProvider} from './DefinitionProvider';
 import {HoverProvider} from './HoverProvider';
@@ -59,40 +58,23 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     // Register commands.
-    vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', () => {
-        findLabelsWithNoReferenceAllRootFolders();
+    vscode.commands.registerCommand('asm-code-lens.find-labels-with-no-reference', async () => {
+        // Get current text editor to get current project/root folder.
+        const editor = vscode.window.activeTextEditor;
+        const doc = editor?.document;
+        if (!doc)
+            return;
+        const languageId = doc.languageId;
+        if (languageId != 'asm-collection' && languageId != 'asm-list-file')
+            return;
+        // Check which workspace
+        const config = Config.getConfigForDoc(doc);
+        if (!config)
+            return;
+
+        // Found. Find labels
+        await Commands.findLabelsWithNoReference(config, languageId);
     });
-}
-
-
-/**
- * Finds labels with no reference for all root folders.
- */
-function findLabelsWithNoReferenceAllRootFolders() {
-    // Get current text editor to get current project/root folder.
-    const editor = vscode.window.activeTextEditor;
-    if (!editor)
-        return;
-    const languageId = editor.document.languageId;
-    if (languageId != 'asm-collection' && languageId != 'asm-list-file')
-        return;
-    const editorPath =editor.document.uri.fsPath;
-    // Get all workspace folders
-    const wsFolders = (vscode.workspace.workspaceFolders || []).map(ws => ws.uri.fsPath + path.sep);
-    /* TODO: Enable again
-    const config = getLabelsConfig();
-    // Check in which workspace folder the path is included
-    for (const rootFolder of wsFolders) {
-        if (editorPath.includes(rootFolder)) {
-            // Add root folder
-            config.wsFolderPath = rootFolder;
-            // Found. Find labels
-            Commands.findLabelsWithNoReference(config, languageId);
-            // Stop loop
-            break;
-        }
-    }
-    */
 }
 
 

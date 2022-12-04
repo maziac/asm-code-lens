@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {AllowedLanguageIds} from './languageId';
-import { CommonRegexes } from './regexes/commonregexes';
+import {CommonRegexes} from './regexes/commonregexes';
 import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
@@ -12,7 +12,7 @@ import {DonateInfo} from './donate/donateinfo';
  * Extends CodeLens by the TextDocument.
  */
 class AsmCodeLens extends vscode.CodeLens {
-    public config: any; // TODO
+    public config: Config;
     public document: vscode.TextDocument;
     public symbol: string;  // The searched symbol (text).
 
@@ -35,14 +35,6 @@ class AsmCodeLens extends vscode.CodeLens {
  * CodeLensProvider for assembly language.
  */
 export class CodeLensProvider implements vscode.CodeLensProvider {
-    /**
-     * Constructor.
-     * @param config The configuration (preferences) to use.
-     */
-    //constructor() {
-    //}
-
-
     /**
      * Called from vscode to provide the code lenses.
      * Code lenses are provided unresolved.

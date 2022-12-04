@@ -33,5 +33,4 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         return reducedLocations;
     }
-
 }

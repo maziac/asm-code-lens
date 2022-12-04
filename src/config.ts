@@ -139,15 +139,6 @@ export class Config {
 	}
 
 
-	/** Returns a config for a workspace folder path.
-	 * @param wsFolderPath The workspace folder path.
-	 * @returns The correspondent config or undefined.
-	 */
-	public static getConfig(wsFolderPath: string) { // TODO: Really required?
-		return Config.configs.get(wsFolderPath);
-	}
-
-
 	/** Returns a config for a text document.
 	 * @param document The TextDocument.
 	 * @returns The correspondent config or undefined for the workspace folder the
