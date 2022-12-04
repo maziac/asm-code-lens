@@ -4,10 +4,45 @@ import {PackageInfo} from "./whatsnew/packageinfo";
 
  /**
   * Used to pass user preferences settings between functions.
+  * All configurations all all workspace folder are stored in 'configs'.
+  * Each workspace folder can have own settings.
+  *
+  * However, there is only one provider registered at vscode for all workspaces.
+  * This seems not fully implemented in vscode:
+  * E.g. if folder A registers the goto definitions and the folder B doesn't,
+  * then a definition provider has to be registered. I.e. a menu "Goto definition"
+  * is also displayed in folder B.
+  *
+  * If a provider should be enabled is found in the 'enable...' instance variables.
+  * All are ORed in the 'globalEnable...' static variables.
+  * Via the global variables a provider is registered. I.e. if the 'GlobalEnable...'
+  * is false the provider will not be registered at all.
   */
 export class Config {
+	// true if code lenses should be enabled.
+	public static globalEnableCodeLenses: boolean;
+
+	// true if code lenses should be enabled.
+	public static globalEnableHovering: boolean;
+
+	// true if code lenses should be enabled.
+	public static globalEnableCompletions: boolean;
+
+	// true if code lenses should be enabled.
+	public static globalEnableGotoDefinition: boolean;
+
+	// true if code lenses should be enabled.
+	public static globalEnableFindAllReferences: boolean;
+
+	// true if code lenses should be enabled.
+	public static globalEnableRenaming: boolean;
+
+	// true if code lenses should be enabled.
+	public static globalEnableOutlineView: boolean;
+
 	// A map with the configs for all workspace folders
 	public static configs = new Map<string, Config>();
+
 
 	// The root folder of the workspace
 	public wsFolderPath: string;
@@ -52,6 +87,16 @@ export class Config {
 	/** Loops through all workspace folders and gets there configuration.
 	 */
 	public static init() {
+		// Clear global variables
+		Config.globalEnableCodeLenses = false;
+		Config.globalEnableHovering = false;
+		Config.globalEnableCompletions = false;
+		Config.globalEnableGotoDefinition = false;
+		Config.globalEnableFindAllReferences = false;
+		Config.globalEnableRenaming = false;
+		Config.globalEnableOutlineView = false;
+
+		// Go through each setting
 		const workspaceFolders = vscode.workspace.workspaceFolders || [];
 		for (const workspaceFolder of workspaceFolders) {
 			// Create a new config instance
@@ -82,6 +127,14 @@ export class Config {
 				config.completionsRequiredLength = 1;
 			// Store
 			Config.configs.set(fsPath, config);
+			// Set global variables
+			Config.globalEnableCodeLenses ||= settings.enableCodeLenses;
+			Config.globalEnableHovering ||= config.enableHovering;
+			Config.globalEnableCompletions ||= config.enableCompletions;
+			Config.globalEnableGotoDefinition ||= config.enableGotoDefinition;
+			Config.globalEnableFindAllReferences ||= config.enableFindAllReferences;
+			Config.globalEnableRenaming ||= config.enableRenaming;
+			Config.globalEnableOutlineView ||= config.enableOutlineView;
 		}
 	}
 

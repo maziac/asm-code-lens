@@ -143,36 +143,47 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // Multiroot: One provider for all workspace folders:
 
     // Register
-    const codeLensProvider = new CodeLensProvider();
-    regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
-    context.subscriptions.push(regCodeLensProvider);
+    if (Config.globalEnableCodeLenses) {
+        const codeLensProvider = new CodeLensProvider();
+        regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
+        context.subscriptions.push(regCodeLensProvider);
+    }
 
     // Register
-    regHoverProvider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider());
-    context.subscriptions.push(regHoverProvider);
+    if (Config.globalEnableHovering) {
+        regHoverProvider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider());
+        context.subscriptions.push(regHoverProvider);
+    }
 
     // Register
-    regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider());
-    context.subscriptions.push(regCompletionProposalsProvider);
+    if (Config.globalEnableCompletions) {
+        regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider());
+        context.subscriptions.push(regCompletionProposalsProvider);
+    }
 
     // Register
-    regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider());
-    context.subscriptions.push(regDefinitionProvider);
+    if (Config.globalEnableGotoDefinition) {
+        regDefinitionProvider = vscode.languages.registerDefinitionProvider(asmListFiles, new DefinitionProvider());
+        context.subscriptions.push(regDefinitionProvider);
+    }
 
     // Register
-    regReferenceProvider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider());
-    context.subscriptions.push(regReferenceProvider);
+    if (Config.globalEnableFindAllReferences) {
+        regReferenceProvider = vscode.languages.registerReferenceProvider(asmListFiles, new ReferenceProvider());
+        context.subscriptions.push(regReferenceProvider);
+    }
 
     // Register
-    regRenameProvider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider());
-    context.subscriptions.push(regRenameProvider);
+    if (Config.globalEnableRenaming) {
+        regRenameProvider = vscode.languages.registerRenameProvider(asmListFiles, new RenameProvider());
+        context.subscriptions.push(regRenameProvider);
+    }
 
-    /*
     // Register
-    regDocumentSymbolProvider = vscode.languages.registerDocumentSymbolProvider(asmListFiles, new DocumentSymbolProvider());
-    context.subscriptions.push(regDocumentSymbolProvider);
-*/
-
+    if (Config.globalEnableOutlineView) {
+        regDocumentSymbolProvider = vscode.languages.registerDocumentSymbolProvider(asmListFiles, new DocumentSymbolProvider());
+        context.subscriptions.push(regDocumentSymbolProvider);
+    }
 
     // Toggle line Comment configuration
     const toggleCommentPrefix = settings.get<string>("comments.toggleLineCommentPrefix") || ';';    // TODO: global or per workspace?
