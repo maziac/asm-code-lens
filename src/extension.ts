@@ -107,11 +107,6 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     // So in multiroot different workspaces have different settings.
 
     const settings = PackageInfo.getConfiguration();
-
-    // Get all workspace folders
-    const workspaceFolders = vscode.workspace.workspaceFolders || [];
-    const wsFolders = workspaceFolders.map(ws => ws.uri.fsPath + path.sep);
-
     // Check for the hex calculator params
     if (event) {
         if (event.affectsConfiguration('asm-code-lens.hexCalculator.hexPrefix')
@@ -136,9 +131,6 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     removeProvider(regDocumentSymbolProvider, context);
 
 
-    // Set search paths.
-    //  setGrepGlobPatterns(settings.excludeFiles); TODO
-
     // Re-read settings for all workspaces.
     Config.init();
 
@@ -155,11 +147,11 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
     context.subscriptions.push(regCodeLensProvider);
 
-    /*
     // Register
-    regHoverProvider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider(config));
+    regHoverProvider = vscode.languages.registerHoverProvider(asmListFiles, new HoverProvider());
     context.subscriptions.push(regHoverProvider);
 
+    /*
     // Register
     regCompletionProposalsProvider = vscode.languages.registerCompletionItemProvider(asmListFiles, new CompletionProposalsProvider());
     context.subscriptions.push(regCompletionProposalsProvider);

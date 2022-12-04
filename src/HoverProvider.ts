@@ -11,20 +11,6 @@ import {getCompleteLabel} from './grepextra';
  * HoverProvider for assembly language.
  */
 export class HoverProvider implements vscode.HoverProvider {
-    // The configuration to use.
-    protected config: Config;
-
-
-    /**
-     * Constructor.
-     * @param config The configuration (preferences) to use.
-     */
-    constructor(config: Config) {
-        // Store
-        this.config = config;
-    }
-
-
     /**
      * Called from vscode if the user hovers over a word.
      * @param document The current document.
@@ -32,23 +18,14 @@ export class HoverProvider implements vscode.HoverProvider {
      * @param options
      * @param token
      */
-    public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover> {
-        // First check for right path
-        const docPath = document.uri.fsPath;
-        if (!docPath.includes(this.config.wsFolderPath))
-            return undefined as any; // Path is wrong.
-        // Right path.
-        return this.search(document, position);
-    }
+    public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
+        // Check which workspace
+        const config = Config.getConfigForDoc(document);
+        if (!config?.enableHovering)
+            return undefined;   // Don't show any hover.
 
+        // Search the word:
 
-    /**
-     * Does a search for a word. I.e. finds all references of the word.
-     * @param document The document that contains the word.
-     * @param position The word position.
-     * @return A promise with a vscode.Hover object.
-     */
-    protected async search(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover> {
         // Check for local label
         const regexEnd = /\w/;
         const lineContents = document.lineAt(position.line).text;
@@ -63,7 +40,7 @@ export class HoverProvider implements vscode.HoverProvider {
         const range = document.getWordRangeAtPosition(position);
         const searchWord = document.getText(range);
         // regexes for labels with and without colon
-        const regexes = CommonRegexes.regexesLabelForWord(searchWord, this.config, languageId);
+        const regexes = CommonRegexes.regexesLabelForWord(searchWord, config, languageId);
         // Find all sjasmplus MODULEs in the document
         const searchSjasmModule = CommonRegexes.regexModuleForWord(searchWord);
         regexes.push(searchSjasmModule);
@@ -71,9 +48,9 @@ export class HoverProvider implements vscode.HoverProvider {
         const searchSjasmMacro = CommonRegexes.regexMacroForWord(searchWord);
         regexes.push(searchSjasmMacro);
 
-        const locations = await grepMultiple(regexes, this.config.wsFolderPath, languageId);
+        const locations = await grepMultiple(regexes, config.wsFolderPath, languageId);
         // Reduce the found locations.
-        const regexLbls = CommonRegexes.regexesLabel(this.config, languageId);
+        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, regexEnd);
 
         // Now read the comment lines above the document.
@@ -83,7 +60,7 @@ export class HoverProvider implements vscode.HoverProvider {
         for (const loc of reducedLocations) {
             // Check if included in exclusion list
             const name = loc.moduleLabel;
-            if (this.config.labelsExcludes.includes(name))
+            if (config.labelsExcludes.includes(name))
                 continue;
             // Get comments
             const lineNr = loc.range.start.line;
@@ -106,7 +83,7 @@ export class HoverProvider implements vscode.HoverProvider {
         // End of processing.
         // Check if 0 entries
         if (hoverTexts.length == 0)
-            return undefined as any;  // Nothing found
+            return undefined;  // Nothing found
 
         // return
         const hover = new vscode.Hover(hoverTexts);

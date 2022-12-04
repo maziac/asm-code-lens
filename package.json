@@ -65,7 +65,7 @@
             "title": "asm-code-lens configuration",
             "properties": {
                 "asm-code-lens.enableOutlineView": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable outline view for the active document."
@@ -77,37 +77,37 @@
                     "markdownDescription": "Enable/disable the display of code lenses (references) above labels."
                 },
                 "asm-code-lens.enableHovering": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable the of showing information while hovering labels etc."
                 },
                 "asm-code-lens.enableCompletions": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable symbol input completion."
                 },
                 "asm-code-lens.completionsRequiredLength": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "number",
                     "default": 1,
                     "markdownDescription": "The number of characters required before completion proposals will be presented."
                 },
                 "asm-code-lens.enableGotoDefinition": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable 'Go to Type Definition'. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.enableFindAllReferences": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable 'Find All References'."
                 },
                 "asm-code-lens.enableRenaming": {
-                    "scope": "window",
+                    "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable the possibility to rename labels. You need to reload the extension to take effect."
@@ -149,7 +149,7 @@
                     "default": ";"
                 },
                 "asm-code-lens.labels.colon": {
-                    "scope": "window",
+                    "scope": "resource",
                     "markdownDescription": "Determines if labels with or without or both should be recognized.\nPlease note: labels without colons cannot be determined in list files.",
                     "type": "string",
                     "enum": [
@@ -165,7 +165,7 @@
                     "default": "Both"
                 },
                 "asm-code-lens.labels.excludes": {
-                    "scope": "window",
+                    "scope": "resource",
                     "markdownDescription": "Configure here a comma separated list of words that should not be recognized as labels. E.g. if asm-code-lens wrongly interprets an assembler directive as label you can exclude it here. For example `if;then;else;elif;endif`. The exclude is case-insensitive.",
                     "type": "string",
                     "default": ""
