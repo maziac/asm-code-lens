@@ -9,15 +9,12 @@
     },
     "license": "MIT",
     "keywords": [
-        "asm-code-lens",
         "assembler",
         "references",
         "code lens",
         "z80",
-        "hex",
-        "calculator",
-        "hover",
-        "markdown"
+        "x86",
+        "multi-root ready"
     ],
     "repository": {
         "type": "git",
