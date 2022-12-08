@@ -53,8 +53,17 @@ export function activate(context: vscode.ExtensionContext) {
     configure(context);
 
     // Check for every change.
-	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         configure(context, event);
+    }));
+
+    // Check for added/removed workspace folders.
+    context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(event => {
+        // Simply removes and re-inits all workspace folders.
+        configure(context);
+        // Note: in my tests together with this event a 'onDidChangeConfiguration' was sent.
+        // But because I'm not sure if that would always be the case I also
+        // check for the 'onDidChangeWorkspaceFolders' event.
     }));
 
     // Register commands.
@@ -128,6 +137,12 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         const codeLensProvider = new CodeLensProvider();
         regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
         context.subscriptions.push(regCodeLensProvider);
+
+        {
+            const codeLensProvider2 = new CodeLensProvider();
+            const regCodeLensProvider2 = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider2);
+            context.subscriptions.push(regCodeLensProvider2);
+        }
     }
 
     // Register

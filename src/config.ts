@@ -106,11 +106,13 @@ export class Config {
 
 		// Go through each setting
 		const workspaceFolders = vscode.workspace.workspaceFolders || [];
+		//console.log("# workspacefolders=" + workspaceFolders.length);
 		for (const workspaceFolder of workspaceFolders) {
 			// Create a new config instance
 			const config = new Config();
 			// Get settings for folder.
 			const fsPath = workspaceFolder.uri.fsPath;
+			//console.log("workspacefolder=" + fsPath);
 			config.wsFolderPath = fsPath;
 			const settings = PackageInfo.getConfiguration(workspaceFolder);
 			config.labelsWithColons = true;
