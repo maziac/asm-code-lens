@@ -1,5 +1,8 @@
 # Changelog
 
+# 2.1.0
+- Fixed incompatibility with vscode 1.74.
+
 # 2.0.2
 - Fixed #83: incorrect behavior "$problem-matcher-sjasmplus". Now also supports absolute paths.
 - Fixed #82: Another codepages. Hovering now honors the vscode code page settings of the file.
