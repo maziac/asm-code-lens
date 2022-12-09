@@ -1,10 +1,7 @@
-.DS_Store
-.VSCodeCounter
+.*/
 node_modules/
 out/
 /*.vsix
 **/*.zip
 logs/
-coverage/
 notes.md
-.vscode/settings.json
