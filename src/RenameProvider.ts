@@ -1,8 +1,8 @@
-import { Config } from './config';
-import { AllowedLanguageIds } from './languageId';
-import { CommonRegexes } from './regexes/commonregexes';
+import {Config} from './config';
+import {AllowedLanguageIds} from './languageId';
+import {CommonRegexes} from './regexes/commonregexes';
 import * as vscode from 'vscode';
-import { grep, reduceLocations, getTextDocument } from './grep';
+import {grep, openTextDocument, reduceLocations} from './grep';
 import * as fs from 'fs';
 import {RenameRegexes} from './regexes/renameregexes';
 
@@ -54,14 +54,14 @@ export class RenameProvider implements vscode.RenameProvider {
         // For the undirty opened docs this will result in a reload at the same position.
         // Not nice, but working.
         const wsEdit = new vscode.WorkspaceEdit();
-        const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
         const fileMap = new Map<string, Array<vscode.Range>>()
         for (const loc of reducedLocations) {
             // Check if doc is not open
             const fsPath = loc.uri.fsPath;
-            const foundDoc = getTextDocument(fsPath, docs);
+            const foundDoc = await openTextDocument(fsPath);
             if (foundDoc) {
                 // use workspace edit because file is opened in editor
+  // TODO:   Rename ausprobieren: wsedit auch wenn doc gar nicht geöffnet ist?
                 wsEdit.replace(loc.uri, loc.range, newName);
             }
             else {

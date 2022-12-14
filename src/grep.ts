@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {FileInfo, getCompleteLabel, getLabelAndModuleLabelFromFileInfo, getModuleFileInfo} from './grepextra';
@@ -72,24 +71,20 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
 }
 
 
-/**
- * Checks the list of 'docs' for a given 'filePath' and returns the corresponding
- * text document.
- * @param filePath
- * @param docs The list of text documents. Obtained with vscode.workspace.textDocuments.filter(doc => doc.isDirty)
- * @returns The vscode.TextDocument or undefined if not found.
+/** Open a text document through the vscode api.
+ * can be called with await.
+ * @param filePath The file path.
+ * @returns the text document.
  */
-export function getTextDocument(filePath: string, docs: Array<vscode.TextDocument>): vscode.TextDocument {
-    // Check if file is opened in editor
-    let foundDoc;
-    for (const doc of docs) {
-        //if(doc.isDirty)    // Only check dirty documents, other are on disk
-        if (doc.fileName == filePath) {
-            foundDoc = doc;
-            break;
-        }
-    }
-    return foundDoc;
+// TODO: Do I need to try/catch a call to this fucntion?
+export async function openTextDocument(filePath: string) {
+    return new Promise<vscode.TextDocument>((resolve, reject) => {
+        const uri = vscode.Uri.file(filePath);
+        vscode.workspace.openTextDocument(uri).then(
+            textDoc => resolve(textDoc),
+            reason => reject(reason)
+        );
+    });
 }
 
 
@@ -97,23 +92,11 @@ export function getTextDocument(filePath: string, docs: Array<vscode.TextDocumen
  * Returns an array of strings for the given file.
  * Reads it either from the open editor or from the file itself.
  * @param fileName The filename of the document.
- * @param documents All dirty vscode.TextDocuments.
  */
-function getLinesForFile(filePath: string, documents: vscode.TextDocument[]): string[] {
-    // Check if file is opened in editor
-    let foundDoc = getTextDocument(filePath, documents);
-
-    let lines: Array<string>;
-    // Different handling: open text document or file on disk
-    if (foundDoc) {
-        // Doc is opened in text editor (and dirty).
-        lines = foundDoc.getText().split('\n');
-    }
-    else {
-        // Doc is read from disk.
-        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-        lines = linesData.split('\n');
-    }
+async function getLinesForFile(filePath: string): Promise<string[]> {
+    // Doc is read through vscode API
+    const textDoc: vscode.TextDocument = await openTextDocument(filePath);
+    const lines = textDoc.getText().split('\n');
 
     // Strip comments
     stripAllComments(lines);
@@ -137,9 +120,6 @@ export async function grep(regex: RegExp, rootFolder: string, languageId: Allowe
     try {
         const globInclude = LanguageId.getGlobalIncludeForLanguageId(languageId);
         const uris = await vscode.workspace.findFiles(globInclude, globExcludeFiles);
-        //const uris = urisUnfiltered.filter(uri => fileBelongsToLanguageId(uri.fsPath, languageId));
-        const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty && doc.languageId == languageId);
-
         for (const uri of uris) {
             // get fileName
             const fileName = uri.fsPath;
@@ -148,74 +128,16 @@ export async function grep(regex: RegExp, rootFolder: string, languageId: Allowe
 
             // Check if file is opened in editor
             const filePath = fileName;
-            let foundDoc = getTextDocument(filePath, docs);
+            const foundDoc = await openTextDocument(filePath);
 
-            // Check if file on disk is checked or in vscode
-            if (foundDoc) {
-                // Check file in vscode
-                const fileMatches = grepTextDocument(foundDoc, regex);
-                // Add filename to matches
-                for (const match of fileMatches) {
-                    match.filePath = fileName;
-                }
-                // Store
-                allMatches.set(fileName, fileMatches);
+            // Check file in vscode
+            const fileMatches = grepTextDocument(foundDoc, regex);
+            // Add filename to matches
+            for (const match of fileMatches) {
+                match.filePath = fileName;
             }
-            else {
-                // Check file on disk
-                let fileMatches = allMatches.get(fileName);
-
-                // Read
-                const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-                const lines = linesData.split('\n');
-                stripAllComments(lines);
-
-                const len = lines.length;
-                for (let index = 0; index < len; index++) {
-                    const lineContents = lines[index];
-                    if (lineContents.length == 0)
-                        continue;
-                    regex.lastIndex = 0;    // If global search is used, make sure it always start at 0
-                    const lineMatches: Array<FileMatch> = [];
-                    do {
-                        const match = regex.exec(lineContents);
-                        if (!match)
-                            break;
-
-                        // Found: get start and end
-                        let start = match.index;
-                        for (let j = 1; j < match.length; j++) {
-                            // This capture group surrounds the start til the searched word begins. It is used to adjust the found start index.
-                            if (match[j]) {
-                                // Note: an optional group might be undefined
-                                const i = match[j].length;
-                                start += i;
-                            }
-                        }
-                        const end = match.index + match[0].length;
-
-                        // Make sure that the map entry exists.
-                        if (!fileMatches) {
-                            fileMatches = [];
-                            allMatches.set(fileName, fileMatches);
-                        }
-
-                        // Reverse order (useful if names should be replaced later on)
-                        lineMatches.unshift({
-                            filePath,
-                            line: index,
-                            start,
-                            end,
-                            lineContents,
-                            match
-                        });
-                    } while (regex.global); // Note if "g" was specified multiple matches (e.g. for rename) can be found.
-
-                    // Put in global array.
-                    if (fileMatches)
-                        fileMatches.push(...lineMatches);
-                }
-            }
+            // Store
+            allMatches.set(fileName, fileMatches);
         }
     }
     catch (e) {
@@ -422,9 +344,8 @@ export function getRegExFromLabel(label: string): RegExp {
  */
 export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
     //console.log('reduceLocations');
-    const docs = vscode.workspace.textDocuments.filter(doc => doc.isDirty);
     // 1. Get module label
-    const docLines = getLinesForFile(docFileName, docs);
+    const docLines = await getLinesForFile(docFileName);
     const docModStructInfos = getModuleFileInfo(docLines);
     const docFileInfo = {
         lines: docLines,
@@ -460,7 +381,7 @@ export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocati
         // Check if file was already analyze for modules and labels
         let fileInfo = filesInfo[fileName];
         if (!fileInfo) {
-            const lines = getLinesForFile(fileName, docs);
+            const lines = await getLinesForFile(fileName);
             const modStructInfos = getModuleFileInfo(lines);
             fileInfo = {
                 lines,

@@ -137,12 +137,6 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         const codeLensProvider = new CodeLensProvider();
         regCodeLensProvider = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider);
         context.subscriptions.push(regCodeLensProvider);
-
-        {
-            const codeLensProvider2 = new CodeLensProvider();
-            const regCodeLensProvider2 = vscode.languages.registerCodeLensProvider(asmListFiles, codeLensProvider2);
-            context.subscriptions.push(regCodeLensProvider2);
-        }
     }
 
     // Register
