@@ -1,5 +1,8 @@
 # Changelog
 
+# 2.1.1
+- Fixed #87: # comment
+
 # 2.1.0
 - Fixed incompatibility with vscode 1.74.
 
