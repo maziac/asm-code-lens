@@ -43,46 +43,15 @@ export class RenameProvider implements vscode.RenameProvider {
 
         // Change to WorkSpaceEdits.
         // Note: WorkSpaceEdits do work on all (even not opened files) in the workspace.
-        // However the problem is that the file which is not yet open would be
-        // opened by the WorkSpaceEdit and stay there unsaved.
-        // Therefore I try beforehand to find out which documents are already opened and
-        // handle the unopened files differently.
-        // The problem is: there is no way to find out the opened documents.
-        // The only available information are the dirty docs. I.e. those are opened.
-        // And only those are changed with WorkSpaceEdits.
-        // The other, undirty opened docs and unopened docs, are changed on disk.
-        // For the undirty opened docs this will result in a reload at the same position.
-        // Not nice, but working.
+        // If a file is not open in the text editor it will remain unopened.
+        // (This was probably different in the past.)
+        // I.e. WorkSpaceEdits can work on all files:
+        // - not opened in text editor
+        // - opened in text editor and saved
+        // - opened in text editor and unsaved. The file in the editor will be saved, but this is normal behavior also e.g. in typescript renaming.
         const wsEdit = new vscode.WorkspaceEdit();
-        const fileMap = new Map<string, Array<vscode.Range>>()
         for (const loc of reducedLocations) {
-            // Check if doc is not open
-            const fsPath = loc.uri.fsPath;
-            const foundDoc = await openTextDocument(fsPath);
-            if (foundDoc) {
-                // use workspace edit because file is opened in editor
-  // TODO:   Rename ausprobieren: wsedit auch wenn doc gar nicht geöffnet ist?
-                wsEdit.replace(loc.uri, loc.range, newName);
-            }
-            else {
-                // Remember the change for the files on disk:
-                // It may happen that the same file is changed several times.
-                // Therefore the data is collected first.
-                // Check if location array already exists.
-                let locs = fileMap.get(fsPath);
-                if (!locs) {
-                    // If not, create it.
-                    locs = new Array<any>();
-                    fileMap.set(fsPath, locs);
-                }
-                // Add location
-                locs.push(loc.range);
-            }
-        }
-
-        // Change files on disk.
-        for (const [fsPath, changes] of fileMap) {
-            this.renameInFile(fsPath, changes, newName);
+            wsEdit.replace(loc.uri, loc.range, newName);
         }
 
         return wsEdit;
