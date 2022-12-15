@@ -76,7 +76,6 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
  * @param filePath The file path.
  * @returns the text document.
  */
-// TODO: Do I need to try/catch a call to this function?
 export async function openTextDocument(filePath: string) {
     return new Promise<vscode.TextDocument>((resolve, reject) => {
         const uri = vscode.Uri.file(filePath);
@@ -215,18 +214,13 @@ export async function grepMultiple(regexes: RegExp[], rootFolder: string, langua
  */
 export function grepTextDocument(doc: vscode.TextDocument, regex: RegExp): FileMatch[] {
     const matches: FileMatch[] = [];
-    const len = doc.lineCount;
-
 
     // Strip all comments
-    const lines = Array<string>(len);
-    for (let i = 0; i < len; i++) {
-        const textLine = doc.lineAt(i);
-        lines[i] = textLine.text;
-    }
+    const lines = doc.getText().split('\n');
     stripAllComments(lines);
 
     // Go through all lines
+    const len = lines.length;
     for (let line = 0; line < len; line++) {
         const lineContents = lines[line];
 

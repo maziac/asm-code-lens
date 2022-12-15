@@ -59,15 +59,11 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         let defaultSymbolKind = vscode.SymbolKind.Function;
 
         // Strip all comments
-        const len = document.lineCount;
-        const lines = Array<string>(len);
-        for (let i = 0; i < len; i++) {
-            const textLine = document.lineAt(i);
-            lines[i] = textLine.text;
-        }
+        const lines = document.getText().split('\n');
         stripAllComments(lines);
 
         // Go through all lines
+        const len = lines.length;
         for (let line = 0; line < len; line++) {
             let lineContents = lines[line];
 
