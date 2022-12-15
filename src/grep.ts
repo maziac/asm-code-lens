@@ -76,7 +76,7 @@ export function removeDuplicates(locations: GrepLocation[], handler: (loc: GrepL
  * @param filePath The file path.
  * @returns the text document.
  */
-// TODO: Do I need to try/catch a call to this fucntion?
+// TODO: Do I need to try/catch a call to this function?
 export async function openTextDocument(filePath: string) {
     return new Promise<vscode.TextDocument>((resolve, reject) => {
         const uri = vscode.Uri.file(filePath);

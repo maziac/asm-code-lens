@@ -2,8 +2,7 @@ import {Config} from './config';
 import {AllowedLanguageIds} from './languageId';
 import {CommonRegexes} from './regexes/commonregexes';
 import * as vscode from 'vscode';
-import {grep, openTextDocument, reduceLocations} from './grep';
-import * as fs from 'fs';
+import {grep, reduceLocations} from './grep';
 import {RenameRegexes} from './regexes/renameregexes';
 
 
@@ -56,45 +55,4 @@ export class RenameProvider implements vscode.RenameProvider {
 
         return wsEdit;
     }
-
-
-    /**
-     * Replaces one occurrence in the file on disk with the 'newName'.
-     * @param filePath The absolute file path.
-     * @param changes The changes: an array with locations.
-     * @param newName The new name.
-     */
-    protected async renameInFile(filePath: string, changes: Array<vscode.Range>, newName: string) {
-        //const readStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
-
-        // Read and exchange
-        const linesData = fs.readFileSync(filePath, {encoding: 'utf-8'});
-        const lines = linesData.split('\n');
-
-        // Process all changes
-        const regex = CommonRegexes.regexInclude();
-        for(const range of changes) {
-            const row = range.start.line;
-            const clmn = range.start.character;
-            const clmnEnd = range.end.character;
-            const line = lines[row];
-
-            // Skip include lines
-            const match = regex.exec(line);
-            if(match)
-                continue;
-
-            // Replace
-            const replacedLine = line.substring(0, clmn) + newName + line.substring(clmnEnd);
-            lines[row] = replacedLine;
-        }
-
-        // Now write file
-        const replacedText = lines.join('\n');
-        const writeStream = fs.createWriteStream(filePath, { encoding: 'utf-8' });
-        await writeStream.write(replacedText, () => {
-            writeStream.close();
-        })
-    }
-
 }
