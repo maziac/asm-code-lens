@@ -36,7 +36,6 @@ export interface FileInfo {
  * I.e. all MODULE OR STRUCT occurrences are scanned and the start
  * and end of the structures are put into the array (row and label name).
  * @param fileName The filename of the document.
- * @param documents All dirty vscode.TextDocuments.
  * @returns FileModuleStructInfo[]
  */
 export function getModuleFileInfo(lines: string[]): FileModuleStructInfo[] {

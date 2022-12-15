@@ -94,13 +94,19 @@ export async function openTextDocument(filePath: string) {
  * @param fileName The filename of the document.
  */
 async function getLinesForFile(filePath: string): Promise<string[]> {
-    // Doc is read through vscode API
-    const textDoc: vscode.TextDocument = await openTextDocument(filePath);
-    const lines = textDoc.getText().split('\n');
+    try {
+        // Doc is read through vscode API
+        const textDoc: vscode.TextDocument = await openTextDocument(filePath);
+        const lines = textDoc.getText().split('\n');
 
-    // Strip comments
-    stripAllComments(lines);
-    return lines;
+        // Strip comments
+        stripAllComments(lines);
+        return lines;
+    }
+    catch (e) {
+        console.log(e);
+        return [];
+    }
 }
 
 
@@ -278,6 +284,7 @@ export function grepTextDocumentMultiple(doc: vscode.TextDocument, regexes: RegE
  * @param label  E.g. 'explosion.init' or 'check_all'
  * @return E.g. 'init' or 'check_all'.
  */
+/*
 export function getLastLabelPart(label: string): string {
     const k = label.indexOf('.');
     if (k < 0)
@@ -285,6 +292,7 @@ export function getLastLabelPart(label: string): string {
 
     return label.substring(k + 1);
 }
+*/
 
 
 /**

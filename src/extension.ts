@@ -7,7 +7,6 @@ import {RenameProvider} from './RenameProvider';
 import {DocumentSymbolProvider} from './DocumentSymbolProvider';
 import {CompletionProposalsProvider} from './CompletionProposalsProvider';
 import {Commands} from './Commands';
-//import {setGrepGlobPatterns} from './grep';
 import {setCustomCommentPrefix} from './comments';
 import {HexCalcProvider} from './HexCalcProvider';
 import {WhatsNewView} from './whatsnew/whatsnewview';

@@ -55,8 +55,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         // Find all code lenses
         const languageId = document.languageId as AllowedLanguageIds;
 
-        const fsPath = document.uri.fsPath;
-        console.log(fsPath);
+        //console.log(document.uri.fsPath);
         const codeLenses: Array<vscode.CodeLens> = [];
         const regexes = CommonRegexes.regexesLabel(config, languageId);
         const matches = grepTextDocumentMultiple(document, regexes);
