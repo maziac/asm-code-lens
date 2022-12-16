@@ -11,9 +11,9 @@ If you like ASM-Code-Lens please consider supporting it.
 </a>
 
 
-# ASM Code Lens
+# ASM Code Lens XXxy
 
-![](assets/codelens_usage.gif)
+![](assets/remote/codelens_usage.gif)
 
 'ASM Code Lens' is a language server extension for Visual Studio Code for assembler files.
 It provides support for:
@@ -66,14 +66,14 @@ The calculator allows the basic integer calculations:
 - multiplication
 - division
 
-![](assets/hexcalculator.gif)
+![](assets/remote/hexcalculator.gif)
 
 
 ## Outline View
 
 An outline view of the assembly can be shown like this:
 
-![](assets/outline_view.jpg)
+![](assets/remote/outline_view.jpg)
 
 "ASM Code Lens" uses some heuristics to tell what labels are data, const or code.
 So be aware that it's decision might be wrong sometimes.
@@ -84,7 +84,7 @@ Note: The outline view also supports sjasmplus MODULE information.
 ## Find Dead Code
 
 With a right click on a text editor (an asm file) and by selecting 'Find Labels with no Reference'
-![](assets/find-labels-with-no-reference.jpg)
+![](assets/remote/find-labels-with-no-reference.jpg)
 you get a list of labels (in the OUTPUT pane) that are not referenced anywhere in all files.
 
 This can be useful to find any dead code because code or data that is not referenced is probably not used or the label is superfluous.
@@ -131,7 +131,7 @@ main_loop:
 ```
 
 Which results in the following highlighting:
-![](assets/md_code_blocks.jpg)
+![](assets/remote/md_code_blocks.jpg)
 
 
 

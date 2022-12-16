@@ -9,10 +9,21 @@
 <li>
 	<span class="changelog-badge changelog-badge-changed">CHANGED</span>
 	<br>The "asm-code-lens.includeFiles" setting was removed.<br>
-	It is now determined by the file association if the file should be included. Add all files you want asm-code-lens to recognize into the "Assembler file" (for asm files) or "Assembler list file" (for list files) file association.
+	It is now determined by the file association if the file should be included. Add all files you want asm-code-lens to
+	recognize into the "Assembler file" (for asm files) or "Assembler list file" (for list files) file association.
+</li>
+
+<li>
+	<span class="changelog-badge changelog-badge-changed">CHANGED</span>
+	<br>'Find Labels with no Reference' now only prints unused labels of the current workspace folder.
 </li>
 
 <li>
 	<span class="changelog-badge changelog-badge-fixed">FIXED</span>
-	The problem matcher for sjasmplus ("$problem-matcher-sjasmplus") now supports both, absolute and relative, paths.
+	<br>The problem matcher for sjasmplus ("$problem-matcher-sjasmplus") now supports both, absolute and relative, paths.
+</li>
+
+<li>
+	<span class="changelog-badge changelog-badge-fixed">FIXED</span>
+	<br>Multiroot: Each workspace folder and configuration works separately from the other. References from workspace folder A will not show up in workspace folder B.
 </li>

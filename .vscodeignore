@@ -11,4 +11,4 @@ notes.md
 *.vsix
 *.vsix.zip
 .*/
-
+assets/remote/
