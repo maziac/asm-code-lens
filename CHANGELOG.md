@@ -4,6 +4,7 @@
 - Fixed #84: Refactoring of all vscode providers. Especially the code lens provider. The way there were used did not work in all multiroot configurations. This should be fixed now.
 - 'Find Labels with no Reference' now only prints unused labels of the current workspace folder.
 - Refactored: all file access now goes through vscode.
+- Fixed #87: # comment
 
 # 2.1.0
 - Fixed incompatibility with vscode 1.74.

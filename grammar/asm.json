@@ -3,9 +3,6 @@
 	"name": "asm",
 	"patterns": [
 		{
-			"include": "#comments"
-		},
-		{
 			"include": "#keywords"
 		},
 		{
@@ -19,6 +16,9 @@
 		},
 		{
 			"include": "#labels"
+		},
+		{
+			"include": "#comments"
 		}
 	],
 	"repository": {
@@ -55,7 +55,7 @@
 				},
 				{
 					"name": "comment.line_hashtag.asm",
-					"begin": "#+\\s",
+					"begin": "#",
 					"end": "\\n"
 				}
 			]
