@@ -1,3 +1,5 @@
+node_modules/**
+out/src/**
 out/tests/**
 **/*.tests.*
 tests/**
