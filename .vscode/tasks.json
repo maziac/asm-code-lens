@@ -4,16 +4,39 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "watch", // Used by "Launch Extension" in launch.json
             "type": "npm",
-            "label": "npm",
             "script": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ],
+            "problemMatcher": "$esbuild-watch",
             "isBackground": true,
             "group": {
                 "kind": "build",
                 "isDefault": true
+            }
+        },
+
+        {
+            "label": "test",
+            "type": "npm",
+            "script": "test",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "dependsOn": "compile-nobundle"
+        },
+
+        {
+            "label": "compile-nobundle",
+            "type": "npm",
+            "script": "compile-nobundle",
+            "problemMatcher": "$tsc-watch",
+            "isBackground": true,
+            "hide": true,
+            "group": {
+                "kind": "build",
+                "isDefault": false
             }
         },
 

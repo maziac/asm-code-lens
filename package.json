@@ -33,7 +33,7 @@
     "activationEvents": [
         "onStartupFinished"
     ],
-    "main": "./out/src/extension",
+    "main": "./out/extension.js",
     "contributes": {
         "views": {
             "explorer": [
@@ -41,7 +41,7 @@
                     "type": "webview",
                     "id": "asm-code-lens.calcview-explorer",
                     "name": "Hexadecimal Calculator",
-                    "icon": "assets/hexcalc_icon.svg",
+                    "icon": "assets/local/hexcalc_icon.svg",
                     "contextualTitle": "Hex Calculator",
                     "when": "config.asm-code-lens.hexCalculator.showInExplorer"
                 }
@@ -51,7 +51,7 @@
                     "type": "webview",
                     "id": "asm-code-lens.calcview-debug",
                     "name": "Hexadecimal Calculator",
-                    "icon": "assets/hexcalc_icon.svg",
+                    "icon": "assets/local/hexcalc_icon.svg",
                     "contextualTitle": "Hex Calculator",
                     "when": "config.asm-code-lens.hexCalculator.showInDebug"
                 }
@@ -275,9 +275,13 @@
         ]
     },
     "scripts": {
-        "compile": "tsc -p ./",
+        "vscode:prepublish": "npm run esbuild-base -- --minify",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+        "compile": "npm run esbuild-base -- --sourcemap",
+        "watch": "npm run esbuild-base -- --sourcemap --watch",
+        "compile-nobundle": "tsc -p ./",
+        "watch-nobundle": "tsc -w -p ./",
         "tslint": "eslint ./**/*.ts",
-        "watch": "tsc -w -p ./",
         "test": "mocha -u tdd 'out/**/*.tests.js'",
         "package": "vsce package",
         "publish": "vsce publish"
@@ -294,6 +298,7 @@
         "@types/mocha": "^9.1.0",
         "@types/node": "^17.0.21",
         "@types/vscode": "^1.65.0",
+        "esbuild": "^0.16.9",
         "mocha": "^9.2.2",
         "source-map-support": "^0.5.21",
         "typescript": "^4.6.2"
