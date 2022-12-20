@@ -10,7 +10,10 @@
             "args": ["--extensionDevelopmentPath=${workspaceFolder}" ],
             "sourceMaps": true,
             "outFiles": [ "${workspaceFolder}/out/extension.js" ],
-            "preLaunchTask": "watch"
+            "preLaunchTask": "watch",
+            "skipFiles": [
+                "**/extensionHostProcess.js"
+            ]
         },
         {
             "name": "Launch Tests",
