@@ -1,4 +1,10 @@
 {
-  "preset": "ts-jest",
-  "testEnvironment": "node"
+  "transform": {
+    "^.+\\.tsx?$": [
+      "esbuild-jest",
+      {
+        "sourcemap": "both"
+      }
+    ]
+  }
 }
