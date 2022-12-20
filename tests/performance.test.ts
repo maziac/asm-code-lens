@@ -96,12 +96,12 @@ class RefRegexes {
 const BASE_COUNT = 100;
 
 
-suite('Performance', () => {
+describe('Performance', () => {
 
     let asmLines: string[];
     let listLines: string[];
 
-    setup(() => {
+    beforeEach(() => {
         const asmString = fs.readFileSync('./tests/data/sample.asm').toString();
         asmLines = asmString.split('\n');
         const listString = fs.readFileSync('./tests/data/sample.list').toString();
@@ -194,7 +194,7 @@ suite('Performance', () => {
     }
 
 
-    suite('regexes', () => {
+    describe('regexes', () => {
 
         test('regexLabelColon asm', () => {
             const speed = compare(CommonRegexes.regexLabelColon("asm-collection"), RefRegexes.regexLabelColon(), true, false, BASE_COUNT);
