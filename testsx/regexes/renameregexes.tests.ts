@@ -1,4 +1,4 @@
-import { RenameRegexes } from './../../src/regexes/renameregexes';
+import { RenameRegexes } from '../../src/regexes/renameregexes';
 import * as assert from 'assert';
 
 

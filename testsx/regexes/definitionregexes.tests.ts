@@ -1,4 +1,4 @@
-import { DefinitionRegexes } from './../../src/regexes/definitionregexes';
+import { DefinitionRegexes } from '../../src/regexes/definitionregexes';
 import * as assert from 'assert';
 
 

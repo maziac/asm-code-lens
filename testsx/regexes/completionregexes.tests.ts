@@ -1,6 +1,6 @@
-import { AllowedLanguageIds } from './../../src/languageId';
+import { AllowedLanguageIds } from '../../src/languageId';
 import * as assert from 'assert';
-import {CompletionRegexes} from './../../src/regexes/completionregexes';
+import {CompletionRegexes} from '../../src/regexes/completionregexes';
 
 
 // For access to protected functions.

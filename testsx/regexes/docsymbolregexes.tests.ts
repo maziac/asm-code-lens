@@ -1,4 +1,4 @@
-import { DocSymbolRegexes } from './../../src/regexes/docsymbolregexes';
+import { DocSymbolRegexes } from '../../src/regexes/docsymbolregexes';
 import * as assert from 'assert';
 
 

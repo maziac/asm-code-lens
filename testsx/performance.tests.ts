@@ -1,5 +1,5 @@
 import { CommonRegexes } from '../src/regexes/commonregexes';
-import { DefinitionRegexes } from './../src/regexes/definitionregexes';
+import { DefinitionRegexes } from '../src/regexes/definitionregexes';
 import {CompletionRegexes} from '../src/regexes/completionregexes';
 import * as fs from 'fs';
 import {RenameRegexes} from '../src/regexes/renameregexes';
