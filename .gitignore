@@ -5,3 +5,4 @@ out/
 **/*.zip
 logs/
 notes.md
+coverage/
