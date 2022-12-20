@@ -7,7 +7,7 @@
             "label": "watch", // Used by "Launch Extension" in launch.json
             "type": "npm",
             "script": "watch",
-            "problemMatcher": "$esbuild-watch",
+            "problemMatcher": [],
             "isBackground": true,
             "group": {
                 "kind": "build",
