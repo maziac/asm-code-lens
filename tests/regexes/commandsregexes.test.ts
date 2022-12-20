@@ -3,7 +3,7 @@ import {CommandsRegexes} from '../../src/regexes/commandsregexes';
 
 
 
-suite('CommandsRegexes', () => {
+describe('CommandsRegexes', () => {
 
     function checkResultsMatch(regex: RegExp, insOuts: (string | boolean)[]) {
         try {

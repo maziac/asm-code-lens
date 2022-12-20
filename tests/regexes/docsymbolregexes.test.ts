@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 
 
-suite('DocSymbolRegexes', () => {
+describe('DocSymbolRegexes', () => {
 
     function checkResultsMatch(regex: RegExp, insOuts: (string | boolean | undefined)[]) {
         try {

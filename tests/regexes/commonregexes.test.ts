@@ -8,9 +8,9 @@ import {CompletionRegexes} from '../../src/regexes/completionregexes';
 const CompletionRegexesMock = CompletionRegexes as any;
 
 
-suite('CommonRegexes', () => {
+describe('CommonRegexes', () => {
 
-    suite('Simple regexes', () => {
+    describe('Simple regexes', () => {
 
         function checkResultsMatch(regex: RegExp, insOuts: (string | boolean)[]) {
             try {
@@ -207,7 +207,7 @@ suite('CommonRegexes', () => {
     });
 
 
-    suite('RegEx 1 capture', () => {
+    describe('RegEx 1 capture', () => {
 
         function checkResults1Capture(regex: RegExp, insOuts: string[]) {
             try {
@@ -352,7 +352,7 @@ suite('CommonRegexes', () => {
         }
     }
 
-    suite('RegEx with search-word', () => {
+    describe('RegEx with search-word', () => {
 
         test('regexLabelColonForWord asm', (done) => {
             const insOuts = [

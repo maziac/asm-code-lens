@@ -6,9 +6,9 @@ import {CompletionRegexes} from '../../src/regexes/completionregexes';
 // For access to protected functions.
 const CompletionRegexesMock = CompletionRegexes as any;
 
-suite('CompletionRegexes', () => {
+describe('CompletionRegexes', () => {
 
-    suite('RegEx with search-word middle, ignore case', () => {
+    describe('RegEx with search-word middle, ignore case', () => {
 
         // insOuts: search-word, input-line, should-match, found-prefix
         function checkResultsSearchWord(func: (string, languagId?: AllowedLanguageIds) => RegExp, insOuts: (string | boolean)[], languageId: AllowedLanguageIds) {
@@ -39,7 +39,7 @@ suite('CompletionRegexes', () => {
             }
         }
 
-        suite('regexEveryLabelColonForWord', () => {
+        describe('regexEveryLabelColonForWord', () => {
 
             test('find label asm', (done) => {
                 const insOuts = [

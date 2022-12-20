@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 
 
-suite('DefinitionRegexes', () => {
+describe('DefinitionRegexes', () => {
 
 
 
