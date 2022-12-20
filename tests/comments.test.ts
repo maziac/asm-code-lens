@@ -404,7 +404,7 @@ describe('comments', () => {
                 'label: ',
             ], 4);
             assert.equal(result.length, 1);
-            assert.equal(result[0], 'd*/');
+            assert.equal(result[0], '*/');
 
             result = readCommentsForLine([
                 '/*',
