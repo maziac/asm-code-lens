@@ -285,7 +285,7 @@
         "test": "mocha -u tdd 'out/**/*.tests.js'",
         "package": "vsce package",
         "publish": "vsce publish",
-        "jstest": "jest"
+        "jstest": "jest --coverage"
     },
     "dependencies": {
         "assert": "^2.0.0",

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import {readCommentsForLine, setCustomCommentPrefix, stripAllComments} from '../src/comments';
 
 
-suite('comments', () => {
+describe('comments', () => {
 
     function verifyMultiLines(inpOutp: string[]) {
         // Split into input and output
@@ -29,7 +29,7 @@ suite('comments', () => {
         }
     }
 
-    suite('stripAllComments', () => {
+    describe('stripAllComments', () => {
 
         setCustomCommentPrefix();
 
@@ -74,7 +74,7 @@ suite('comments', () => {
 
 
 
-        suite('multiline', () => {
+        describe('multiline', () => {
 
             test('one or 2 liners', () => {
                 const inpOutp = [
@@ -146,7 +146,7 @@ suite('comments', () => {
     });
 
 
-    suite('setCustomCommentPrefix', () => {
+    describe('setCustomCommentPrefix', () => {
         test('single char', () => {
             setCustomCommentPrefix('#');
             const inpOutp = [
@@ -173,7 +173,7 @@ suite('comments', () => {
     });
 
 
-    suite('readCommentsForLine', () => {
+    describe('readCommentsForLine', () => {
         setCustomCommentPrefix();
 
         test('edge cases', () => {
@@ -404,7 +404,7 @@ suite('comments', () => {
                 'label: ',
             ], 4);
             assert.equal(result.length, 1);
-            assert.equal(result[0], '*/');
+            assert.equal(result[0], 'd*/');
 
             result = readCommentsForLine([
                 '/*',
