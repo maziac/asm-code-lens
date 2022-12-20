@@ -11,7 +11,7 @@ If you like ASM-Code-Lens please consider supporting it.
 </a>
 
 
-# ASM Code Lens XXxy
+# ASM Code Lens
 
 ![](assets/remote/codelens_usage.gif)
 
