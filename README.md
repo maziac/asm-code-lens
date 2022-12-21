@@ -20,9 +20,9 @@ If you like ASM-Code-Lens please consider supporting it.
 
   outline: none;
 
-  background-color: var(--vscode-button-background);
-  border: 1px solid var(--vscode-button-background);
-  color: white !important;
+  background-color: steelblue;
+  border: 1px solid steelblue;
+  color: white;
   font-weight: 600;
   transition: background-color 250ms, border-color 250ms, color 250ms;
 }
