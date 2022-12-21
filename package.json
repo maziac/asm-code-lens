@@ -279,13 +279,8 @@
         "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
         "compile": "npm run esbuild-base -- --sourcemap",
         "watch": "npm run esbuild-base -- --sourcemap --watch",
-        "compile-nobundle": "tsc -p ./",
-        "watch-nobundle": "tsc -w -p ./",
-        "tslint": "eslint ./**/*.ts",
-        "test": "mocha -u tdd 'out/**/*.tests.js'",
         "package": "vsce package",
-        "publish": "vsce publish",
-        "jstest": "jest --coverage"
+        "test": "jest --coverage"
     },
     "dependencies": {
         "assert": "^2.0.0",
