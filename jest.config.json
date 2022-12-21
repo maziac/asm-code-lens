@@ -3,7 +3,8 @@
     "^.+\\.tsx?$": [
       "esbuild-jest",
       {
-        "sourcemap": "both"
+        "sourcemap": true,
+        "external": "vscode"
       }
     ]
   }
