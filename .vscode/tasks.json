@@ -29,31 +29,6 @@
         },
 
         {
-            "label": "test",
-            "type": "npm",
-            "script": "test",
-            "problemMatcher": [],
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "dependsOn": "compile-nobundle"
-        },
-
-        {
-            "label": "compile-nobundle",
-            "type": "npm",
-            "script": "compile-nobundle",
-            "problemMatcher": "$tsc-watch",
-            "isBackground": true,
-            "hide": true,
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-
-        {
             "label": "Clean SonarLint Problems",
             "type": "shell",
             "command": "echo Cleaning problems...",
