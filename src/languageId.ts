@@ -1,6 +1,6 @@
 
 import * as path from 'path';
-import * as assert from 'assert';
+import {strict as assert} from 'assert';
 import * as vscode from 'vscode';
 import {FuncCache} from './funccache';
 import {PackageInfo} from './whatsnew/packageinfo';
@@ -39,7 +39,7 @@ export class LanguageId {
 		if (languageId == 'asm-list-file')
 			return LanguageId.asmFileListCache.getData();
 		// Should not reach here
-		assert(false, 'languageId = ' + languageId + ' unknown.');
+		assert(false, 'languageId = "' + languageId + '" unknown.');
 	}
 
 	/**
