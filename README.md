@@ -2,14 +2,39 @@
 
 If you like ASM-Code-Lens please consider supporting it.
 
-<a href="https://github.com/sponsors/maziac" title="Github sponsor">
-	<img src="assets/button_donate_sp.png" />
-</a>
-&nbsp;&nbsp;
-<a href="https://www.paypal.com/donate/?hosted_button_id=K6NNLZCTN3UV4&locale.x=en_DE&Z3JncnB0=" title="PayPal">
-	<img src="assets/button_donate_pp.png" />
-</a>
+<style>
+.button--flat-primary {
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 0.8em;
+  letter-spacing: 0.25em;
+  margin: 1em 0.5em;
+  padding: 1em 1.75em;
+  text-decoration: none;
+  text-transform: uppercase;
+  user-select: none;
+  white-space: nowrap;
 
+  outline: none;
+
+  background-color: var(--vscode-button-background);
+  border: 1px solid var(--vscode-button-background);
+  color: white !important;
+  font-weight: 600;
+  transition: background-color 250ms, border-color 250ms, color 250ms;
+}
+</style>
+
+<div>
+    <a class="button button--flat-primary" title="Donate via PayPal"
+        href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url"
+        target="_blank">Donate via PayPal</a>
+    <a class="button button--flat-primary" title="Become a sponsor on Github" href="https://github.com/sponsors/maziac"
+       target="_blank">Other</a>
+</div>
 
 # ASM Code Lens
 
