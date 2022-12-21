@@ -1,9 +1,10 @@
 # Changelog
 
 # 2.2.0
+- Reduced package size a lot due to PR #90 by Crystal-RainSlide.
 - Fixed #84: Refactoring of all vscode providers. Especially the code lens provider. The way there were used did not work in all multiroot configurations. This should be fixed now.
 - 'Find Labels with no Reference' now only prints unused labels of the current workspace folder.
-- Refactored: all file access now goes through vscode.
+- Refactored: all file access now goes through vscode api.
 - Fixed #87: # comment
 
 # 2.1.0

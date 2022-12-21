@@ -146,17 +146,16 @@ Which results in the following highlighting:
 
 ASM-Code-Lens is licensed under the [MIT license](https://github.com/maziac/dezog/blob/master/LICENSE.txt).
 
-This extension made use of 3 other packages:
-- [find all references](https://github.com/gayanhewa/vscode-find-all-references) by gayanhewa, MIT License
-- [grob](https://www.npmjs.com/package/grob) by jamiebuilds, MIT License
-- [vscode-whats-new](https://github.com/alefragnani/vscode-whats-new) project from Alessandro Fragnani aka [alefragni](https://github.com/alefragnani), MIT License
+This extension uses code from the [vscode-whats-new](https://github.com/alefragnani/vscode-whats-new) project from Alessandro Fragnani aka [alefragni](https://github.com/alefragnani), MIT License.
 
 I also included the grammar for syntax highlighting from Martin Bórik's vscode extension [z80-macroasm-vscode](https://github.com/mborik/z80-macroasm-vscode) because I got problems when running both extensions at the same time and I could not turn off features selectively.
 I.e. I copied the files language.configuration.json and z80-macroasm.tmLanguage.json. The z80-macroasm-vscode extension itself was forked from Imanol Barriuso's vscode extension [z80asm-vscode](https://github.com/Imanolea/z80asm-vscode). MIT license, copyright (c) 2016 Imanol Barriuso (Imanolea).
 
 Many thanks to the authors.
 
-I also would like to thank these authors for contributions:
+I also would like to thank these contributors:
 - [kborowinski](https://github.com/kborowinski) for PRs regarding sjasmplus ([#20](https://github.com/maziac/asm-code-lens/pull/20), [#21](https://github.com/maziac/asm-code-lens/pull/21), [#22](https://github.com/maziac/asm-code-lens/pull/22), [#44](https://github.com/maziac/asm-code-lens/pull/44), [#47](https://github.com/maziac/asm-code-lens/pull/47), [#50](https://github.com/maziac/asm-code-lens/pull/50)).
-- [chrijbel](https://github.com/chribjel) for PR [Added support for changing the line comment prefix](https://github.com/maziac/asm-code-lens/pull/53).
-- [64kramsystem](https://github.com/64kramsystem) for PR [Add syntax highlight to Markdown code blocks](https://github.com/maziac/asm-code-lens/pull/65).
+- [chrijbel](https://github.com/chribjel) for PR #53 [Added support for changing the line comment prefix](https://github.com/maziac/asm-code-lens/pull/53).
+- [64kramsystem](https://github.com/64kramsystem) for PR #65 [Add syntax highlight to Markdown code blocks](https://github.com/maziac/asm-code-lens/pull/65).
+- [Crystal-RainSlide](https://github.com/Crystal-RainSlide) for PR #90 [Use esbuild](https://github.com/maziac/asm-code-lens/pull/90) which decreased the size of extension a lot.
+- And all the others who contributed and entered error reports.
