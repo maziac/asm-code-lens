@@ -1,4 +1,3 @@
-
 import * as path from 'path';
 import {strict as assert} from 'assert';
 import * as vscode from 'vscode';

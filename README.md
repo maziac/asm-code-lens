@@ -30,6 +30,14 @@ It provides support for:
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
 
 
+## Incompatibilities
+
+It has been reported a few times now that there might be problems using ASM Code Lens together with the [Z80 Macro-Assembler](https://github.com/mborik/z80-macroasm-vscode) extension.
+
+Both extensions do more or less the same.
+So, if you are doing Z80 stuff it is recommended to either install the "Z80 Macro-Assembler" extension or "ASM Code Lens", not both.
+
+
 ## Installation
 
 Install through Visual Studio Code Marketplace.
