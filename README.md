@@ -32,10 +32,13 @@ Please refer to the "Feature Contributions" tab to see how to enable/disable cer
 
 ## Incompatibilities
 
-It has been reported a few times now that there might be problems using ASM Code Lens together with the [Z80 Macro-Assembler](https://github.com/mborik/z80-macroasm-vscode) extension.
+If you are using "ASM Code Lens" with other extensions that define assembler language ids (such as [Z80 Macro-Assembler](https://github.com/mborik/z80-macroasm-vscode) or other syntax highlighting extensions for assembly code) you might experience problems. E.g. code lenses do not work.
 
-Both extensions do more or less the same.
-So, if you are doing Z80 stuff it is recommended to either install the "Z80 Macro-Assembler" extension or "ASM Code Lens", not both.
+The underlying problem is that vscode can associate a file only to one language id. I.e. the language id of your assembler files is associated to something else than "Assembler file" ASM Code Lens will not find the file anymore.
+
+When selecting an assembly file the file association is shown in the right side of the status bar, it should show something like:
+![](assets/remote/status_bar_file_association.jpg)
+Otherwise click on it and select the right association.
 
 
 ## Installation
