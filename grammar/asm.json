@@ -72,7 +72,7 @@
 				},
 				{
 					"name": "keyword.control.asm",
-					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdghlmswir]|d[bcdghmqszw]|d24|abyte[cz]?|byte|word|dword|qword|hex)\\b)"
+					"match": "(?i:(?<=\\s)(?:assert|fatal|error|warning|message|display|shellexec|def[bdghlmswir]|d[bcdghmqszw]|d24|abyte[cz]?|(?:byte|word|dword|qword)(?:\\sptr)?|hex)\\b)"
 				},
 				{
 					"name": "keyword.control.asm",
