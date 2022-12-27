@@ -17,15 +17,6 @@
             "skipFiles": [
                 "**/extensionHostProcess.js"
             ]
-        },
-        {
-            "name": "Launch Tests",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/test" ],
-            "sourceMaps": true,
-            "outFiles": [ "${workspaceFolder}/out/test/**/*.js" ]
         }
     ]
 }
