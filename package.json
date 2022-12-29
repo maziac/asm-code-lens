@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -275,10 +275,11 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run esbuild-base -- --minify",
-        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-        "compile": "npm run esbuild-base -- --sourcemap",
-        "watch": "npm run esbuild-base -- --sourcemap --watch",
+        "vscode:prepublish": "npm run esbuild-node -- --minify && npm run esbuild-browser -- --minify",
+        "esbuild-node": "esbuild ./src/extension.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
+        "esbuild-browser": "esbuild ./src/html/hexcalc.ts ./src/html/donate.ts --bundle --outdir=out/html --platform=browser",
+        "watch-node": "npm run esbuild-node -- --sourcemap --watch",
+        "watch-browser": "npm run esbuild-browser -- --sourcemap --watch",
         "package": "vsce package",
         "test": "jest --coverage"
     },
@@ -287,17 +288,17 @@
         "fast-glob": "^3.2.11",
         "fs-extra": "^10.0.1",
         "grepit": "^1.0.0",
-        "jsonc-parser": "^3.0.0",
-        "ts-node": "^10.7.0"
+        "ts-node": "^10.9.1"
     },
     "devDependencies": {
         "@types/jest": "^29.2.4",
-        "@types/node": "^17.0.21",
-        "@types/vscode": "^1.65.0",
+        "@types/node": "^18.8.2",
+        "@types/vscode": "^1.71.0",
+        "@types/vscode-webview": "^1.57.0",
         "esbuild": "^0.16.9",
         "esbuild-jest": "^0.5.0",
         "jest": "^29.3.1",
         "source-map-support": "^0.5.21",
-        "typescript": "^4.6.2"
+        "typescript": "^4.8.4"
     }
 }
