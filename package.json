@@ -284,11 +284,6 @@
         "test": "jest --coverage"
     },
     "dependencies": {
-        "assert": "^2.0.0",
-        "fast-glob": "^3.2.11",
-        "fs-extra": "^10.0.1",
-        "grepit": "^1.0.0",
-        "ts-node": "^10.9.1"
     },
     "devDependencies": {
         "@types/jest": "^29.2.4",
