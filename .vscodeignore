@@ -14,3 +14,5 @@ notes.md
 *.vsix.zip
 .*/
 assets/remote/
+coverage/
+jest.config.json
