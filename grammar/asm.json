@@ -232,7 +232,16 @@
 				},
 				{
 					"name": "keyword.mnemonic.asm",
-					"match": ":\\s(?i:rep|repe|repne|repnz|repz)\\s(?i:ins|movs|outs|stos|cmps|scas|lods)[bwdq]?\\s"
+					"match": "\\s(?i:rep|repe|repne|repnz|repz)\\s(?i:ins|movs|outs|stos|cmps|scas|lods)[bwdq]?\\s"
+				},
+
+				{
+					"name": "support.type.register.asm",
+					"match": "\\b(?:[re]?[a-d]x|[a-d][hl]|[re]?(?:si|di|bp|sp)|(?:si|di|bp|sp)l|r(?:[89]|1[0-5])[dwb]?)\\b"
+				},
+				{
+					"name": "support.type.register.asm",
+					"match": "\\b(?:[csdefg]s|st[0-7]|mm[0-7]|xmm(?:[0-9]|1[0-5])|cr[02348]|dr[0-7])\\b"
 				}
 			]
 		},

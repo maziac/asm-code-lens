@@ -1,29 +1,18 @@
-// export = ; at the top is required to get rid of
-// Object.defineProperty(exports, "__esModule", {value: true});
-// at the top of the transpiled js file.
-// Otherwise global variables do not work.
-// See here https://github.com/microsoft/TypeScript/issues/14351
-export = 0;
+import {vscode} from './vscode-import';
 
 
-declare let acquireVsCodeApi: any;
-declare let document: any;
-declare let hexPrefix: string;	// Prefix for hex values (e.g. "0x").
-
-const vscode = acquireVsCodeApi();
-
-
+// Prefix for hex values (e.g. "0x").
+declare let hexPrefix: string;
 
 // The last result in the calculator.
 let lastResult: number;
 
 
-
 // Get used elements.
-const decimalOutput = document.getElementById("dec_output");
-const hexOutput = document.getElementById("hex_output");
-const decimalInput = document.getElementById("dec_input");
-const hexInput = document.getElementById("hex_input");
+const decimalOutput = document.getElementById("dec_output")!;
+const hexOutput = document.getElementById("hex_output")!;
+const decimalInput = document.getElementById("dec_input")! as HTMLInputElement;
+const hexInput = document.getElementById("hex_input")! as HTMLInputElement;
 
 
 /**
@@ -59,7 +48,7 @@ function scrollToBottom() {
 /**
  * Clears/initializes the calculator values.
  */
-function clearCalculator() {
+globalThis.clearCalculator = function () {
 	lastResult = 0;
 	// Output
 	const initText = '<br>'.repeat(50);
@@ -79,7 +68,7 @@ function clearCalculator() {
  * @param numberBase 10 for decimal input, 16 for hex input.
  */
 // @ts-ignore
-function keypress(obj, event, numberBase) {
+globalThis.keypress = function (obj, event, numberBase) {
 	let text = obj.value.trim();
 
 	// Check for invalid input
@@ -162,7 +151,7 @@ function keypress(obj, event, numberBase) {
  * Send message that donate button has been clicked.
  */
 // @ts-ignore
-function donateClicked() {
+globalThis.donateClicked = function () {
 	vscode.postMessage({
 		command: 'donateClicked'
 	});
@@ -170,4 +159,4 @@ function donateClicked() {
 
 
 // INIT
-clearCalculator();
+globalThis.clearCalculator();

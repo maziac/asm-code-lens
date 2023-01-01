@@ -5,12 +5,32 @@
     "tasks": [
         {
             "label": "watch", // Used by "Launch Extension" in launch.json
+            "dependsOn": [
+                "watch-node",
+                "watch-browser"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+
+        {
+            "label": "watch-node", // Used by "Launch Extension" in launch.json
             "type": "npm",
-            "script": "watch",
+            "script": "watch-node",
             "problemMatcher": {
-                "pattern": {
-                    "regexp": ""
-                },
+                "owner": "watch-node",
+                "pattern": [
+                    {
+                        // File name and position
+                        "regexp": "^\\s*(.+):(\\d+):(\\d+):\\s*$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "message": 1 // Multiline does not work for some reason
+                    },
+                ],
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": {
@@ -22,10 +42,37 @@
                 }
             },
             "isBackground": true,
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build"
+        },
+
+        {
+            "label": "watch-browser", // Used by "Launch Extension" in launch.json
+            "type": "npm",
+            "script": "watch-browser",
+            "problemMatcher": {
+                "owner": "watch-browser",
+                "pattern": [
+                    {
+                        // File name and position
+                        "regexp": "^\\s*(.+):(\\d+):(\\d+):\\s*$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "message": 1 // Multiline does not work for some reason
+                    },
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": "\\s*\\[watch\\] build started"
+                    },
+                    "endsPattern": {
+                        "regexp": "^\\s*\\[watch\\] build finished"
+                    }
+                }
+            },
+            "isBackground": true,
+            "group": "build"
         },
 
         {

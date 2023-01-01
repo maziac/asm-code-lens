@@ -30,6 +30,17 @@ It provides support for:
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
 
 
+## Incompatibilities
+
+If you are using "ASM Code Lens" with other extensions that define assembler language ids (such as [Z80 Macro-Assembler](https://github.com/mborik/z80-macroasm-vscode) or other syntax highlighting extensions for assembly code) you might experience problems. E.g. code lenses do not work.
+
+The underlying problem is that vscode can associate a file only to one language id. I.e. the language id of your assembler files is associated to something else than "Assembler file" ASM Code Lens will not find the file anymore.
+
+When selecting an assembly file the file association is shown in the right side of the status bar, it should show something like:
+![](assets/remote/status_bar_file_association.jpg)
+Otherwise click on it and select the right association.
+
+
 ## Installation
 
 Install through Visual Studio Code Marketplace.

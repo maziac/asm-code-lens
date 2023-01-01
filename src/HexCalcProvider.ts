@@ -68,9 +68,6 @@ let hexPrefix = "${hexPrefix}";`
 		<button class="button-donate" style="float:right" onclick="donateClicked()">Donate...<div style="float:right;font-size:50%">ASM Code Lens</div></button>`);
 		}
 
-		// Add a Reload and Copy button for debugging
-		//mainHtml = mainHtml.replace('<body>', '<body><button onclick="parseStart()">Reload</button><button onclick="copyHtmlToClipboard()">Copy HTML to clipboard</button>');
-
 		// Set content
 		this.webview.html = mainHtml;
 	}
