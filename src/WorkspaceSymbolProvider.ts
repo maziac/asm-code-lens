@@ -4,7 +4,6 @@ import {Config} from './config';
 import {CommonRegexes} from './regexes/commonregexes';
 import {CompletionRegexes} from './regexes/completionregexes';
 import {grepMultiple} from './grep';
-import path = require('path');
 
 
 
@@ -39,7 +38,6 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
             // Get a list of workspaces folders
             const wsFolders = vscode.workspace.workspaceFolders;
             if (wsFolders) {
-                console.time('allworkspacesymbols');
                 // Check each
                 const len = query.length;
                 for (const ws of wsFolders) {
@@ -57,7 +55,6 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
                     const wsSymbols = await this.getWsSymbols(config, query);
                     symbols.push(...wsSymbols);
                 }
-                console.timeEnd('allworkspacesymbols');
             }
 
             resolve(symbols);
@@ -70,8 +67,6 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
      * @param query The query to check for symbols.
      */
     protected async getWsSymbols(config: Config, query: string): Promise<vscode.SymbolInformation[]> {
-        console.time('workspacesymbols');
-
         // Allow symbols only for asm files (not list files)
         const languageId: AllowedLanguageIds = 'asm-collection';
 
@@ -97,20 +92,11 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
                 continue;   // Skip if excluded
 
             // Add to symbol list
-            const container = path.basename(config.wsFolderPath);
             const location = new vscode.Location(loc.uri, loc.range);
-            const symb = new vscode.SymbolInformation(text, vscode.SymbolKind.Method, container, location);
+            const symb = new vscode.SymbolInformation(text, vscode.SymbolKind.Method, '', location);
             symbols.push(symb);
         }
 
-        console.timeEnd('workspacesymbols');
         return symbols;
     }
-
-
-    /*
-    resolveWorkspaceSymbol?(symbol: vscode.SymbolInformation, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation> {
-        throw new Error('Method not implemented.');
-    }
-*/
 }

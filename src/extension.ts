@@ -14,7 +14,7 @@ import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
-import {WorkspaceSymbolProvider} from './WorkSpaceSymbolProvider';
+import {WorkspaceSymbolProvider} from './WorkspaceSymbolProvider';
 
 
 
@@ -177,7 +177,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
 
 
     // Register
-    //if (Config.globalEnableWorkspaceSymbols)  // TODO
+    if (Config.globalEnableWorkspaceSymbols)
     {
         regWorkspaceSymbolProvider = vscode.languages.registerWorkspaceSymbolProvider( new WorkspaceSymbolProvider());
         context.subscriptions.push(regWorkspaceSymbolProvider);

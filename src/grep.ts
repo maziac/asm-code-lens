@@ -125,7 +125,7 @@ export async function grep(regex: RegExp, rootFolder: string, languageId: Allowe
     try {
         const globInclude = LanguageId.getGlobalIncludeForLanguageId(languageId);
         const allUris = await vscode.workspace.findFiles(globInclude, globExcludeFiles);
-        const uris = allUris.filter(uri => !uri.fsPath.startsWith(rootFolder));
+        const uris = allUris.filter(uri => uri.fsPath.startsWith(rootFolder));
         for (const uri of uris) {
             // Check if file is opened in editor
             const filePath = uri.fsPath;

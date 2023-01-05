@@ -40,6 +40,9 @@ export class Config {
 	// true if code lenses should be enabled.
 	public static globalEnableOutlineView: boolean;
 
+	// true if workspace symbols should be enabled
+	public static globalEnableWorkspaceSymbols: boolean;
+
 	// The custom prefix to use for toggle line comment. Depends on language
 	// id and can therefore only be set globally.
 	public static globalToggleCommentPrefix: string;
@@ -153,6 +156,7 @@ export class Config {
 			Config.globalEnableFindAllReferences ||= config.enableFindAllReferences;
 			Config.globalEnableRenaming ||= config.enableRenaming;
 			Config.globalEnableOutlineView ||= config.enableOutlineView;
+			Config.globalEnableWorkspaceSymbols ||= config.enableWorkspaceSymbols;
 		}
 	}
 
