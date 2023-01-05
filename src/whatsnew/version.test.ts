@@ -2,9 +2,9 @@ import * as assert from 'assert';
 import {Version} from './version';
 
 
-suite('Version', () => {
+describe('Version', () => {
 
-    suite('isNewVersion', () => {
+    describe('isNewVersion', () => {
         test('bigger/equal/lower', () => {
             // Bigger
             assert.ok(Version.isNewVersion('1.2.0', '1.1.0'));

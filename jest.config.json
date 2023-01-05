@@ -1,4 +1,7 @@
 {
+  "testPathIgnorePatterns": [
+    "out"
+  ],
   "transform": {
     "^.+\\.tsx?$": [
       "esbuild-jest",
