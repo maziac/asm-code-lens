@@ -275,6 +275,8 @@
         ]
     },
     "scripts": {
+        "compile": "tsc -p ./",
+        "watch-tsc": "tsc -w -p ./",
         "vscode:prepublish": "npm run esbuild-node -- --minify && npm run esbuild-browser -- --minify",
         "esbuild-node": "esbuild ./src/extension.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
         "esbuild-browser": "esbuild ./src/html/hexcalc.ts ./src/html/donate.ts --bundle --outdir=out/html --platform=browser",
