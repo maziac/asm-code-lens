@@ -126,7 +126,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         // regexes for labels with and without colon
         const regexes = CompletionRegexes.regexesEveryLabelForWord(fuzzySearchWord, config, languageId);
         // Find all sjasmplus MODULEs in the document
-        const searchSjasmModule = CompletionRegexes. regexEveryModuleForWord(fuzzySearchWord, languageId);
+        const searchSjasmModule = CompletionRegexes.regexEveryModuleForWord(fuzzySearchWord, languageId);
         regexes.push(searchSjasmModule);
         // Find all sjasmplus MACROs in the document
         const searchSjasmMacro = CompletionRegexes.regexEveryMacroForWord(fuzzySearchWord, languageId);

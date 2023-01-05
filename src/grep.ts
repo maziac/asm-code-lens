@@ -124,25 +124,21 @@ export async function grep(regex: RegExp, rootFolder: string, languageId: Allowe
 
     try {
         const globInclude = LanguageId.getGlobalIncludeForLanguageId(languageId);
-        const uris = await vscode.workspace.findFiles(globInclude, globExcludeFiles);
+        const allUris = await vscode.workspace.findFiles(globInclude, globExcludeFiles);
+        const uris = allUris.filter(uri => !uri.fsPath.startsWith(rootFolder));
         for (const uri of uris) {
-            // get fileName
-            const fileName = uri.fsPath;
-            if (fileName.indexOf(rootFolder) < 0)
-                continue;   // Skip because path belongs to different project
-
             // Check if file is opened in editor
-            const filePath = fileName;
+            const filePath = uri.fsPath;
             const foundDoc = await openTextDocument(filePath);
 
             // Check file in vscode
             const fileMatches = grepTextDocument(foundDoc, regex);
             // Add filename to matches
             for (const match of fileMatches) {
-                match.filePath = fileName;
+                match.filePath = filePath;
             }
             // Store
-            allMatches.set(fileName, fileMatches);
+            allMatches.set(filePath, fileMatches);
         }
     }
     catch (e) {
@@ -338,7 +334,7 @@ export function getRegExFromLabel(label: string): RegExp {
  *    concatenated label it is removed from 'locations'
  * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
  * @param locations An array with found locations of grepped labels.
- * @param document The document of the original label.
+ * @param docFileName The document of the original label.
  * @param position The position inside the document with the original label.
  * @param removeOwnLocation true (default) to remove the location of the searched word.
  * @param checkFullName true (default) = During label check the full name is checked. false (e.g.

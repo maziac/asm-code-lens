@@ -72,6 +72,9 @@ export class Config {
 	// true if code lenses should be enabled.
 	public enableOutlineView: boolean;
 
+	// true if workspace symbols are enabled
+	public enableWorkspaceSymbols: boolean;	// TODO: implement
+
 	// true if labels with colons should be searched.
 	public labelsWithColons: boolean;
 
@@ -86,6 +89,9 @@ export class Config {
 
 	// Required minimum length for completions.
 	public completionsRequiredLength: number;
+
+	// Required minimum length for workspace symbols.
+	public workspaceSymbolsRequiredLength: number;	// TODO: Make configurable
 
 
 	/** Loops through all workspace folders and gets there configuration.
@@ -135,6 +141,8 @@ export class Config {
 			config.completionsRequiredLength = settings.completionsRequiredLength || 0;
 			if (config.completionsRequiredLength < 1)
 				config.completionsRequiredLength = 1;
+			config.workspaceSymbolsRequiredLength = 3;	// TODO
+			config.enableWorkspaceSymbols = true;	// TODO
 			// Store
 			Config.configs.set(fsPath, config);
 			// Set global variables

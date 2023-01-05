@@ -14,6 +14,7 @@ import {PackageInfo} from './whatsnew/packageinfo';
 import {GlobalStorage} from './globalstorage';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
+import {WorkspaceSymbolProvider} from './WorkSpaceSymbolProvider';
 
 
 
@@ -118,7 +119,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     removeProvider(regReferenceProvider, context);
     removeProvider(regRenameProvider, context);
     removeProvider(regDocumentSymbolProvider, context);
-
+    removeProvider(regWorkspaceSymbolProvider, context);
 
     // Re-read settings for all workspaces.
     Config.init();
@@ -174,6 +175,14 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         context.subscriptions.push(regDocumentSymbolProvider);
     }
 
+
+    // Register
+    //if (Config.globalEnableWorkspaceSymbols)  // TODO
+    {
+        regWorkspaceSymbolProvider = vscode.languages.registerWorkspaceSymbolProvider( new WorkspaceSymbolProvider());
+        context.subscriptions.push(regWorkspaceSymbolProvider);
+    }
+
     // Toggle line Comment configuration
     vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: Config.globalToggleCommentPrefix}});
     // Store
@@ -203,7 +212,7 @@ let regDefinitionProvider: vscode.Disposable;
 let regReferenceProvider: vscode.Disposable;
 let regRenameProvider: vscode.Disposable;
 let regDocumentSymbolProvider: vscode.Disposable;
-
+let regWorkspaceSymbolProvider: vscode.Disposable;
 
 
 
