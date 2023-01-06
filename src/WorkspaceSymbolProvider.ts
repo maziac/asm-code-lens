@@ -8,7 +8,16 @@ import {grepMultiple} from './grep';
 
 
 /**
- * ReferenceProvider for assembly language.
+ * The WorkspaceSymbolProvider.
+ * In a multiroot environment the WorkspaceSymbolProvider can take quite some time.
+ * E.g. 5 secs.
+ * Therefore the following restirctions have been used to not increase the search time further:
+ * 1. The Symbol-kind is undefined, so that vscode does not show any symbol
+ * Recognizing the correct symbol would be quite complicated as it depends also on
+ * the previous lines (e.g. data vs. function).
+ * 2. MODULE information is not extracted. This would also require more analyzes
+ * on the file.
+ * The benefit for both is quite minimal, so it has been dropped.
  */
 export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
 
@@ -94,9 +103,6 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
             // Add to symbol list
             const location = new vscode.Location(loc.uri, loc.range);
             const symb = new vscode.SymbolInformation(text, undefined as any, '', location);
-            // Note: Above, the kind is undefined, so that vscode does not show any symbol.
-            // Recognizing the correct symbol would be quite complicated as it depends also on the previous lines (e.g. data vs. function).
-            // As the workspace symbol provider is already quite slow and the benefit is limited, no symbol is used.
             symbols.push(symb);
         }
 
