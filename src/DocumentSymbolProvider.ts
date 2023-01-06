@@ -52,6 +52,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         const excludes = ['include', ...config.labelsExcludes];
         const regexConst = DocSymbolRegexes.regexConst();
         const regexData = DocSymbolRegexes.regexData();
+        const regexMacro = DocSymbolRegexes.regexMacro(languageId);
         let lastSymbol;
         let lastSymbols = new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;
@@ -115,6 +116,18 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 }
             }
 
+            // Check for MACRO
+            if (regexMacro) {
+                const matchMacro = regexMacro.exec(lineContents);
+                if (matchMacro) {
+                    const macroName = matchMacro[2];
+                    const range = new vscode.Range(line, 0, line, 10000);
+                    const macroSymbol = new vscode.DocumentSymbol(macroName, '', vscode.SymbolKind.Method, range, range);
+                    symbols.push(macroSymbol);
+                }
+                continue;
+            }
+
             // Now check for MODULE or STRUCT
             let matchModule = regexModule.exec(lineContents);
             if (!matchModule)
@@ -126,10 +139,9 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     // Handle MODULE
                     // Create range
                     const range = new vscode.Range(line, 0, line, 10000);
-                    const selRange = range; //new vscode.Range(line, 0, line, 3);
                     // Create symbol
                     const kind = (keyword.startsWith("module")) ? vscode.SymbolKind.Module : vscode.SymbolKind.Struct;
-                    const moduleSymbol = new vscode.DocumentSymbol(moduleName, '', kind, range, selRange);
+                    const moduleSymbol = new vscode.DocumentSymbol(moduleName, '', kind, range, range);
                     // Add to children of last module
                     const len = lastModules.length;
                     if (len > 0) {

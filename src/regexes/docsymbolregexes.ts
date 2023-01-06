@@ -73,8 +73,7 @@ export class DocSymbolRegexes {
 	}
 
 
-	/**
-	 * Returns labels without a colon.
+	/** Checks for a const.
 	 * Capture groups for " EQU label"
 	 * 1 = "EQU"
 	 * 2 = "label"
@@ -85,8 +84,7 @@ export class DocSymbolRegexes {
 	}
 
 
-	/**
-	 * Returns labels without a colon.
+	/** Checks for a data.
 	 * Capture groups for " DEFB 0, 1, 2, 3"
 	 * 1 = "DEFB"
 	 * 2 = "0, 1, 2, 3"
@@ -94,6 +92,19 @@ export class DocSymbolRegexes {
 	 */
 	public static regexData(): RegExp {
 		return /\b(d[bcdghmsw]|def[bdghmsw])\b\s*(.*)/i;
+	}
+
+
+	/** Checks for a macro.
+	 * Capture groups for " macro label"
+	 * 1 = "MACRO"
+	 * 2 = "label"
+	 * Note: For list files undefined is returned.
+	 */
+	public static regexMacro(languageId: AllowedLanguageIds): RegExp | undefined {
+		if (languageId == 'asm-list-file')
+			return undefined;
+		return /\b(macro)\s+(.*)/i;
 	}
 }
 
