@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.3.0
+- WorkspaceSymbolProvider added.
+- MACROs are now identified as 'Methods' in the outline view.
+
 # 2.2.1
 - Hex-Calculator and donate buttons fixed.
 

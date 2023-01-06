@@ -93,7 +93,10 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
 
             // Add to symbol list
             const location = new vscode.Location(loc.uri, loc.range);
-            const symb = new vscode.SymbolInformation(text, vscode.SymbolKind.Method, '', location);
+            const symb = new vscode.SymbolInformation(text, undefined as any, '', location);
+            // Note: Above, the kind is undefined, so that vscode does not show any symbol.
+            // Recognizing the correct symbol would be quite complicated as it depends also on the previous lines (e.g. data vs. function).
+            // As the workspace symbol provider is already quite slow and the benefit is limited, no symbol is used.
             symbols.push(symb);
         }
 
