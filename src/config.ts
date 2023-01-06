@@ -144,8 +144,10 @@ export class Config {
 			config.completionsRequiredLength = settings.completionsRequiredLength || 0;
 			if (config.completionsRequiredLength < 1)
 				config.completionsRequiredLength = 1;
-			config.workspaceSymbolsRequiredLength = 3;	// TODO
-			config.enableWorkspaceSymbols = true;	// TODO
+			config.workspaceSymbolsRequiredLength = settings.workspaceSymbolsRequiredLength;
+			if (config.workspaceSymbolsRequiredLength < 1)
+				config.workspaceSymbolsRequiredLength = 1;
+			config.enableWorkspaceSymbols = settings.enableWorkspaceSymbols;
 			// Store
 			Config.configs.set(fsPath, config);
 			// Set global variables

@@ -61,91 +61,85 @@
             "type": "object",
             "title": "asm-code-lens configuration",
             "properties": {
+                "asm-code-lens.enableWorkspaceSymbols": {
+                    "order": 11,
+                    "scope": "resource",
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Enable/disable ['Open symbol by name'](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name)"
+                },
+                "asm-code-lens.workspaceSymbolsRequiredLength": {
+                    "order": 12,
+                    "scope": "resource",
+                    "type": "number",
+                    "default": 2,
+                    "markdownDescription": "The number of characters required before symbols will be presented."
+                },
                 "asm-code-lens.enableOutlineView": {
+                    "order": 21,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable outline view for the active document."
                 },
                 "asm-code-lens.enableCodeLenses": {
+                    "order": 31,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "Enable/disable the display of code lenses (references) above labels."
+                    "markdownDescription": "Enable/disable the display of code lenses ([references](https://code.visualstudio.com/docs/editor/editingevolved#_reference-information)) above labels."
                 },
                 "asm-code-lens.enableHovering": {
+                    "order": 41,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable showing the comments while hovering labels etc."
                 },
                 "asm-code-lens.enableCompletions": {
+                    "order": 51,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable symbol input completion."
                 },
                 "asm-code-lens.completionsRequiredLength": {
+                    "order": 52,
                     "scope": "resource",
                     "type": "number",
                     "default": 1,
                     "markdownDescription": "The number of characters required before completion proposals will be presented."
                 },
                 "asm-code-lens.enableGotoDefinition": {
+                    "order": 61,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "Enable/disable 'Go to Type Definition'."
+                    "markdownDescription": "Enable/disable ['Go to Type Definition'](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-type-definition)."
                 },
                 "asm-code-lens.enableFindAllReferences": {
+                    "order": 71,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
                     "markdownDescription": "Enable/disable 'Find All References'."
                 },
                 "asm-code-lens.enableRenaming": {
+                    "order": 81,
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "Enable/disable the possibility to rename labels. You need to reload the extension to take effect."
-                },
-                "asm-code-lens.excludeFiles": {
-                    "scope": "resource",
-                    "type": "string",
-                    "default": "",
-                    "markdownDescription": "Choose what files or directories to exclude e.g `**/*.{inc,s}`."
-                },
-                "asm-code-lens.hexCalculator.showInExplorer": {
-                    "scope": "window",
-                    "markdownDescription": "Set to false to disable calculator in explorer view.",
-                    "type": "boolean",
-                    "default": true
-                },
-                "asm-code-lens.hexCalculator.showInDebug": {
-                    "scope": "resource",
-                    "markdownDescription": "Set to false to disable calculator in debug view.",
-                    "type": "boolean",
-                    "default": true
-                },
-                "asm-code-lens.hexCalculator.hexPrefix": {
-                    "scope": "application",
-                    "markdownDescription": "The prefix to use for hex values, e.g. `0x` or `$`",
-                    "type": "string",
-                    "default": "0x"
-                },
-                "asm-code-lens.donated": {
-                    "scope": "application",
-                    "markdownDescription": "If you donated (press the `Donate...` button in hex calculator to do so) you can hide the button by setting this parameter.",
-                    "type": "boolean",
-                    "default": false
+                    "markdownDescription": "Enable/disable the possibility to [rename](https://code.visualstudio.com/docs/editor/editingevolved#_rename-symbol) labels. You need to reload the extension to take effect."
                 },
                 "asm-code-lens.comments.toggleLineCommentPrefix": {
+                    "order": 91,
                     "scope": "window",
                     "markdownDescription": "Configure the prefix used when toggling the line comment.",
                     "type": "string",
                     "default": ";"
                 },
                 "asm-code-lens.labels.colon": {
+                    "order": 101,
                     "scope": "resource",
                     "markdownDescription": "Determines if labels with or without or both should be recognized.\nPlease note: labels without colons cannot be determined in list files.",
                     "type": "string",
@@ -162,10 +156,46 @@
                     "default": "Both"
                 },
                 "asm-code-lens.labels.excludes": {
+                    "order": 102,
                     "scope": "resource",
                     "markdownDescription": "Configure here a comma separated list of words that should not be recognized as labels. E.g. if asm-code-lens wrongly interprets an assembler directive as label you can exclude it here. For example `if;then;else;elif;endif`. The exclude is case-insensitive.",
                     "type": "string",
                     "default": ""
+                },
+                "asm-code-lens.excludeFiles": {
+                    "order": 111,
+                    "scope": "resource",
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "Choose what files or directories to exclude e.g `**/*.{inc,s}`."
+                },
+                "asm-code-lens.hexCalculator.showInExplorer": {
+                    "order": 121,
+                    "scope": "window",
+                    "markdownDescription": "Set to false to disable calculator in explorer view.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "asm-code-lens.hexCalculator.showInDebug": {
+                    "order": 122,
+                    "scope": "resource",
+                    "markdownDescription": "Set to false to disable calculator in debug view.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "asm-code-lens.hexCalculator.hexPrefix": {
+                    "order": 123,
+                    "scope": "application",
+                    "markdownDescription": "The prefix to use for hex values, e.g. `0x` or `$`",
+                    "type": "string",
+                    "default": "0x"
+                },
+                "asm-code-lens.donated": {
+                    "order": 1000,
+                    "scope": "application",
+                    "markdownDescription": "If you donated (press the `Donate...` button in hex calculator to do so) you can hide the button by setting this parameter.",
+                    "type": "boolean",
+                    "default": false
                 }
             }
         },

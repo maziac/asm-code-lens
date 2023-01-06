@@ -39,9 +39,7 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
      * signaled by returning `undefined`, `null`, or an empty array.
      */
     public provideWorkspaceSymbols(query: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[]> {
-        console.log(':', query);    // TODO: Remove
         return new Promise<vscode.ProviderResult<vscode.SymbolInformation[]>>(async resolve => {
-            // TODO: Check query for starting dot ?
             const symbols: vscode.SymbolInformation[] = [];
 
             // Get a list of workspaces folders
