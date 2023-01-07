@@ -115,7 +115,7 @@
                     "scope": "resource",
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "Enable/disable ['Go to Type Definition'](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-type-definition)."
+                    "markdownDescription": "Enable/disable ['Go to Definition'](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)."
                 },
                 "asm-code-lens.enableFindAllReferences": {
                     "order": 71,

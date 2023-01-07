@@ -14,5 +14,5 @@ notes.md
 *.vsix.zip
 .*/
 assets/remote/
-coverage/
+**/coverage/
 jest.config.json
