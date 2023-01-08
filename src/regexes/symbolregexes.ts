@@ -1,4 +1,4 @@
-import { AllowedLanguageIds } from './../languageId';
+import { AllowedLanguageIds } from '../languageId';
 
 
 /**

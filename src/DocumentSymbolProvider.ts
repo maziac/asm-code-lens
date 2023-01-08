@@ -2,7 +2,7 @@ import { AllowedLanguageIds } from './languageId';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {Config} from './config';
-import {DocSymbolRegexes} from './regexes/docsymbolregexes';
+import {DocSymbolRegexes} from './regexes/symbolregexes';
 
 
 
