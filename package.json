@@ -238,8 +238,7 @@
                 ],
                 "aliases": [
                     "Assembler file"
-                ],
-                "configuration": "./language-configuration.json"
+                ]
             },
             {
                 "id": "asm-list-file",
@@ -249,8 +248,7 @@
                 ],
                 "aliases": [
                     "Assembler list file"
-                ],
-                "configuration": "./language-configuration.json"
+                ]
             },
             {
                 "id": "asm-markdown-codeblock"
