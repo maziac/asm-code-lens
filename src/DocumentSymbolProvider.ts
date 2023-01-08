@@ -2,7 +2,7 @@ import { AllowedLanguageIds } from './languageId';
 import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {Config} from './config';
-import {DocSymbolRegexes} from './regexes/symbolregexes';
+import {SymbolRegexes} from './regexes/symbolregexes';
 
 
 
@@ -35,24 +35,24 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         let symbols = new Array<vscode.DocumentSymbol>();
         let regexLabel;
         if (config.labelsWithColons && config.labelsWithoutColons)
-            regexLabel = DocSymbolRegexes.regexLabelWithAndWithoutColon(languageId);
+            regexLabel = SymbolRegexes.regexLabelWithAndWithoutColon(languageId);
         else {
             if (config.labelsWithColons)
-                regexLabel = DocSymbolRegexes.regexLabelWithColon(languageId);
+                regexLabel = SymbolRegexes.regexLabelWithColon(languageId);
             else {
                 if (languageId == 'asm-list-file')
                     return undefined as any; // In list files labels without colons are not supported.
-                regexLabel = DocSymbolRegexes.regexLabelWithoutColon();
+                regexLabel = SymbolRegexes.regexLabelWithoutColon();
             }
         }
 
-        const regexModule = DocSymbolRegexes.regexModuleLabel();
-        const regexStruct = DocSymbolRegexes.regexStructLabel();
+        const regexModule = SymbolRegexes.regexModuleLabel();
+        const regexStruct = SymbolRegexes.regexStructLabel();
         //const regexNotLabels = /^(include|if|endif|else|elif)$/i;
         const excludes = ['include', ...config.labelsExcludes];
-        const regexConst = DocSymbolRegexes.regexConst();
-        const regexData = DocSymbolRegexes.regexData();
-        const regexMacro = DocSymbolRegexes.regexMacro(languageId);
+        const regexConst = SymbolRegexes.regexConst();
+        const regexData = SymbolRegexes.regexData();
+        const regexMacro = SymbolRegexes.regexMacro(languageId);
         let lastSymbol;
         let lastSymbols = new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;

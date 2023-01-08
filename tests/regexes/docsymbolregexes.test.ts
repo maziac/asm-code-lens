@@ -1,4 +1,4 @@
-import { DocSymbolRegexes } from '../../src/regexes/symbolregexes';
+import { SymbolRegexes } from '../../src/regexes/symbolregexes';
 import * as assert from 'assert';
 
 
@@ -40,7 +40,7 @@ describe('DocSymbolRegexes', () => {
             "main", true, "main", "main",
             "M.a.main:", true, "M.a.main:", "M.a.main",
         ];
-        const regex = DocSymbolRegexes.regexLabelWithAndWithoutColon('asm-collection');
+        const regex = SymbolRegexes.regexLabelWithAndWithoutColon('asm-collection');
         checkResultsMatch(regex, insOuts);
     });
 
@@ -51,7 +51,7 @@ describe('DocSymbolRegexes', () => {
             "57   8000              main", false, "", "",
             "57   8000              M.a.main:", true, "M.a.main:", "M.a.main",
         ];
-        const regex = DocSymbolRegexes.regexLabelWithAndWithoutColon('asm-list-file');
+        const regex = SymbolRegexes.regexLabelWithAndWithoutColon('asm-list-file');
         checkResultsMatch(regex, insOuts);
     });
 
@@ -63,7 +63,7 @@ describe('DocSymbolRegexes', () => {
             "main", false, "", "",
             "M.a.main:", true, "M.a.main:", "M.a.main",
         ];
-        const regex = DocSymbolRegexes.regexLabelWithColon('asm-collection');
+        const regex = SymbolRegexes.regexLabelWithColon('asm-collection');
         checkResultsMatch(regex, insOuts);
     });
 
@@ -73,7 +73,7 @@ describe('DocSymbolRegexes', () => {
             "57   8000              main", false, "", "",
             "57   8000              M.a.main:", true, "M.a.main:", "M.a.main",
         ];
-        const regex = DocSymbolRegexes.regexLabelWithColon('asm-list-file');
+        const regex = SymbolRegexes.regexLabelWithColon('asm-list-file');
         checkResultsMatch(regex, insOuts);
     });
 
@@ -88,7 +88,7 @@ describe('DocSymbolRegexes', () => {
             "M.a.main:", false, "", "",
             "@M.a.main:", false, "", "",
         ];
-        const regex = DocSymbolRegexes.regexLabelWithoutColon();
+        const regex = SymbolRegexes.regexLabelWithoutColon();
         checkResultsMatch(regex, insOuts);
     });
 
@@ -106,7 +106,7 @@ describe('DocSymbolRegexes', () => {
             "24+  60D", false, "", "",
             "92+  6180   ENDMODULE", true, "ENDMODULE", undefined,
         ];
-        const regex = DocSymbolRegexes.regexModuleLabel();
+        const regex = SymbolRegexes.regexModuleLabel();
         checkResultsMatch(regex, insOuts);
     });
 
@@ -123,7 +123,7 @@ describe('DocSymbolRegexes', () => {
             "24+  60D", false, "", "",
             "92+  6180   ENDS", true, "ENDS", undefined,
         ];
-        const regex = DocSymbolRegexes.regexStructLabel();
+        const regex = SymbolRegexes.regexStructLabel();
         checkResultsMatch(regex, insOuts);
     });
 
@@ -138,7 +138,7 @@ describe('DocSymbolRegexes', () => {
             " 23+  60D5   EQU aa.b.c ", true, "EQU", "aa.b.c ",
             "24+  60D", false, "", "",
         ];
-        const regex = DocSymbolRegexes.regexConst();
+        const regex = SymbolRegexes.regexConst();
         checkResultsMatch(regex, insOuts);
     });
 
@@ -167,7 +167,7 @@ describe('DocSymbolRegexes', () => {
             " 23+  60D5   DS some ", true, "DS", "some ",
             "24+  60D", false, "", "",
         ];
-        const regex = DocSymbolRegexes.regexData();
+        const regex = SymbolRegexes.regexData();
         checkResultsMatch(regex, insOuts);
     });
 });

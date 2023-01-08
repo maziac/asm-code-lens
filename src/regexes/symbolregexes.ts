@@ -2,9 +2,10 @@ import { AllowedLanguageIds } from '../languageId';
 
 
 /**
- * All regexes that are used for the documentation symbol provider.
+ * All regexes that are used for the documentation symbol provider
+ * and the WorkSpaceSymbolProvider.
  */
-export class DocSymbolRegexes {
+export class SymbolRegexes {
 
 	/**
 	 * Returns labels with and without a colon.
@@ -14,7 +15,7 @@ export class DocSymbolRegexes {
 	 */
 	public static regexLabelWithAndWithoutColon(languageId: AllowedLanguageIds): RegExp {
 		if (languageId === 'asm-list-file')
-			return DocSymbolRegexes.regexLabelWithColon(languageId);	// Only with colon
+			return SymbolRegexes.regexLabelWithColon(languageId);	// Only with colon
 		return /^((@?[a-z_][\w\.]*):?)/i;
 	}
 
