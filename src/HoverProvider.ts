@@ -1,6 +1,6 @@
-import { AllowedLanguageIds } from './languageId';
-import { CommonRegexes } from './regexes/commonregexes';
 import * as vscode from 'vscode';
+import {AllowedLanguageIds} from './languageId';
+import {CommonRegexes} from './regexes/commonregexes';
 import {grepMultiple, reduceLocations} from './grep';
 import {Config} from './config';
 import {readCommentsForLine} from './comments';

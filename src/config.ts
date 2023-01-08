@@ -76,7 +76,10 @@ export class Config {
 	public enableOutlineView: boolean;
 
 	// true if workspace symbols are enabled
-	public enableWorkspaceSymbols: boolean;	// TODO: implement
+	public enableWorkspaceSymbols: boolean;
+
+	// true if folding is enabled
+	public enableFolding: boolean;
 
 	// true if labels with colons should be searched.
 	public labelsWithColons: boolean;
@@ -148,6 +151,7 @@ export class Config {
 			if (config.workspaceSymbolsRequiredLength < 1)
 				config.workspaceSymbolsRequiredLength = 1;
 			config.enableWorkspaceSymbols = settings.enableWorkspaceSymbols;
+			config.enableFolding = true;	// TODO
 			// Store
 			Config.configs.set(fsPath, config);
 			// Set global variables

@@ -15,6 +15,7 @@ import {GlobalStorage} from './globalstorage';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
 import {WorkspaceSymbolProvider} from './WorkspaceSymbolProvider';
+import {FoldingProvider} from './FoldingRangeProvider';
 
 
 
@@ -175,12 +176,18 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         context.subscriptions.push(regDocumentSymbolProvider);
     }
 
+    // Register
+    if (Config.globalEnableWorkspaceSymbols) {
+        regWorkspaceSymbolProvider = vscode.languages.registerWorkspaceSymbolProvider(new WorkspaceSymbolProvider());
+        context.subscriptions.push(regWorkspaceSymbolProvider);
+    }
 
     // Register
-    if (Config.globalEnableWorkspaceSymbols)
+    //if (Config.globalEnableWorkspaceSymbols)
+    if(true)
     {
-        regWorkspaceSymbolProvider = vscode.languages.registerWorkspaceSymbolProvider( new WorkspaceSymbolProvider());
-        context.subscriptions.push(regWorkspaceSymbolProvider);
+        regFoldingProvider = vscode.languages.registerFoldingRangeProvider({scheme: "file", language: 'asm-collection'}, new FoldingProvider());
+        context.subscriptions.push(regFoldingProvider);
     }
 
     // Toggle line Comment configuration
@@ -213,7 +220,7 @@ let regReferenceProvider: vscode.Disposable;
 let regRenameProvider: vscode.Disposable;
 let regDocumentSymbolProvider: vscode.Disposable;
 let regWorkspaceSymbolProvider: vscode.Disposable;
-
+let regFoldingProvider: vscode.Disposable;
 
 
 // this method is called when your extension is deactivated
