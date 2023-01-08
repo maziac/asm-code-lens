@@ -31,38 +31,71 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 		// Read doc
 		const linesData = document.getText();
 		const lines = linesData.split('\n');
+		const foldingRanges: vscode.FoldingRange[] = [];
+
+		// Search comments /* */
+		//	this.parseLines(foldingRanges, lines, vscode.FoldingRangeKind.Comment, [/^\s*\/\*/], [/\*\//]);
+		// Search comments ;
+		this.parseLines(foldingRanges, lines, vscode.FoldingRangeKind.Comment, [/^;/], [/^[^;]/, /^\s*$/], -1);
+
+
 		// Strip comments
 		stripAllComments(lines);
 
-		// Search label
+		// Search (non-local) label
 		const regexLabels = CommonRegexes.regexesLabel(config, 'asm-collection');
+		//this.parseLines(foldingRanges, lines, vscode.FoldingRangeKind.Region, regexLabels, regexLabels, -1);
+
+
+		return foldingRanges;
+	}
+
+
+	/** Parses all lines for regexes.
+	 * All are toplevel folding. There are no sub-foldings.
+	 * When a
+	 */
+	protected parseLines(foldingRanges: vscode.FoldingRange[], lines: string[], kind: vscode.FoldingRangeKind, regexesStart: RegExp[], regexesEnd: RegExp[], endOffset = 0) {
 		let currentRange: vscode.FoldingRange | undefined;
-		let foldingRanges: vscode.FoldingRange[] = [];
 		let lineNr = -1;
 		for (const line of lines) {
 			lineNr++;
-			for (const regexLabel of regexLabels) {
-				// Check if line starts with a (non-local) label
-				const match = regexLabel.exec(line);
-				if (match) {
-					// Check for range start or end?
-					if (currentRange) {
+			// Check for end
+			if (currentRange) {
+				for (const regexEnd of regexesEnd) {
+					// Check if line starts with a (non-local) label
+					const match = regexEnd.exec(line);
+					if (match) {
 						// End of range
-						currentRange.end = lineNr - 1;
-						foldingRanges.push(currentRange);
+						currentRange.end = lineNr + endOffset;
+						if(currentRange.start !== currentRange.end)
+							foldingRanges.push(currentRange);
+						currentRange = undefined;
+						break;	// One match is enough
 					}
-					// End of range is always also the start of of a range
-					currentRange = new vscode.FoldingRange(lineNr, 0, vscode.FoldingRangeKind.Region);
-					break;	// One match is enough
+				}
+				if (currentRange === undefined && endOffset === 0)
+					continue;	// Skip finding the start for this line
+			}
+
+			// Check for start
+			if (regexesStart !== regexesEnd && !currentRange) {
+				for (const regexStart of regexesStart) {
+					// Check if line starts with a (non-local) label
+					const match = regexStart.exec(line);
+					if (match) {
+						// End of range is always also the start of of a range
+						currentRange = new vscode.FoldingRange(lineNr, 0, kind);
+						break;	// One match is enough
+					}
 				}
 			}
 		}
 		// Close any opened folding range
 		if (currentRange) {
 			currentRange.end = lineNr - 1;
-			foldingRanges.push(currentRange);
+			if (currentRange.start !== currentRange.end)
+				foldingRanges.push(currentRange);
 		}
-
-		return foldingRanges;
 	}
 }
