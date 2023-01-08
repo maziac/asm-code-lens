@@ -48,6 +48,12 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
                 // Check each
                 const len = query.length;
                 for (const ws of wsFolders) {
+                    // Check for cancellation (e.g. another key was typed)
+                    if (token.isCancellationRequested) {
+                        resolve(undefined);
+                        return;
+                    }
+
                     // Check if enabled
                     const config = Config.configs.get(ws.uri.fsPath);
                     if (!config?.enableWorkspaceSymbols)
