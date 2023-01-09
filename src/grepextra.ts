@@ -127,19 +127,15 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
  * @param index The starting line (the line where the label was found.
  * @returns A string like 'check_collision'. undefined if nothing found.
  */
-export function getNonLocalLabel(regexLbls: RegExp[], lines: Array<string>, index: number): string {
+export function getNonLocalLabel(regexLbls: RegExp, lines: Array<string>, index: number): string {
 	// Loop
 	let match;
-	const regexesLenIndex = regexLbls.length - 1;
 	for (; index >= 0; index--) {
 		const line = lines[index];
-		for (let k = regexesLenIndex; k >= 0; k--) {
-			const regex = regexLbls[k];
-			match = regex.exec(line);
-			if (match) {
-				const label = match[2];
-				return label;
-			}
+		match = regexLbls.exec(line);
+		if (match) {
+			const label = match[2];
+			return label;
 		}
 	}
 
@@ -180,7 +176,7 @@ export function concatenateModuleAndLabel(module: string, label: string): string
  * @param clmn The column position that points to the label.
  * @returns { label, moduleLabel }
  */
-export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp[], fileInfo: FileInfo, row: number, clmn: number, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
+export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: FileInfo, row: number, clmn: number, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
 	// 1. Get original label
 	const lines = fileInfo.lines;
 	const line = lines[row];

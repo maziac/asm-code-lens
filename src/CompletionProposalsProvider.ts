@@ -113,7 +113,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
 
         // Get the first non-local label
         const languageId = document.languageId as AllowedLanguageIds;
-        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
+        const regexLbls = CommonRegexes.regexLabel(config, languageId);
         let nonLocalLabel;  // Only used for local labels
         if (rowLabel.label.startsWith('.')) {
             nonLocalLabel = getNonLocalLabel(regexLbls, lines, row);

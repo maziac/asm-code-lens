@@ -26,9 +26,9 @@ export class Commands {
      */
     public static async findLabelsWithNoReference(config: Config, languageId: AllowedLanguageIds): Promise<void> {
         // Get regexes
-        const regexes = CommonRegexes.regexesLabel(config, languageId);
+        const regex = CommonRegexes.regexLabel(config, languageId);
         // Get all label definition (locations)
-        const labelLocations = await grepMultiple(regexes, config.wsFolderPath, languageId, config.excludeFiles);
+        const labelLocations = await grepMultiple([regex], config.wsFolderPath, languageId, config.excludeFiles);
 
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
@@ -54,7 +54,7 @@ export class Commands {
             let labelsCount = locLabels.length;
             let unrefLabels = 0;
             const regexEqu = CommandsRegexes.regexLabelEquOrMacro();
-            const regexLbls = CommonRegexes.regexesLabel(cfg, languageId);
+            const regexLbls = CommonRegexes.regexLabel(cfg, languageId);
             for (const locLabel of locLabels) {
                 // Skip all EQU and MACRO
                 const fm: FileMatch = locLabel.fileMatch;

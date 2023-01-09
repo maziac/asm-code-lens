@@ -13,6 +13,7 @@ export class CompletionRegexes {
 	 */
 	public static regexesEveryLabelForWord(fuzzySearchWord: string, cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}, languageId: AllowedLanguageIds): RegExp[] {
 		const regexes: RegExp[] = [];
+		// TODO: maybe regexEveryLabelColonForWord and regexEveryLabelWithoutColonForWord can be combined
 		// Find all "some.thing:" (labels) in the document
 		if (cfg.labelsWithColons) {
 			const searchRegex = this.regexEveryLabelColonForWord(fuzzySearchWord, languageId);
@@ -56,7 +57,7 @@ export class CompletionRegexes {
 	 * A different regex is returned dependent on languageId.
 	 */
 	protected static regexEveryLabelColonForWord(fuzzySearchWord: string, languageId: AllowedLanguageIds): RegExp {
-		if (languageId == 'asm-list-file') {
+		if (languageId === 'asm-list-file') {
 			//return new RegExp('^([\\s\\@\\w\\.]*)\\b' + fuzzySearchWord + '[\\w\\.]*:', 'i');
 			return new RegExp('^(.*)\\b' + fuzzySearchWord + '[\\w\\.]*:', 'i');
 		}

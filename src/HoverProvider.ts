@@ -50,7 +50,7 @@ export class HoverProvider implements vscode.HoverProvider {
 
         const locations = await grepMultiple(regexes, config.wsFolderPath, languageId, config.excludeFiles);
         // Reduce the found locations.
-        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
+        const regexLbls = CommonRegexes.regexLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, regexEnd);
 
         // Now read the comment lines above the document.

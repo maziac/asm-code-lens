@@ -340,7 +340,7 @@ export function getRegExFromLabel(label: string): RegExp {
  * @param checkFullName true (default) = During label check the full name is checked. false (e.g.
  * for CompletionProvider) = It is checked with 'startsWith'.
  */
-export async function reduceLocations(regexLbls: RegExp[], locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
+export async function reduceLocations(regexLbls: RegExp, locations: GrepLocation[], docFileName: string, position: vscode.Position, removeOwnLocation = true, checkFullName = true, regexEnd = /[\w\.]/): Promise<GrepLocation[]> {
     //console.log('reduceLocations');
     // 1. Get module label
     const docLines = await getLinesForFile(docFileName);

@@ -29,7 +29,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
 
         const languageId = document.languageId as AllowedLanguageIds;
         const locations = await grep(searchRegex, config.wsFolderPath, languageId, config.excludeFiles);
-        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
+        const regexLbls = CommonRegexes.regexLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, document.fileName, position, false, true, /\w/);
         return reducedLocations;
     }

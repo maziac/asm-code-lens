@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import {AllowedLanguageIds} from './languageId';
 import {CommonRegexes} from './regexes/commonregexes';
-import {grep, grepTextDocumentMultiple, reduceLocations} from './grep';
+import {grep, grepTextDocument, reduceLocations} from './grep';
 import {Config} from './config';
 import {DonateInfo} from './donate/donateinfo';
 
@@ -57,8 +57,8 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
 
         //console.log(document.uri.fsPath);
         const codeLenses: Array<vscode.CodeLens> = [];
-        const regexes = CommonRegexes.regexesLabel(config, languageId);
-        const matches = grepTextDocumentMultiple(document, regexes);
+        const regex = CommonRegexes.regexLabel(config, languageId);
+        const matches = grepTextDocument(document, regex);
         // Loop all matches and create code lenses
         for (const fmatch of matches) {
             // Create codeLens
@@ -110,7 +110,7 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
         const languageId = doc.languageId as AllowedLanguageIds;
         const locations = await grep(searchRegex, config.wsFolderPath, languageId, config.excludeFiles);
         // Remove any locations because of module information (dot notation)
-        const regexLbls = CommonRegexes.regexesLabel(config, languageId);
+        const regexLbls = CommonRegexes.regexLabel(config, languageId);
         const reducedLocations = await reduceLocations(regexLbls, locations, doc.fileName, pos, true, true);
         // create title
         const count = reducedLocations.length;

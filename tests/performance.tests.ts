@@ -197,12 +197,12 @@ suite('Performance', () => {
     suite('regexes', () => {
 
         test('regexLabelColon asm', () => {
-            const speed = compare(CommonRegexes.regexLabelColon("asm-collection"), RefRegexes.regexLabelColon(), true, false, BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelWithColon("asm-collection"), RefRegexes.regexLabelColon(), true, false, BASE_COUNT);
             console.log('regexLabelColon asm: ', speed + '% speed');
         });
 
         test('regexLabelColon list', () => {
-            const speed = compare(CommonRegexes.regexLabelColon("asm-list-file"), RefRegexes.regexLabelColon(), false, true, BASE_COUNT);
+            const speed = compare(CommonRegexes.regexLabelWithColon("asm-list-file"), RefRegexes.regexLabelColon(), false, true, BASE_COUNT);
             console.log('regexLabelColon list: ', speed + '% speed');
         });
 

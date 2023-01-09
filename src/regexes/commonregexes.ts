@@ -9,23 +9,35 @@ import { RegexIndexOf, RegexTwo } from './extendedregex';
 export class CommonRegexes {
 
     /**
+     * Returns labels with and without a colon.
+     * Not to be used for list files.
+     * Capture groups:
+     *  1 = '@' or ''
+     *  2 = the label itself e.g. "init.label_1"
+     */
+    public static regexLabelWithAndWithoutColon(): RegExp {
+        return /(^@?)([a-z_][\w\.]*):?/i;
+    }
+
+
+    /**
      * Checks for a label with a colon, e.g.
      * "label:", " label:" or "init.label_1:".
      * Also "@label:".
      * But not ".label:".
      * Capture groups:
-     *  1 = preceding spaces (and other chars in case of list file)
+     *  1 = preceding spaces (and other chars in case of list file) otherwise '@' or ''
      *  2 = the label itself e.g. "init.label_1
      * Used by findLabelsWithNoReference, provideCodeLenses.
 	 * @param languageId either "asm-collection" or "asm-list-file".
 	 * A different regex is returned dependent on languageId.
      */
-    public static regexLabelColon(languageId: AllowedLanguageIds): RegExp {
-        if (languageId == 'asm-list-file') {
+    public static regexLabelWithColon(languageId: AllowedLanguageIds): RegExp {
+        if (languageId === 'asm-list-file') {
             return new RegexIndexOf(':', /(^[^#]*\s@?)([a-z_][\w\.]*):/i);
         }
 		// "asm-collection"
-        return /(^@?)\b([a-z_][\w\.]*):/i;
+        return /(^@?)([a-z_][\w\.]*):/i;
     }
 
 
@@ -36,7 +48,7 @@ export class CommonRegexes {
      * Also "@label".
      * But not ".label".
      * Capture groups:
-     *  1 = ''
+     *  1 = '@' or ''
      *  2 = the label itself e.g. "init.label_1"
      * Used by findLabelsWithNoReference, provideCodeLenses.
      */
@@ -52,19 +64,17 @@ export class CommonRegexes {
 	 * @param languageId either "asm-collection" or "asm-list-file".
 	 * A different regex is returned dependent on languageId.
      */
-    public static regexesLabel(cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}, languageId: AllowedLanguageIds): RegExp[] {
-        const regexes: RegExp[] = [];
-        // Find all "some.thing:" (labels) in the document
-        if (cfg.labelsWithColons) {
-            const searchRegex = CommonRegexes.regexLabelColon(languageId);
-            regexes.push(searchRegex);
-        }
-        // Find all sjasmplus labels without ":" in the document
-        if (cfg.labelsWithoutColons && languageId == "asm-collection") {
-            const searchRegex2 = CommonRegexes.regexLabelWithoutColon();
-            regexes.push(searchRegex2);
-        }
-        return regexes;
+    public static regexLabel(cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}, languageId: AllowedLanguageIds): RegExp {
+        if (languageId === "asm-list-file")   // List file: only with colons
+            return CommonRegexes.regexLabelWithColon(languageId); // TODO remove []
+
+        // Now for "asm-collection"
+        if (cfg.labelsWithColons && cfg.labelsWithoutColons)
+            return CommonRegexes.regexLabelWithAndWithoutColon();
+        if (cfg.labelsWithoutColons)
+            return CommonRegexes.regexLabelWithoutColon();
+        // LAbels with colons is the default
+        return CommonRegexes.regexLabelWithColon(languageId);
     }
 
 

@@ -236,7 +236,7 @@ suite('CommonRegexes', () => {
         }
 
         test('regexLabelColon asm', (done) => {
-            const regex = CommonRegexes.regexLabelColon("asm-collection");
+            const regex = CommonRegexes.regexLabelWithColon("asm-collection");
             const insOuts = [
                 // input-line, found-prefix, found-label
                 "label1:", "", "label1",
@@ -268,7 +268,7 @@ suite('CommonRegexes', () => {
 
 
         test('regexLabelColon list', (done) => {
-            const regex = CommonRegexes.regexLabelColon("asm-list-file");
+            const regex = CommonRegexes.regexLabelWithColon("asm-list-file");
             const insOuts = [
                 // For list file
                 "6017.R11 00 AF     label:", "6017.R11 00 AF     ", "label",

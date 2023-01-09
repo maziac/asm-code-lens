@@ -58,7 +58,7 @@ label7:
             modStructInfos
         };
 
-        const regexLbls = CommonRegexes.regexesLabel({labelsWithColons: true, labelsWithoutColons: false}, "asm-collection");
+        const regexLbls = CommonRegexes.regexLabel({labelsWithColons: true, labelsWithoutColons: false}, "asm-collection");
         const regexEnd = /[\w\.]/;
 
         let mLabel = getLabelAndModuleLabelFromFileInfo(regexLbls, fileInfo, 1, 0, regexEnd);
