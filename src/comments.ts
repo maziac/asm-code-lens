@@ -6,6 +6,7 @@ let commentHoverPrefixes: RegExp;
 let commentHoverPrefixesSameLine: RegExp;
 let singleLineCommentsSet: Set<string>;
 
+
 /**
  * Sets the characters used as comments.
  * @param prefix Text from toggleCommentPrefix.

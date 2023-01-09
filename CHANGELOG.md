@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.4.0
+- FoldingRangeProvider added.
+- Some optimizations for regexes.
+
 # 2.3.0
 - WorkspaceSymbolProvider added.
 - MACROs are now identified as 'Methods' in the outline view.

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import {Config} from './config';
 import {CommonRegexes} from './regexes/commonregexes';
+import {FoldingRegexes} from './regexes/foldingregexes';
 
 
 
@@ -36,14 +37,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 		const regexLabel = CommonRegexes.regexLabel(config, 'asm-collection');
 		const regexCommentMultipleStart = /^\/\*/;
 		const regexCommentMultipleEnd = /\*\//;
-		const regexCommentSingle = /^;/;
-		/* TODO
-
-	singleLineCommentsSet = new Set<string>([';', '//']);
-	if (prefix)
-		singleLineCommentsSet.add(prefix);
-	const prefixes = Array.from(singleLineCommentsSet);
-	*/
+		const regexCommentSingle = FoldingRegexes.regexSingleLineComments(Config.globalToggleCommentPrefix);
 
 		// State base parsing
 		let rangeLineNrStart = -1;
@@ -63,6 +57,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 
 				case ';':
 					// Check for single comment end.
+					const m = regexCommentSingle.exec(line);
 					if (!regexCommentSingle.exec(line)) {
 						lineNr--;	// Recheck line
 						this.addRange(foldingRanges, rangeLineNrStart, lineNr, vscode.FoldingRangeKind.Comment);
