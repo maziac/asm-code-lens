@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import {stripAllComments} from './comments';
 import {Config} from './config';
 import {CommonRegexes} from './regexes/commonregexes';
 
@@ -33,141 +32,82 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 		const lines = linesData.split('\n');
 		const foldingRanges: vscode.FoldingRange[] = [];
 
-/*
-		// State base parsing
-		let currentRange: vscode.FoldingRange | undefined;
-		let lineNr = -1;
-		let state: string | undefined;
-		let lastIndex = 0;
-		for (const line of lines) {
-			lineNr++;
+		// Prepare regexes
+		const regexLabel = CommonRegexes.regexLabel(config, 'asm-collection');
+		const regexCommentMultipleStart = /^\/\*/;
+		const regexCommentMultipleEnd = /\*\//;
+		const regexCommentSingle = /^;/;
+		/* TODO
 
-			// Check for any start
-			for (const regexStart of regexesStart) {
-				// Check if line starts with a (non-local) label
-				const match = regexStart.exec(line);
-				if (match) {
-					// End of range is always also the start of of a range
-					currentRange = new vscode.FoldingRange(lineNr, 0, kind);
-					break;	// One match is enough
-				}
-			}
+	singleLineCommentsSet = new Set<string>([';', '//']);
+	if (prefix)
+		singleLineCommentsSet.add(prefix);
+	const prefixes = Array.from(singleLineCommentsSet);
+	*/
+
+		// State base parsing
+		let rangeLineNrStart = -1;
+		let state: string | undefined;
+		const len = lines.length;
+		for (let lineNr = 0; lineNr < len; lineNr++) {
+			const line = lines[lineNr];
 
 			switch (state) {
 				case '/*':
-
+					// Check for multiline comment end.
+					if (regexCommentMultipleEnd.exec(line)) {
+						this.addRange(foldingRanges, rangeLineNrStart, lineNr, vscode.FoldingRangeKind.Comment);
+						state = undefined;
+					}
 					break;
 
 				case ';':
-
+					// Check for single comment end.
+					if (!regexCommentSingle.exec(line)) {
+						lineNr--;	// Recheck line
+						this.addRange(foldingRanges, rangeLineNrStart, lineNr, vscode.FoldingRangeKind.Comment);
+						state = undefined;
+					}
 					break;
 
 				case 'label':
-
-					break;
-
-				case 'macro':
-
-					break;
-
-				case 'module':
-
-					break;
-
 				default:
+					// Find label, comment etc.
+					let nextState: string | undefined;
+					if (regexLabel.exec(line))
+						nextState = 'label';
+					else if (regexCommentSingle.exec(line))
+						nextState = ';';
+					else if (regexCommentMultipleStart.exec(line))
+						nextState = '/*';
+					if (nextState) {
+						// Check if a previous range ends
+						if (state === 'label') {
+							this.addRange(foldingRanges, rangeLineNrStart, lineNr - 1, vscode.FoldingRangeKind.Region);
+						}
+						// Start a new folding marker
+						rangeLineNrStart = lineNr;
+						state = nextState;
+					}
 					break;
 			}
-
-
 		}
-		// Close any opened folding range
-		if (currentRange) {
-			currentRange.end = lineNr - 1;
-			if (currentRange.start !== currentRange.end)
-				foldingRanges.push(currentRange);
+
+		// Close last range
+		if(state) {
+			const kind = (state === 'label') ? vscode.FoldingRangeKind.Region : vscode.FoldingRangeKind.Comment;
+			this.addRange(foldingRanges, rangeLineNrStart, len - 1, kind);
 		}
-		*/
-
-		// Search comments /* */
-		 this.parseLines(foldingRanges, lines, vscode.FoldingRangeKind.Comment, [/^\s*\/\*/], [/\*\//]);
-		// // Search comments ;
-		// this.parseLines(foldingRanges, lines, vscode.FoldingRangeKind.Comment, [/^;/], [/^[^;]/, /^\s*$/], -1);
-
-
-		// // Strip comments
-		// stripAllComments(lines);
-
-		// // Search (non-local) label
-		// const regexLabels = CommonRegexes.regexesLabel(config, 'asm-collection');
-		// this.parseLines(foldingRanges, lines, vscode.FoldingRangeKind.Region, regexLabels, regexLabels, -1);
-
 
 		return foldingRanges;
 	}
 
 
-	/** Parses all lines for regexes.
-	 * All are toplevel folding. There are no sub-foldings.
-	 * When a
-	 */
-	protected parseLines(foldingRanges: vscode.FoldingRange[], lines: string[], kind: vscode.FoldingRangeKind, regexesStart: RegExp[], regexesEnd: RegExp[], endOffset = 0) {
-		let currentRange: vscode.FoldingRange | undefined;
-		let lineNr = -1;
-		let lastIndex = 0;
-		for (const line of lines) {
-			lineNr++;
-			// Check for end
-			if (currentRange) {
-				// First check if another folding range already starts here (would ed the current range)
-				const len = foldingRanges.length;
-				for (; lastIndex < len; lastIndex++) {  //macht nur sinn für die Commentare. Das Array sollte ich also übergeben, oder zumindest den array index
-					const range = foldingRanges[lastIndex];
-					if (lineNr === range.start) {
-						// This ends the current range
-						currentRange.end = lineNr;
-						if (currentRange.start !== currentRange.end)
-							foldingRanges.push(currentRange);
-						currentRange = undefined;
-						break;
-					}
-				}
-				if (currentRange === undefined)
-					continue;	// Skip finding the start for this line (there is already one)
-				// Check for end regex
-				for (const regexEnd of regexesEnd) {
-					// Check if line starts with a (non-local) label
-					const match = regexEnd.exec(line);
-					if (match) {
-						// End of range
-						currentRange.end = lineNr + endOffset;
-						if(currentRange.start !== currentRange.end)
-							foldingRanges.push(currentRange);
-						currentRange = undefined;
-						break;	// One match is enough
-					}
-				}
-				if (currentRange === undefined && endOffset === 0)
-					continue;	// Skip finding the start for this line
-			}
-
-			// Check for start
-			if (regexesStart === regexesEnd || !currentRange) {
-				for (const regexStart of regexesStart) {
-					// Check if line starts with a (non-local) label
-					const match = regexStart.exec(line);
-					if (match) {
-						// End of range is always also the start of of a range
-						currentRange = new vscode.FoldingRange(lineNr, 0, kind);
-						break;	// One match is enough
-					}
-				}
-			}
-		}
-		// Close any opened folding range
-		if (currentRange) {
-			currentRange.end = lineNr - 1;
-			if (currentRange.start !== currentRange.end)
-				foldingRanges.push(currentRange);
+	// TODO: Add comment
+	protected addRange(foldingRanges: vscode.FoldingRange[], lineStart: number, lineEnd: number, kind: vscode.FoldingRangeKind) {
+		if (lineEnd > lineStart) {
+			const range = new vscode.FoldingRange(lineStart, lineEnd, kind);
+			foldingRanges.push(range!);
 		}
 	}
 }
