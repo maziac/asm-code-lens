@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import {stripAllComments} from './comments';
 import {Config} from './config';
 import {SymbolRegexes} from './regexes/symbolregexes';
+import {CommonRegexes} from './regexes/commonregexes';
 
 
 
@@ -32,19 +33,8 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         // data-label and creates symbols for each.
         // Those symbols are returned.
         const languageId = document.languageId as AllowedLanguageIds;
-        let symbols = new Array<vscode.DocumentSymbol>();
-        let regexLabel;
-        if (config.labelsWithColons && config.labelsWithoutColons)
-            regexLabel = SymbolRegexes.regexLabelWithAndWithoutColon(languageId);
-        else {
-            if (config.labelsWithColons)
-                regexLabel = SymbolRegexes.regexLabelWithColon(languageId);
-            else {
-                if (languageId == 'asm-list-file')
-                    return undefined as any; // In list files labels without colons are not supported.
-                regexLabel = SymbolRegexes.regexLabelWithoutColon();
-            }
-        }
+        let symbols: vscode.DocumentSymbol[] = [];
+        const regexLabel = CommonRegexes.regexLabel(config, languageId);
 
         const regexModule = SymbolRegexes.regexModuleLabel();
         const regexStruct = SymbolRegexes.regexStructLabel();
@@ -71,8 +61,8 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
             const match = regexLabel.exec(lineContents);
             if (match) {
                 // It is a label or module (or both)
-                const labelPlus = match[1]; // Label plus e.g. ':'
-                const label = match[2]; // Label without ':'
+                const labelPlus = match[0].trimEnd(); // Label plus e.g. ': '
+                const label = match[1] + match[2]; // Label without ':'
 
                 // Check that label is not excluded
                 if (!excludes.includes(label)) {

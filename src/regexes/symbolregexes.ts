@@ -8,45 +8,6 @@ import { AllowedLanguageIds } from '../languageId';
 export class SymbolRegexes {
 
 	/**
-	 * Returns labels with and without a colon.
-	 * Capture groups for "@label:"
-	 * 1 = "@label:"
-	 * 2 = "@label"
-	 */
-	public static regexLabelWithAndWithoutColon(languageId: AllowedLanguageIds): RegExp {
-		if (languageId === 'asm-list-file')
-			return SymbolRegexes.regexLabelWithColon(languageId);	// Only with colon
-		return /^((@?[a-z_][\w\.]*):?)/i;
-	}
-
-
-	/**
-	 * Returns labels with a colon.
-	 * Capture groups for "@label:"
-	 * 1 = "@label:"
-	 * 2 = "@label"
-	 */
-	public static regexLabelWithColon(languageId: AllowedLanguageIds): RegExp {
-		if (languageId === 'asm-list-file')
-			return /^[^#].*\s((@?[a-z_][\w\.]*):)/i;	// Only with colon
-		return /^((@?[a-z_][\w\.]*):)/i;
-	}
-
-
-	/**
-	 * Returns labels without a colon.
-	 * Capture groups for "@label:"
-	 * 1 = "@label"
-	 * 2 = "@label"
-	 * Note: there is no version for list files as labels without colons cannot be
-	 * safely determined.
-	 */
-	public static regexLabelWithoutColon(): RegExp {
-		return /^(@?[a-z_][\w\.]*)(?:\s|$)/i;
-	}
-
-
-	/**
 	 * Returns labels after MODULE and if MODULE or ENDMODULE was found.
 	 * Capture groups for " MODULE mod"
 	 * 1 = "MODULE mod"

@@ -1,4 +1,4 @@
-import {SymbolRegexes} from './../../src/regexes/symbolregexes';
+import {SymbolRegexes} from '../../src/regexes/symbolregexes';
 import * as assert from 'assert';
 
 
@@ -32,66 +32,6 @@ suite('SymbolRegexes', () => {
             assert.fail("Testcase assertion: " + e);
         }
     }
-
-
-    test('regexLabelWithAndWithoutColon asm', () => {
-        const insOuts = [
-            "main:", true, "main:", "main",
-            "main", true, "main", "main",
-            "M.a.main:", true, "M.a.main:", "M.a.main",
-        ];
-        const regex = SymbolRegexes.regexLabelWithAndWithoutColon('asm-collection');
-        checkResultsMatch(regex, insOuts);
-    });
-
-    test('regexLabelWithAndWithoutColon list', () => {
-        const insOuts = [
-            "# file opened: main.asm", false, "", "",
-            "57   8000              main:", true, "main:", "main",
-            "57   8000              main", false, "", "",
-            "57   8000              M.a.main:", true, "M.a.main:", "M.a.main",
-        ];
-        const regex = SymbolRegexes.regexLabelWithAndWithoutColon('asm-list-file');
-        checkResultsMatch(regex, insOuts);
-    });
-
-
-
-    test('regexLabelWithColon asm', () => {
-        const insOuts = [
-            "main:", true, "main:", "main",
-            "main", false, "", "",
-            "M.a.main:", true, "M.a.main:", "M.a.main",
-        ];
-        const regex = SymbolRegexes.regexLabelWithColon('asm-collection');
-        checkResultsMatch(regex, insOuts);
-    });
-
-    test('regexLabelWithColon list', () => {    // NOSONAR
-        const insOuts = [
-            "57   8000              main:", true, "main:", "main",
-            "57   8000              main", false, "", "",
-            "57   8000              M.a.main:", true, "M.a.main:", "M.a.main",
-        ];
-        const regex = SymbolRegexes.regexLabelWithColon('asm-list-file');
-        checkResultsMatch(regex, insOuts);
-    });
-
-
-
-    test('regexLabelWithoutColon (only asm)', () => {
-        const insOuts = [
-            "main:", false, "", "",
-            "main", true, "main", undefined,
-            "@main", true, "@main", undefined,
-            "@M.a.main", true, "@M.a.main", undefined,
-            "M.a.main:", false, "", "",
-            "@M.a.main:", false, "", "",
-        ];
-        const regex = SymbolRegexes.regexLabelWithoutColon();
-        checkResultsMatch(regex, insOuts);
-    });
-
 
 
     test('regexModuleLabel', () => {
