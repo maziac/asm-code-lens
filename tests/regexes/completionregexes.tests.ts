@@ -1,14 +1,14 @@
-import { AllowedLanguageIds } from '../../src/languageId';
+import { AllowedLanguageIds } from './../../src/languageId';
 import * as assert from 'assert';
-import {CompletionRegexes} from '../../src/regexes/completionregexes';
+import {CompletionRegexes} from './../../src/regexes/completionregexes';
 
 
 // For access to protected functions.
 const CompletionRegexesMock = CompletionRegexes as any;
 
-describe('CompletionRegexes', () => {
+suite('CompletionRegexes', () => {
 
-    describe('RegEx with search-word middle, ignore case', () => {
+    suite('RegEx with search-word middle, ignore case', () => {
 
         // insOuts: search-word, input-line, should-match, found-prefix
         function checkResultsSearchWord(func: (string, languagId?: AllowedLanguageIds) => RegExp, insOuts: (string | boolean)[], languageId: AllowedLanguageIds) {
@@ -39,7 +39,7 @@ describe('CompletionRegexes', () => {
             }
         }
 
-        describe('regexEveryLabelColonForWord', () => {
+        suite('regexEveryLabelColonForWord', () => {
 
             test('find label asm', (done) => {
                 const insOuts = [

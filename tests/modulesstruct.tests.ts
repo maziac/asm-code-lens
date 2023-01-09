@@ -3,7 +3,7 @@ import {getLabelAndModuleLabelFromFileInfo, getModuleFileInfo} from '../src/grep
 import {CommonRegexes} from '../src/regexes/commonregexes';
 
 
-describe('grepextra', () => {
+suite('grepextra', () => {
 
     test('getFileinfo', () => {
         const file = `

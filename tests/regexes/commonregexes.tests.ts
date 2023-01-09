@@ -1,16 +1,16 @@
-import { AllowedLanguageIds } from '../../src/languageId';
+import { AllowedLanguageIds } from './../../src/languageId';
 import * as assert from 'assert';
 import {CommonRegexes} from '../../src/regexes/commonregexes';
-import {CompletionRegexes} from '../../src/regexes/completionregexes';
+import {CompletionRegexes} from './../../src/regexes/completionregexes';
 
 
 // For access to protected functions.
 const CompletionRegexesMock = CompletionRegexes as any;
 
 
-describe('CommonRegexes', () => {
+suite('CommonRegexes', () => {
 
-    describe('Simple regexes', () => {
+    suite('Simple regexes', () => {
 
         function checkResultsMatch(regex: RegExp, insOuts: (string | boolean)[]) {
             try {
@@ -207,7 +207,7 @@ describe('CommonRegexes', () => {
     });
 
 
-    describe('RegEx 1 capture', () => {
+    suite('RegEx 1 capture', () => {
 
         function checkResults1Capture(regex: RegExp, insOuts: string[]) {
             try {
@@ -352,7 +352,7 @@ describe('CommonRegexes', () => {
         }
     }
 
-    describe('RegEx with search-word', () => {
+    suite('RegEx with search-word', () => {
 
         test('regexLabelColonForWord asm', (done) => {
             const insOuts = [

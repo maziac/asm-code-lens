@@ -1,5 +1,5 @@
 import { CommonRegexes } from '../src/regexes/commonregexes';
-import { DefinitionRegexes } from '../src/regexes/definitionregexes';
+import { DefinitionRegexes } from './../src/regexes/definitionregexes';
 import {CompletionRegexes} from '../src/regexes/completionregexes';
 import * as fs from 'fs';
 import {RenameRegexes} from '../src/regexes/renameregexes';
@@ -96,12 +96,12 @@ class RefRegexes {
 const BASE_COUNT = 100;
 
 
-describe('Performance', () => {
+suite('Performance', () => {
 
     let asmLines: string[];
     let listLines: string[];
 
-    beforeEach(() => {
+    setup(() => {
         const asmString = fs.readFileSync('./tests/data/sample.asm').toString();
         asmLines = asmString.split('\n');
         const listString = fs.readFileSync('./tests/data/sample.list').toString();
@@ -194,7 +194,7 @@ describe('Performance', () => {
     }
 
 
-    describe('regexes', () => {
+    suite('regexes', () => {
 
         test('regexLabelColon asm', () => {
             const speed = compare(CommonRegexes.regexLabelColon("asm-collection"), RefRegexes.regexLabelColon(), true, false, BASE_COUNT);

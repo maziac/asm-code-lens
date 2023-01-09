@@ -1,10 +1,10 @@
 import * as assert from 'assert';
-import {readCommentsForLine, setCustomCommentPrefix, stripAllComments, stripAllCommentsContents} from '../src/comments';
+import {readCommentsForLine, setCustomCommentPrefix, stripAllComments} from '../src/comments';
 
 
-describe('comments', () => {
+suite('comments', () => {
 
-    function verifyMultiLines(inpOutp: string[], onlyContents = false) {
+    function verifyMultiLines(inpOutp: string[]) {
         // Split into input and output
         const inp: string[] = [];
         const outp: string[] = [];
@@ -18,10 +18,7 @@ describe('comments', () => {
         }
 
         // Execute
-        if (onlyContents)
-            stripAllCommentsContents(inp);
-        else
-            stripAllComments(inp);
+        stripAllComments(inp);
 
         // Verify
         const len = inp.length;
@@ -32,50 +29,52 @@ describe('comments', () => {
         }
     }
 
-    describe('stripAllComments', () => {
+    suite('stripAllComments', () => {
 
         setCustomCommentPrefix();
 
         test('single line comments', () => {
             const inpOutp = [
-                '', '', // 0
-                ' ', ' ',
-                ' a', ' a',
-                'a: b ', 'a: b ',
-                ';', '',
-                ' ;', ' ',
-                ' a ;b', ' a ',
-                ' "a" ;b', '     ',
-                " 'a' ;b", '     ',
-                " '\"' '\"'", '        ',
-                ' "\'" "\'"', '        ',
-                '//', '',
-                ' //', ' ',
+                '',	            '', // 0
+                ' ',	        ' ',
+                ' a',	        ' a',
+                'a: b ',	    'a: b ',
+                ';',	        '',
+                ' ;',	        ' ',
+                ' a ;b',        ' a ',
+                ' "a" ;b',      '     ',
+                " 'a' ;b",      '     ',
+                " '\"' '\"'",   '        ',
+                ' "\'" "\'"',   '        ',
+                '//',	        '',
+                ' //',          ' ',
 
-                ' a //b', ' a ',  // 10
-                ' "a" //b', '     ',
-                ' / //b', ' / ',
-                '""', '  ',
-                ' "abc" ', '       ',
-                '"', '',    // 15
-                ' "abc ', ' ',
-                '""""', '    ',
-                ' "abc" "xy" ', '            ',
-                '"""', '  ',
+                ' a //b',	    ' a ',  // 10
+                ' "a" //b',	    '     ',
+                ' / //b',	    ' / ',
+                '""',	        '  ',
+                ' "abc" ',	    '       ',
+                '"',	        '',    // 15
+                ' "abc ',	    ' ',
+                '""""',	        '    ',
+                ' "abc" "xy" ',	'            ',
+                '"""',          '  ',
 
-                ' "abc" "xy ', '       ',  // 20
-                'a";"b', 'a   b',
-                ' "abc" ";x ', '       ',
-                'a"//"b', 'a    b',
+                ' "abc" "xy ',	'       ',  // 20
+                'a";"b',	    'a   b',
+                ' "abc" ";x ',	'       ',
+                'a"//"b',	    'a    b',
                 ' "abc" "//x ', '       ',
-                ' "/*"b', '     b',
-                ' */b', ' */b'
+                ' "/*"b',       '     b',
+                ' */b',         ' */b'
             ];
             // Verify
             verifyMultiLines(inpOutp);
         });
 
-        describe('multiline', () => {
+
+
+        suite('multiline', () => {
 
             test('one or 2 liners', () => {
                 const inpOutp = [
@@ -147,122 +146,7 @@ describe('comments', () => {
     });
 
 
-    describe('stripAllCommentsContents', () => {
-
-        setCustomCommentPrefix();
-
-        test('single line comments', () => {
-            const inpOutp = [
-                '', '', // 0
-                ' ', ' ',
-                ' a', ' a',
-                'a: b ', 'a: b ',
-                ';', ';',
-                ' ;', ' ',
-                ' a ;b', ' a ',
-                ' "a" ;b', '     ',
-                " 'a' ;b", '     ',
-                " '\"' '\"'", '        ',
-                ' "\'" "\'"', '        ',
-                '//', '',
-                ' //', ' ',
-
-                ' a //b', ' a ',  // 10
-                ' "a" //b', '     ',
-                ' / //b', ' / ',
-                '""', '  ',
-                ' "abc" ', '       ',
-                '"', '',    // 15
-                ' "abc ', ' ',
-                '""""', '    ',
-                ' "abc" "xy" ', '            ',
-                '"""', '  ',
-
-                ' "abc" "xy ', '       ',  // 20
-                'a";"b', 'a   b',
-                ' "abc" ";x ', '       ',
-                'a"//"b', 'a    b',
-                ' "abc" "//x ', '       ',
-                ' "/*"b', '     b',
-                ' */b', ' */b'
-            ];
-            // Verify
-            verifyMultiLines(inpOutp, true);
-        });
-
-        describe('multiline', () => {
-
-            test('one or 2 liners', () => {
-                const inpOutp = [
-                    '/*/', '',
-                    '*/', '  ',
-
-                    '*/*', '*',
-                    '*/', '  ',
-
-                    'ab/*/', 'ab',
-                    'cd/*/', '     ',
-
-                    '/**/', '    ',
-
-                    'a/*b*/c', 'a     c',
-                ];
-
-                // Verify
-                verifyMultiLines(inpOutp);
-            });
-
-            test('several comments in one line', () => {
-                const inpOutp = [
-                    'd/*ee', 'd',
-                    'f*//*g*/h', '        h',
-
-                    '/**/a/*b*/', '    a     ',
-
-                    '/**/a/*b', '    a',
-                    '*/', '  ',
-
-                    '/**/a/*b*/c', '    a     c',
-
-                    ' /*aa*/bb/*ccc*/ddd/*ee', '       bb       ddd',
-                    'f*//*gg*/h', '         h',
-
-                    'ab/*/', 'ab',
-                    'cd/*/', '     ',
-
-                    '/**/', '    ',
-
-                    'a/*b*/c', 'a     c',
-                ];
-
-                // Verify
-                verifyMultiLines(inpOutp);
-            });
-
-            test('several lines', () => {
-                const inpOutp = [
-                    '/*/', '',
-                    '', '',
-                    'abcdef', '',
-                    '*/', '  ',
-
-                    'ab/*/', 'ab',
-                    'cd/*/', '     ',
-
-                    '/**/', '    ',
-
-                    'a/*b*/c', 'a     c',
-                ];
-
-                // Verify
-                verifyMultiLines(inpOutp);
-            });
-        });
-
-    });
-
-
-    describe('setCustomCommentPrefix', () => {
+    suite('setCustomCommentPrefix', () => {
         test('single char', () => {
             setCustomCommentPrefix('#');
             const inpOutp = [
@@ -289,7 +173,7 @@ describe('comments', () => {
     });
 
 
-    describe('readCommentsForLine', () => {
+    suite('readCommentsForLine', () => {
         setCustomCommentPrefix();
 
         test('edge cases', () => {

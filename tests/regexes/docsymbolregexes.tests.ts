@@ -1,9 +1,9 @@
-import { SymbolRegexes } from '../../src/regexes/symbolregexes';
+import {SymbolRegexes} from './../../src/regexes/symbolregexes';
 import * as assert from 'assert';
 
 
 
-describe('DocSymbolRegexes', () => {
+suite('SymbolRegexes', () => {
 
     function checkResultsMatch(regex: RegExp, insOuts: (string | boolean | undefined)[]) {
         try {

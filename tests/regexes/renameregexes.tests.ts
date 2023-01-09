@@ -1,9 +1,9 @@
-import { RenameRegexes } from '../../src/regexes/renameregexes';
+import { RenameRegexes } from './../../src/regexes/renameregexes';
 import * as assert from 'assert';
 
 
 
-describe('RenameRegexes', () => {
+suite('RenameRegexes', () => {
 
     // insOuts: search-word, input-line, number of matches, found1, found2, ...
     function checkResultsSearchWordGlobal(func: (string) => RegExp, insOuts: (string | number)[]) {  // NOSONAR

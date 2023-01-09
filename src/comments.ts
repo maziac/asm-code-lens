@@ -95,7 +95,7 @@ export function stripAllComments(lines: Array<string>) {
 			}
 			else if (singleLineCommentsSet.has(opening)) {
 				// Single line comment: Cut off
-				line = line.substring(0, j1 + match[0].length);
+				line = line.substring(0, j1);
 				break;
 			}
 		}

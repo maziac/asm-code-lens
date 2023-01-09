@@ -15,6 +15,7 @@
                 "isDefault": true
             }
         },
+
         {
             "type": "npm",
             "label": "watch-tsc",

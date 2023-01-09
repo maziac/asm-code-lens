@@ -2,13 +2,12 @@ import * as assert from 'assert';
 import {DonateInfoInner} from './donateinfoinner';
 
 
-describe('DonateInfoInner', () => {
+suite('DonateInfoInner', () => {
 
 	/**
 	 * Mock class to control the time for the unit tests.
 	 */
 	class MockDonateInfo extends DonateInfoInner {
-		public static enableDonationInfo = true;	// Make sure it is enabled.
 		public static time: number;
 		public static previousVersion: string;
 		public static currentVersion: string;
@@ -85,7 +84,7 @@ describe('DonateInfoInner', () => {
 	});
 
 
-	describe('checkDonateInfo', () => {
+	suite('checkDonateInfo', () => {
 
 		test('not enabled', async () => {
 			// evaluateDonateTime = undefined
