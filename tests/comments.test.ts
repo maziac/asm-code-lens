@@ -1,10 +1,10 @@
 import * as assert from 'assert';
-import {readCommentsForLine, setCustomCommentPrefix, stripAllComments} from '../src/comments';
+import {readCommentsForLine, setCustomCommentPrefix, stripAllComments, stripAllCommentsContents} from '../src/comments';
 
 
 describe('comments', () => {
 
-    function verifyMultiLines(inpOutp: string[]) {
+    function verifyMultiLines(inpOutp: string[], onlyContents = false) {
         // Split into input and output
         const inp: string[] = [];
         const outp: string[] = [];
@@ -18,7 +18,10 @@ describe('comments', () => {
         }
 
         // Execute
-        stripAllComments(inp);
+        if (onlyContents)
+            stripAllCommentsContents(inp);
+        else
+            stripAllComments(inp);
 
         // Verify
         const len = inp.length;
@@ -35,44 +38,157 @@ describe('comments', () => {
 
         test('single line comments', () => {
             const inpOutp = [
-                '',	            '', // 0
-                ' ',	        ' ',
-                ' a',	        ' a',
-                'a: b ',	    'a: b ',
-                ';',	        '',
-                ' ;',	        ' ',
-                ' a ;b',        ' a ',
-                ' "a" ;b',      '     ',
-                " 'a' ;b",      '     ',
-                " '\"' '\"'",   '        ',
-                ' "\'" "\'"',   '        ',
-                '//',	        '',
-                ' //',          ' ',
+                '', '', // 0
+                ' ', ' ',
+                ' a', ' a',
+                'a: b ', 'a: b ',
+                ';', '',
+                ' ;', ' ',
+                ' a ;b', ' a ',
+                ' "a" ;b', '     ',
+                " 'a' ;b", '     ',
+                " '\"' '\"'", '        ',
+                ' "\'" "\'"', '        ',
+                '//', '',
+                ' //', ' ',
 
-                ' a //b',	    ' a ',  // 10
-                ' "a" //b',	    '     ',
-                ' / //b',	    ' / ',
-                '""',	        '  ',
-                ' "abc" ',	    '       ',
-                '"',	        '',    // 15
-                ' "abc ',	    ' ',
-                '""""',	        '    ',
-                ' "abc" "xy" ',	'            ',
-                '"""',          '  ',
+                ' a //b', ' a ',  // 10
+                ' "a" //b', '     ',
+                ' / //b', ' / ',
+                '""', '  ',
+                ' "abc" ', '       ',
+                '"', '',    // 15
+                ' "abc ', ' ',
+                '""""', '    ',
+                ' "abc" "xy" ', '            ',
+                '"""', '  ',
 
-                ' "abc" "xy ',	'       ',  // 20
-                'a";"b',	    'a   b',
-                ' "abc" ";x ',	'       ',
-                'a"//"b',	    'a    b',
+                ' "abc" "xy ', '       ',  // 20
+                'a";"b', 'a   b',
+                ' "abc" ";x ', '       ',
+                'a"//"b', 'a    b',
                 ' "abc" "//x ', '       ',
-                ' "/*"b',       '     b',
-                ' */b',         ' */b'
+                ' "/*"b', '     b',
+                ' */b', ' */b'
             ];
             // Verify
             verifyMultiLines(inpOutp);
         });
 
+        describe('multiline', () => {
 
+            test('one or 2 liners', () => {
+                const inpOutp = [
+                    '/*/', '',
+                    '*/', '  ',
+
+                    '*/*', '*',
+                    '*/', '  ',
+
+                    'ab/*/', 'ab',
+                    'cd/*/', '     ',
+
+                    '/**/', '    ',
+
+                    'a/*b*/c', 'a     c',
+                ];
+
+                // Verify
+                verifyMultiLines(inpOutp);
+            });
+
+            test('several comments in one line', () => {
+                const inpOutp = [
+                    'd/*ee', 'd',
+                    'f*//*g*/h', '        h',
+
+                    '/**/a/*b*/', '    a     ',
+
+                    '/**/a/*b', '    a',
+                    '*/', '  ',
+
+                    '/**/a/*b*/c', '    a     c',
+
+                    ' /*aa*/bb/*ccc*/ddd/*ee', '       bb       ddd',
+                    'f*//*gg*/h', '         h',
+
+                    'ab/*/', 'ab',
+                    'cd/*/', '     ',
+
+                    '/**/', '    ',
+
+                    'a/*b*/c', 'a     c',
+                ];
+
+                // Verify
+                verifyMultiLines(inpOutp);
+            });
+
+            test('several lines', () => {
+                const inpOutp = [
+                    '/*/', '',
+                    '', '',
+                    'abcdef', '',
+                    '*/', '  ',
+
+                    'ab/*/', 'ab',
+                    'cd/*/', '     ',
+
+                    '/**/', '    ',
+
+                    'a/*b*/c', 'a     c',
+                ];
+
+                // Verify
+                verifyMultiLines(inpOutp);
+            });
+        });
+
+    });
+
+
+    describe('stripAllCommentsContents', () => {
+
+        setCustomCommentPrefix();
+
+        test('single line comments', () => {
+            const inpOutp = [
+                '', '', // 0
+                ' ', ' ',
+                ' a', ' a',
+                'a: b ', 'a: b ',
+                ';', ';',
+                ' ;', ' ',
+                ' a ;b', ' a ',
+                ' "a" ;b', '     ',
+                " 'a' ;b", '     ',
+                " '\"' '\"'", '        ',
+                ' "\'" "\'"', '        ',
+                '//', '',
+                ' //', ' ',
+
+                ' a //b', ' a ',  // 10
+                ' "a" //b', '     ',
+                ' / //b', ' / ',
+                '""', '  ',
+                ' "abc" ', '       ',
+                '"', '',    // 15
+                ' "abc ', ' ',
+                '""""', '    ',
+                ' "abc" "xy" ', '            ',
+                '"""', '  ',
+
+                ' "abc" "xy ', '       ',  // 20
+                'a";"b', 'a   b',
+                ' "abc" ";x ', '       ',
+                'a"//"b', 'a    b',
+                ' "abc" "//x ', '       ',
+                ' "/*"b', '     b',
+                ' */b', ' */b'
+            ];
+            // Verify
+            verifyMultiLines(inpOutp, true);
+        });
 
         describe('multiline', () => {
 
