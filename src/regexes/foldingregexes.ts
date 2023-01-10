@@ -51,6 +51,7 @@ export class FoldingRegexes {
 		return /\s+endmodule\b/i;
 	}
 
+
 	/** Returns the regex used for the start of a struct.
 	 * @returns E.g. /\*\//
 	 */
@@ -80,7 +81,5 @@ export class FoldingRegexes {
 	public static regexMacroEnd(): RegExp {
 		return /\s+endm\b/i;
 	}
-
-
 }
 
