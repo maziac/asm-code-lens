@@ -97,7 +97,7 @@ export class Config {
 	public completionsRequiredLength: number;
 
 	// Required minimum length for workspace symbols.
-	public workspaceSymbolsRequiredLength: number;	// TODO: Make configurable
+	public workspaceSymbolsRequiredLength: number;
 
 
 	/** Loops through all workspace folders and gets there configuration.
@@ -151,7 +151,7 @@ export class Config {
 			if (config.workspaceSymbolsRequiredLength < 1)
 				config.workspaceSymbolsRequiredLength = 1;
 			config.enableWorkspaceSymbols = settings.enableWorkspaceSymbols;
-			config.enableFolding = true;	// TODO
+			config.enableFolding = settings.enableFolding;
 			// Store
 			Config.configs.set(fsPath, config);
 			// Set global variables

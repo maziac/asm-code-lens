@@ -10,23 +10,21 @@ import {FoldingRegexes} from './regexes/foldingregexes';
  */
 export class FoldingProvider implements vscode.FoldingRangeProvider {
 
-	/**
-	 * An optional event to signal that the folding ranges from this provider have changed.
-	 */
-	//onDidChangeFoldingRanges?: Event<void>;
-
-
-	/**
-	 * Returns a list of folding ranges or null and undefined if the provider
+	/** Returns a list of folding ranges or null and undefined if the provider
 	 * does not want to participate or was cancelled.
+	 * Is available only for asm files, not list files.
+	 * Note: It seems that the folding range provider is called 3 times with the
+	 * same document for every document change.
 	 * @param document The document in which the command was invoked.
 	 * @param context Additional context information (for future use)
 	 * @param token A cancellation token.
 	 */
-	provideFoldingRanges(document: vscode.TextDocument, _context: vscode.FoldingContext, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.FoldingRange[]> {     // Check which workspace
+	provideFoldingRanges(document: vscode.TextDocument, _context: vscode.FoldingContext, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.FoldingRange[]> {
+		// Check which workspace
 		const config = Config.getConfigForDoc(document);
-		if (!config?.enableFolding) 	// TODO
-			return undefined;   // Don't show any hover.
+		//console.log("folding:", config?.enableFolding, document.uri.fsPath);
+		if (!config?.enableFolding)
+			return [];   // Don't show any hover.
 
 		// Read doc
 		const linesData = document.getText();
@@ -35,9 +33,9 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 
 		// Prepare regexes
 		const regexLabel = CommonRegexes.regexLabel(config, 'asm-collection');
-		const regexCommentMultipleStart = /^\/\*/;
-		const regexCommentMultipleEnd = /\*\//;
-		const regexCommentSingle = FoldingRegexes.regexSingleLineComments(Config.globalToggleCommentPrefix);
+		const regexCommentMultipleStart = FoldingRegexes.regexCommentMultipleStart();
+		const regexCommentMultipleEnd = FoldingRegexes.regexCommentMultipleEnd();
+		const regexCommentSingle = FoldingRegexes.regexCommentSingleLine(Config.globalToggleCommentPrefix);
 
 		// State base parsing
 		let rangeLineNrStart = -1;
@@ -57,7 +55,6 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 
 				case ';':
 					// Check for single comment end.
-					const m = regexCommentSingle.exec(line);
 					if (!regexCommentSingle.exec(line)) {
 						lineNr--;	// Recheck line
 						this.addRange(foldingRanges, rangeLineNrStart, lineNr, vscode.FoldingRangeKind.Comment);
@@ -98,7 +95,12 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 	}
 
 
-	// TODO: Add comment
+	/** Adds a new range if lineEnd is bigger than lineStart.
+	 * @param foldingRanges An array of already known folding ranges, the new range is added to it.
+	 * @param lineStart The range start.
+	 * @param lineEnd The range end.
+	 * @param kind 'Comment' or 'Region'.
+	 */
 	protected addRange(foldingRanges: vscode.FoldingRange[], lineStart: number, lineEnd: number, kind: vscode.FoldingRangeKind) {
 		if (lineEnd > lineStart) {
 			const range = new vscode.FoldingRange(lineStart, lineEnd, kind);

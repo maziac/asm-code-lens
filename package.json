@@ -131,6 +131,13 @@
                     "default": true,
                     "markdownDescription": "Enable/disable the possibility to [rename](https://code.visualstudio.com/docs/editor/editingevolved#_rename-symbol) labels. You need to reload the extension to take effect."
                 },
+                "asm-code-lens.enableFolding": {
+                    "order": 86,
+                    "scope": "resource",
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Enable/disable the folding of e.g. labels in asm files."
+                },
                 "asm-code-lens.comments.toggleLineCommentPrefix": {
                     "order": 91,
                     "scope": "window",

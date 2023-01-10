@@ -66,7 +66,7 @@ export class CommonRegexes {
      */
     public static regexLabel(cfg: {labelsWithColons: boolean, labelsWithoutColons: boolean}, languageId: AllowedLanguageIds): RegExp {
         if (languageId === "asm-list-file")   // List file: only with colons
-            return CommonRegexes.regexLabelWithColon(languageId); // TODO remove []
+            return CommonRegexes.regexLabelWithColon(languageId);
 
         // Now for "asm-collection"
         if (cfg.labelsWithColons && cfg.labelsWithoutColons)
