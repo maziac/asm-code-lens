@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {Config} from './config';
 import {CommonRegexes} from './regexes/commonregexes';
 import {FoldingRegexes} from './regexes/foldingregexes';
+import {stripAllComments} from './comments';
 
 
 
@@ -19,10 +20,11 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 	 * @param context Additional context information (for future use)
 	 * @param token A cancellation token.
 	 */
+	protected N = 1;
 	provideFoldingRanges(document: vscode.TextDocument, _context: vscode.FoldingContext, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.FoldingRange[]> {
 		// Check which workspace
 		const config = Config.getConfigForDoc(document);
-		//console.log("folding:", config?.enableFolding, document.uri.fsPath);
+		console.log("folding:", this.N++, config?.enableFolding, document.uri.fsPath);
 		if (!config?.enableFolding)
 			return [];   // Don't show any hover.
 
@@ -91,6 +93,18 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 			this.addRange(foldingRanges, rangeLineNrStart, len - 1, kind);
 		}
 
+		// Now add overarching regions (modules, structs, macros)
+		stripAllComments(lines);
+
+		// Add ranges for MODULEs
+		this.addRangesForRegex(lines, foldingRanges, FoldingRegexes.regexModuleStart(), FoldingRegexes.regexModuleEnd());
+
+		// Add ranges for STRUCTs
+		this.addRangesForRegex(lines, foldingRanges, FoldingRegexes.regexStructStart(), FoldingRegexes.regexStructEnd());
+
+		// Add ranges for MACROs
+		this.addRangesForRegex(lines, foldingRanges, FoldingRegexes.regexMacroStart(), FoldingRegexes.regexMacroEnd());
+
 		return foldingRanges;
 	}
 
@@ -107,4 +121,36 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 			foldingRanges.push(range!);
 		}
 	}
+
+
+	/** Adds overarching ranges, e.g. for MODULE/ENDMODULE, STRUCT/ENDS and MACRO/ENDM.
+	 * @param lines The text lines to search (comments have been stripped already)
+	 * @param foldingRanges An array of already known folding ranges, the new ranges are added to it.
+	 * @param regexStart E.g. /..MODULE.../
+	 * @param regexEnd E.g. /..ENDMODULE.../
+	 */
+	protected addRangesForRegex(lines: string[], foldingRanges: vscode.FoldingRange[], regexStart: RegExp, regexEnd: RegExp) {
+		let ranges: vscode.FoldingRange[] = [];
+		let lineNr = -1;
+		const lastLineNr = lines.length - 1;
+		for (const line of lines) {
+			lineNr++;
+			// Check for range start
+			if (regexStart.exec(line)) {
+				// Create range object
+				const range = new vscode.FoldingRange(lineNr, lastLineNr, vscode.FoldingRangeKind.Region);
+				ranges.push(range)
+				// Add already
+				foldingRanges.push(range);
+			}
+			// Check for range end
+			else if (regexEnd.exec(line)) {
+				const range = ranges.pop();
+				if (range) {
+					range.end = lineNr;
+				}
+			}
+		}
+	}
+
 }

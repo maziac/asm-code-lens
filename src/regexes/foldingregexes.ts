@@ -34,5 +34,53 @@ export class FoldingRegexes {
 	public static regexCommentMultipleEnd(): RegExp {
 		return /\*\//;
 	}
+
+
+	/** Returns the regex used for the start of a module.
+	 * @returns E.g. /\*\//
+	 */
+	public static regexModuleStart(): RegExp {
+		return /\s+module\b/i;
+	}
+
+
+	/** Returns the regex used for the end of a module.
+	 * @returns E.g. /\*\//
+	 */
+	public static regexModuleEnd(): RegExp {
+		return /\s+endmodule\b/i;
+	}
+
+	/** Returns the regex used for the start of a struct.
+	 * @returns E.g. /\*\//
+	 */
+	public static regexStructStart(): RegExp {
+		return /\s+struct\b/i;
+	}
+
+
+	/** Returns the regex used for the end of a struct.
+	 * @returns E.g. /\*\//
+	 */
+	public static regexStructEnd(): RegExp {
+		return /\s+ends\b/i;
+	}
+
+	/** Returns the regex used for the start of a macro.
+	 * @returns E.g. /\*\//
+	 */
+	public static regexMacroStart(): RegExp {
+		return /\s+macro\b/i;
+	}
+
+
+	/** Returns the regex used for the end of a macro.
+	 * @returns E.g. /\*\//
+	 */
+	public static regexMacroEnd(): RegExp {
+		return /\s+endm\b/i;
+	}
+
+
 }
 

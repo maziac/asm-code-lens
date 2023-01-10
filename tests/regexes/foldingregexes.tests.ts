@@ -74,4 +74,7 @@ suite('FoldingRegexes', () => {
         m = r.exec(' /*=======');
         assert.equal(m, undefined);
     });
+
+
+    // TODO: Tests
 });
