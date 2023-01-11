@@ -183,9 +183,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
         context.subscriptions.push(regWorkspaceSymbolProvider);
     }
 
-    // Register
-    //if (Config.globalEnableWorkspaceSymbols)
-    if(true)
+    // Register (always, even if disabled)
     {
         regFoldingProvider = vscode.languages.registerFoldingRangeProvider({scheme: "file", language: 'asm-collection'}, new FoldingProvider());
         context.subscriptions.push(regFoldingProvider);

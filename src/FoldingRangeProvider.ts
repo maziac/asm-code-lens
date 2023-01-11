@@ -20,11 +20,10 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 	 * @param context Additional context information (for future use)
 	 * @param token A cancellation token.
 	 */
-	protected N = 1;
 	provideFoldingRanges(document: vscode.TextDocument, _context: vscode.FoldingContext, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.FoldingRange[]> {
 		// Check which workspace
 		const config = Config.getConfigForDoc(document);
-		console.log("folding:", this.N++, config?.enableFolding, document.uri.fsPath);
+		//console.log("folding:", config?.enableFolding, document.uri.fsPath);
 		if (!config?.enableFolding)
 			return [];   // Don't show any hover.
 
@@ -118,7 +117,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 	protected addRange(foldingRanges: vscode.FoldingRange[], lineStart: number, lineEnd: number, kind: vscode.FoldingRangeKind) {
 		if (lineEnd > lineStart) {
 			const range = new vscode.FoldingRange(lineStart, lineEnd, kind);
-			foldingRanges.push(range!);
+			foldingRanges.push(range);
 		}
 	}
 
