@@ -17,17 +17,17 @@ If you like ASM-Code-Lens please consider supporting it.
 
 'ASM Code Lens' is a language server extension for Visual Studio Code for assembler files.
 It provides support for:
-- Assembler syntax highlighting.
+- Assembler syntax highlighting (Z80 and x86).
 - Completions: While you type completions are proposed based on the labels in your asm files.
 - "Find all references": through a right mouse click in your assembler source file. It will come up with all found references in the other files.
 - Hovering: When hovering over a symbol it shows the comments for the symbol.
+- Folding.
 - Outline view: View your labels (code, data, constants) in the outline view.
 - [Open symbol by name](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name)
 - [Go to Definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)
 - [Rename symbols (labels)](https://code.visualstudio.com/docs/editor/editingevolved#_rename-symbol).
 - [Code Lenses](https://code.visualstudio.com/docs/editor/editingevolved#_reference-information): Above symbols the number of references is shown. Clicking it reveals the references.
 - Find all labels that are not EQU and are not referenced. Useful to find dead code.
-- Supports e.g. sjasmplus (with dot notation, also MODULE and STRUCTs), Savannah's z80asm, z88dk assembler and many other assemblers that use a standard notation for labels (e.g. "label:").
 
 Please refer to the "Feature Contributions" tab to see how to enable/disable certain features
 

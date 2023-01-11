@@ -11,7 +11,7 @@ import {grepMultiple} from './grep';
  * The WorkspaceSymbolProvider.
  * In a multiroot environment the WorkspaceSymbolProvider can take quite some time.
  * E.g. 5 secs.
- * Therefore the following restirctions have been used to not increase the search time further:
+ * Therefore the following restrictions have been used to not increase the search time further:
  * 1. The Symbol-kind is undefined, so that vscode does not show any symbol
  * Recognizing the correct symbol would be quite complicated as it depends also on
  * the previous lines (e.g. data vs. function).

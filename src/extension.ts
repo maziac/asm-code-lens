@@ -121,6 +121,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     removeProvider(regRenameProvider, context);
     removeProvider(regDocumentSymbolProvider, context);
     removeProvider(regWorkspaceSymbolProvider, context);
+    removeProvider(regFoldingProvider, context);
 
     // Re-read settings for all workspaces.
     Config.init();
