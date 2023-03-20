@@ -47,7 +47,6 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
         let lastSymbols = new Array<vscode.DocumentSymbol>();
         let lastAbsSymbolChildren;
         let lastModules = new Array<vscode.DocumentSymbol>();
-        let defaultSymbolKind = vscode.SymbolKind.Function;
 
         // Strip all comments
         const lines = document.getText().split('\n');
@@ -72,7 +71,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     const selRange = range; //new vscode.Range(line, 0, line, 3);
 
                     // Create Symbol
-                    lastSymbol = new vscode.DocumentSymbol(label, '', defaultSymbolKind, range, selRange);
+                    lastSymbol = new vscode.DocumentSymbol(label, '', vscode.SymbolKind.Function, range, selRange);
                     lastSymbols.push(lastSymbol);
 
                     // Insert as absolute or relative label
@@ -114,8 +113,8 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     const range = new vscode.Range(line, 0, line, 10000);
                     const macroSymbol = new vscode.DocumentSymbol(macroName, '', vscode.SymbolKind.Method, range, range);
                     symbols.push(macroSymbol);
+                    continue;
                 }
-                continue;
             }
 
             // Now check for MODULE or STRUCT
@@ -160,8 +159,6 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
             lineContents = lineContents.trim();
             // Now check which kind of data it is:
             // code, const or data
-            if (!lineContents)
-                defaultSymbolKind = vscode.SymbolKind.Function;
             if (lastSymbol) {
                 if (lineContents) {
                     let kind;
@@ -186,9 +183,8 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                             elem.kind = kind;
                             elem.detail = match![1] + ' ' + match![2].trimEnd();
                         }
-                        defaultSymbolKind = kind;
                     }
-                    // Something different, so assume code
+
                     lastSymbol = undefined;
                     lastSymbols.length = 0;
                     continue;
