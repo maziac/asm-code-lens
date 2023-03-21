@@ -111,7 +111,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 if (matchMacro) {
                     const macroName = matchMacro[2];
                     const range = new vscode.Range(line, 0, line, 10000);
-                    const macroSymbol = new vscode.DocumentSymbol(macroName, '', vscode.SymbolKind.Method, range, range);
+                    const macroSymbol = new vscode.DocumentSymbol(macroName, 'macro', vscode.SymbolKind.Interface, range, range);
                     symbols.push(macroSymbol);
                     continue;
                 }

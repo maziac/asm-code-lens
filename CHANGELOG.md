@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.4.1
+- Outline view: #98: Properly show symbol kinds and structs/modules in document outline by mwpenny
+- Outline view: Show 'macro' as "interface".
+
 # 2.4.0
 - FoldingRangeProvider added.
 - Some optimizations for regexes.
