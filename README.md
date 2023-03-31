@@ -171,5 +171,6 @@ I also would like to thank these contributors:
 - [chrijbel](https://github.com/chribjel) for PR #53 [Added support for changing the line comment prefix](https://github.com/maziac/asm-code-lens/pull/53).
 - [64kramsystem](https://github.com/64kramsystem) for PR #65 [Add syntax highlight to Markdown code blocks](https://github.com/maziac/asm-code-lens/pull/65).
 - [Crystal-RainSlide](https://github.com/Crystal-RainSlide) for PR #90 [Use esbuild](https://github.com/maziac/asm-code-lens/pull/90) which decreased the size of extension a lot.
-- [Coolspy3](https://github.com/CoolSpy3?tab=repositories) for PR #92/93 (x86 syntax highlighting improvements).
+- [Coolspy3](https://github.com/CoolSpy3) for PR #92/93 (x86 syntax highlighting improvements).
+- [mwpenny](https://github.com/mwpenny) for PR #98 (Properly show symbol kinds and structs/modules in document outline #98).
 - And all the others who contributed and entered error reports.
