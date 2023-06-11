@@ -38,6 +38,11 @@ export class HoverProvider implements vscode.HoverProvider {
         // It is a non local label
         const languageId = document.languageId as AllowedLanguageIds;
         const range = document.getWordRangeAtPosition(position);
+        if (!range) {
+            //console.log("provideHover", position);
+            return undefined;
+        }
+
         const searchWord = document.getText(range);
         // regexes for labels with and without colon
         const regexes = CommonRegexes.regexesLabelForWord(searchWord, config, languageId);
