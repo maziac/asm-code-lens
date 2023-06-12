@@ -202,7 +202,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         if (k < 0) {
             // No dot.
             // Check if word starts with a capital letter
-            const upperCase = (rowLabel.label[0] == rowLabel.label[0].toUpperCase());
+            const upperCase = (rowLabel.label[0] === rowLabel.label[0].toUpperCase());  // NOSONAR
             // Add the instruction proposals
             let i = 0;
             allCompletions = completions.map(text => {

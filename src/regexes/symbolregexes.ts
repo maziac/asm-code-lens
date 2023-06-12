@@ -17,7 +17,7 @@ export class SymbolRegexes {
 	 * Note: The same regex can be returned for asm and list files.
 	 */
 	public static regexModuleLabel(): RegExp {
-		return /\b(module\s+([a-z_][\w\.]*)|endmodule.*)/i;
+		return /\b(module\s+([a-z_][\w.]*)|endmodule.*)/i;
 	}
 
 
@@ -31,7 +31,7 @@ export class SymbolRegexes {
 	 * Note: The same regex can be returned for asm and list files.
 	 */
 	public static regexStructLabel(): RegExp {
-		return /\b(struct\s+([a-z_][\w\.]*)|ends.*)/i;
+		return /\b(struct\s+([a-z_][\w.]*)|ends.*)/i;
 	}
 
 

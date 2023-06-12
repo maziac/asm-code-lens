@@ -39,38 +39,39 @@ export class WorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
      * signaled by returning `undefined`, `null`, or an empty array.
      */
     public provideWorkspaceSymbols(query: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[]> {
-        return new Promise<vscode.ProviderResult<vscode.SymbolInformation[]>>(async resolve => {
-            const symbols: vscode.SymbolInformation[] = [];
+        return new Promise<vscode.ProviderResult<vscode.SymbolInformation[]>>(resolve => {
+            (async () => {
+                const symbols: vscode.SymbolInformation[] = [];
 
-            // Get a list of workspaces folders
-            const wsFolders = vscode.workspace.workspaceFolders;
-            if (wsFolders) {
-                // Check each
-                const len = query.length;
-                for (const ws of wsFolders) {
-                    // Check for cancellation (e.g. another key was typed)
-                    if (token.isCancellationRequested) {
-                        resolve(undefined);
-                        return;
+                // Get a list of workspaces folders
+                const wsFolders = vscode.workspace.workspaceFolders;
+                if (wsFolders) {
+                    // Check each
+                    const len = query.length;
+                    for (const ws of wsFolders) {
+                        // Check for cancellation (e.g. another key was typed)
+                        if (token.isCancellationRequested) {
+                            resolve(undefined);
+                            return;
+                        }
+
+                        // Check if enabled
+                        const config = Config.configs.get(ws.uri.fsPath);
+                        if (!config?.enableWorkspaceSymbols)
+                            continue;   // Skip
+
+                        // Get required length
+                        const requiredLen = config.workspaceSymbolsRequiredLength;
+                        if (len < requiredLen)
+                            continue;   // Skip
+
+                        // Get all symbols
+                        const wsSymbols = await this.getWsSymbols(config, query);
+                        symbols.push(...wsSymbols);
                     }
-
-                    // Check if enabled
-                    const config = Config.configs.get(ws.uri.fsPath);
-                    if (!config?.enableWorkspaceSymbols)
-                        continue;   // Skip
-
-                    // Get required length
-                    const requiredLen = config.workspaceSymbolsRequiredLength;
-                    if (len < requiredLen)
-                        continue;   // Skip
-
-                    // Get all symbols
-                    const wsSymbols = await this.getWsSymbols(config, query);
-                    symbols.push(...wsSymbols);
                 }
-            }
-
-            resolve(symbols);
+                resolve(symbols);
+            })();
         });
     }
 

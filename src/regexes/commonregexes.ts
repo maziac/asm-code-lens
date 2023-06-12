@@ -16,7 +16,7 @@ export class CommonRegexes {
      *  2 = the label itself e.g. "init.label_1"
      */
     public static regexLabelWithAndWithoutColon(): RegExp {
-        return /(^@?)([a-z_][\w\.]*):?/i;
+        return /(^@?)([a-z_][\w.]*):?/i;
     }
 
 
@@ -34,10 +34,10 @@ export class CommonRegexes {
      */
     public static regexLabelWithColon(languageId: AllowedLanguageIds): RegExp {
         if (languageId === 'asm-list-file') {
-            return new RegexIndexOf(':', /(^[^#]*\s@?)([a-z_][\w\.]*):/i);
+            return new RegexIndexOf(':', /(^[^#]*\s@?)([a-z_][\w.]*):/i);
         }
 		// "asm-collection"
-        return /(^@?)([a-z_][\w\.]*):/i;
+        return /(^@?)([a-z_][\w.]*):/i;
     }
 
 
@@ -53,7 +53,7 @@ export class CommonRegexes {
      * Used by findLabelsWithNoReference, provideCodeLenses.
      */
     public static regexLabelWithoutColon(): RegExp {
-        return /^(@?)([a-z_][\w\.]*)(?:\s|$)/i;
+        return /^(@?)([a-z_][\w.]*)(?:\s|$)/i;
     }
 
 
@@ -98,7 +98,7 @@ export class CommonRegexes {
     public static regexModuleStruct(): RegExp {
         //return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
         //return /^.*\s(MODULE|STRUCT)\s+([\w\.]+)/i;
-        return new RegexTwo(/(MODULE|STRUCT)/i, /^.*\s(MODULE|STRUCT)\s+([\w\.]+)/i);
+        return new RegexTwo(/(MODULE|STRUCT)/i, /^.*\s(MODULE|STRUCT)\s+([\w.]+)/i);
     }
 
 

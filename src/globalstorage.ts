@@ -26,6 +26,8 @@ export class GlobalStorage {
 	 * Store a value.
 	 */
 	public static Set(key: string, value: any) {
-		this.context.globalState.update(key, value);
+		(async () => {
+			await this.context.globalState.update(key, value);
+		})();
 	}
 }

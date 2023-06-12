@@ -14,6 +14,6 @@ export class CommandsRegexes {
 	 */
 	public static regexLabelEquOrMacro(): RegExp {
 	//	return /^[\w\.]+:?\s*\b(equ|macro)/i;
-		return new RegexTwo(/(equ|macro)/i, /^.*[a-z_][\w\.]*[:\s]\s*(equ|macro)/i);
+		return new RegexTwo(/(equ|macro)/i, /^.*[a-z_][\w.]*[:\s]\s*(equ|macro)/i);
 	}
 }

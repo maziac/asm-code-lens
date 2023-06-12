@@ -33,7 +33,7 @@ export class Commands {
         //dbgPrintLocations(locations);
         // locations is a GrepLocation array that contains all found labels.
         // Convert this to an array of labels.
-        this.findLabels(labelLocations, config, languageId);
+        await this.findLabels(labelLocations, config, languageId);
     }
 
 

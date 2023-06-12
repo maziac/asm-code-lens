@@ -75,11 +75,11 @@ globalThis.keypress = function (obj, event, numberBase) {
 	let regex;
 	if (numberBase == 16) {
 		// Hex
-		regex = /^([+\-\*\/]?)\s*([0-9a-f]*)$/i;
+		regex = /^([+\-*/]?)\s*([0-9a-f]*)$/i;
 	}
 	else {
 		// Decimal
-		regex = /^([+\-\*\/]?)\s*(\d*)$/;
+		regex = /^([+\-*/]?)\s*(\d*)$/;
 	}
 	const match = regex.exec(text);
 	if (!match) {

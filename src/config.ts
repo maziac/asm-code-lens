@@ -117,7 +117,7 @@ export class Config {
 		Config.globalEnableOutlineView = false;
 
 		// Go through each setting
-		const workspaceFolders = vscode.workspace.workspaceFolders || [];
+		const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
 		//console.log("# workspacefolders=" + workspaceFolders.length);
 		for (const workspaceFolder of workspaceFolders) {
 			// Create a new config instance

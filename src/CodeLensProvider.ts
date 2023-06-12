@@ -43,9 +43,9 @@ export class CodeLensProvider implements vscode.CodeLensProvider {
      * @param document The document to check.
      * @param token
      */
-    public async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[] | undefined> {
+    public async provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): Promise<vscode.CodeLens[] | undefined> {
         // Show donate info
-        DonateInfo.checkDonateInfo();   // No need for 'await'.
+        DonateInfo.checkDonateInfo();
 
         // Check which workspace
         const config = Config.getConfigForDoc(document);

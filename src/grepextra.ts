@@ -86,7 +86,7 @@ export function getModuleFileInfo(lines: string[]): FileModuleStructInfo[] {
  * @returns {label, preString} The found label and the part of the string that
  * is found before 'label'.
  */
-export function getCompleteLabel(lineContents: string, startIndex: number, regexEnd = /[\w\.]/): {label: string, preString: string} {
+export function getCompleteLabel(lineContents: string, startIndex: number, regexEnd = /[\w.]/): {label: string, preString: string} {
 	// Find end of label.
 	const len = lineContents.length;    // REMARK: This can lead to error: "length of undefined"
 	let k: number;
@@ -104,7 +104,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
 	for (i = startIndex - 1; i >= 0; i--) {
 		const s = lineContents.charAt(i);
 		// Allow [a-z0-9_.]
-		const match = /[\w\.]/.exec(s);
+		const match = /[\w.]/.exec(s);
 		if (!match)
 			break;
 	}
@@ -176,7 +176,7 @@ export function concatenateModuleAndLabel(module: string, label: string): string
  * @param clmn The column position that points to the label.
  * @returns { label, moduleLabel }
  */
-export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: FileInfo, row: number, clmn: number, regexEnd = /[\w\.]/): {label: string, moduleLabel: string} {
+export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: FileInfo, row: number, clmn: number, regexEnd = /[\w.]/): {label: string, moduleLabel: string} {
 	// 1. Get original label
 	const lines = fileInfo.lines;
 	const line = lines[row];

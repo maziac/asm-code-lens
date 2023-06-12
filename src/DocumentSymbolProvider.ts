@@ -67,7 +67,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 if (!excludes.includes(label)) {
                     // Check for label
                     // Create range
-                    const range = new vscode.Range(line, 0, line, 10000);
+                    const range = new vscode.Range(line, 0, line, Number.MAX_SAFE_INTEGER);
                     const selRange = range; //new vscode.Range(line, 0, line, 3);
 
                     // Create Symbol
@@ -109,8 +109,10 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
             if (regexMacro) {
                 const matchMacro = regexMacro.exec(lineContents);
                 if (matchMacro) {
-                    const macroName = matchMacro[2];
-                    const range = new vscode.Range(line, 0, line, 10000);
+                    let macroName = matchMacro[2];
+                    if (macroName === '')
+                        macroName = ' ';    // Otherwise vscode.DocumentSymbol "crashes".
+                    const range = new vscode.Range(line, 0, line, Number.MAX_SAFE_INTEGER);
                     const macroSymbol = new vscode.DocumentSymbol(macroName, 'macro', vscode.SymbolKind.Interface, range, range);
                     symbols.push(macroSymbol);
                     continue;
@@ -127,7 +129,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 if (moduleName) {
                     // Handle MODULE
                     // Create range
-                    const range = new vscode.Range(line, 0, line, 10000);
+                    const range = new vscode.Range(line, 0, line, Number.MAX_SAFE_INTEGER);
                     // Create symbol
                     const kind = (keyword.startsWith("module")) ? vscode.SymbolKind.Module : vscode.SymbolKind.Struct;
                     const moduleSymbol = new vscode.DocumentSymbol(moduleName, '', kind, range, range);

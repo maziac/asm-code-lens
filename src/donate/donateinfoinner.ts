@@ -137,7 +137,7 @@ export class DonateInfoInner {
 	 * It checks if there is time (and other conditions) to show the
 	 * donate nag screen.
 	 */
-	public static async checkDonateInfo() {
+	public static checkDonateInfo() {
 		if (this.enableDonationInfo) {
 			// Check if enabled
 			if (this.evaluateDonateTime != undefined &&
@@ -155,11 +155,13 @@ export class DonateInfoInner {
 				if (this.now() < this.donateEndTime) {
 					// Time not elapsed yet.
 					// Show info as error text (warning and info text goes away by itself after a short timeout)
-					const selected = await this.showInfoMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Yes, please. I want to show my support", "Not now");
-					if (selected?.toLowerCase().startsWith('yes')) {
-						// Re-direct to donation page
-						this.openDonateWebView();
-					}
+					(async () => {
+						const selected = await this.showInfoMessage("If you use 'ASM Code Lens' regularly please support the project. Every little donation helps keeping the project running.", "Yes, please. I want to show my support", "Not now");
+						if (selected?.toLowerCase().startsWith('yes')) {
+							// Re-direct to donation page
+							this.openDonateWebView();
+						}
+					})();
 				}
 				else {
 					// Stop evaluating.
