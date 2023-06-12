@@ -2,6 +2,7 @@
 
 # 2.4.2
 - Hover: Check added that text range is valid.
+- Fixed: macro (without name according sjasmplus) could result in no symbols in outline view.
 
 # 2.4.1
 - Outline view: #98: Properly show symbol kinds and structs/modules in document outline by mwpenny
