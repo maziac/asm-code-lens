@@ -120,7 +120,11 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         }
 
         // Search
-        const searchWord = document.getText(document.getWordRangeAtPosition(position));
+        const posRange =  document.getWordRangeAtPosition(position);
+        if (!posRange) {
+            return undefined;
+        }
+        const searchWord = document.getText(posRange);
         const fuzzySearchWord = CommonRegexes.regexPrepareFuzzy(searchWord);
 
         // regexes for labels with and without colon

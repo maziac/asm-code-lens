@@ -24,7 +24,11 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
             return undefined;   // Don't show any references.
 
         // Search
-        const searchWord = document.getText(document.getWordRangeAtPosition(position));
+        const posRange = document.getWordRangeAtPosition(position);
+        if (!posRange) {
+            return undefined;
+        }
+        const searchWord = document.getText(posRange);
         const searchRegex = CommonRegexes.regexAnyReferenceForWord(searchWord);
 
         const languageId = document.languageId as AllowedLanguageIds;

@@ -74,7 +74,11 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @returns A promise to an array with locations. Normally there is only one entry to the array.
      */
     protected async search(config: Config, document, position): Promise<vscode.Location[] | undefined> {
-        const searchWord = document.getText(document.getWordRangeAtPosition(position)); //, /[a-z0-9_.]+/i));
+        const posRange = document.getWordRangeAtPosition(position);
+        if (!posRange) {
+            return undefined;
+        }
+        const searchWord = document.getText(posRange); //, /[a-z0-9_.]+/i));
 
         // Check if search word is in the excludes
         if (config.labelsExcludes.includes(searchWord))

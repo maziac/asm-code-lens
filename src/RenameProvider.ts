@@ -19,20 +19,25 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param options
      * @param token
      */
-    public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit|undefined> {
+    public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit | undefined> {
+        const wsEdit = new vscode.WorkspaceEdit();
         // Check which workspace
         const config = Config.getConfigForDoc(document);
         if (!config) {
-            vscode.window.showWarningMessage("Document is in no workspace folder.");
-            return new vscode.WorkspaceEdit();  // Empty = no change
+            await vscode.window.showWarningMessage("Document is in no workspace folder.");
+            return wsEdit;  // Empty = no change
         }
         if (!config.enableRenaming) {
-            vscode.window.showWarningMessage("Renaming is disabled for this workspace folder.");
-            return new vscode.WorkspaceEdit();  // Empty = no change
+            await vscode.window.showWarningMessage("Renaming is disabled for this workspace folder.");
+            return wsEdit;  // Empty = no change
         }
 
         // Rename
-        const oldName = document.getText(document.getWordRangeAtPosition(position));
+        const posRange = document.getWordRangeAtPosition(position);
+        if (!posRange) {
+            return wsEdit;  // Empty = no change
+        }
+        const oldName = document.getText(posRange);
         const searchRegex = RenameRegexes.regexAnyReferenceForWordGlobal(oldName);
 
         const languageId = document.languageId as AllowedLanguageIds;
@@ -48,7 +53,6 @@ export class RenameProvider implements vscode.RenameProvider {
         // - not opened in text editor
         // - opened in text editor and saved
         // - opened in text editor and unsaved. The file in the editor will be saved, but this is normal behavior also e.g. in typescript renaming.
-        const wsEdit = new vscode.WorkspaceEdit();
         for (const loc of reducedLocations) {
             wsEdit.replace(loc.uri, loc.range, newName);
         }
