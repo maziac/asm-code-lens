@@ -77,7 +77,7 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
      * @param position The position of the word for which the references should be found.
      * @param token
      */
-    public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList | undefined>> {
+    public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList | undefined>> {
         // Check which workspace
         const config = Config.getConfigForDoc(document);
         if (!config?.enableCompletions)

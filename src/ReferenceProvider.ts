@@ -17,7 +17,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
      * @param options
      * @param token
      */
-    public async provideReferences(document: vscode.TextDocument, position: vscode.Position, options: {includeDeclaration: boolean}, token: vscode.CancellationToken): Promise<vscode.Location[] | undefined> {
+    public async provideReferences(document: vscode.TextDocument, position: vscode.Position, _options: {includeDeclaration: boolean}, _token: vscode.CancellationToken): Promise<vscode.Location[] | undefined> {
         // Check which workspace
         const config = Config.getConfigForDoc(document);
         if (!config?.enableFindAllReferences)

@@ -19,15 +19,15 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
      * @param options
      * @param token
      */
-    public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Location[] | undefined> {
+    public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Location[] | undefined> {
         // Check which workspace
         const config = Config.getConfigForDoc(document);
         if (!config) {
-            vscode.window.showWarningMessage("Document is in no workspace folder.");
+            await vscode.window.showWarningMessage("Document is in no workspace folder.");
             return undefined;
         }
         if (!config.enableGotoDefinition) {
-            vscode.window.showWarningMessage("Goto definitions are disabled for this workspace folder.");
+            await vscode.window.showWarningMessage("Goto definitions are disabled for this workspace folder.");
             return undefined;
         }
 

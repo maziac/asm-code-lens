@@ -18,7 +18,7 @@ export class HoverProvider implements vscode.HoverProvider {
      * @param options
      * @param token
      */
-    public async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
+    public async provideHover(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
         // Check which workspace
         const config = Config.getConfigForDoc(document);
         if (!config?.enableHovering)

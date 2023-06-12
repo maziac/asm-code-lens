@@ -19,7 +19,7 @@ export class RenameProvider implements vscode.RenameProvider {
      * @param options
      * @param token
      */
-    public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit | undefined> {
+    public async provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, _token: vscode.CancellationToken): Promise<vscode.WorkspaceEdit | undefined> {
         const wsEdit = new vscode.WorkspaceEdit();
         // Check which workspace
         const config = Config.getConfigForDoc(document);
