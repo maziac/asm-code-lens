@@ -245,7 +245,8 @@
                 ],
                 "aliases": [
                     "Assembler file"
-                ]
+                ],
+                "configuration": "./asm-collection.language.configuration.json"
             },
             {
                 "id": "asm-list-file",
