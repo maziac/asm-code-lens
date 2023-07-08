@@ -190,7 +190,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     }
 
     // Toggle line Comment configuration
-    vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: Config.globalToggleCommentPrefix}});
+    vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: Config.globalToggleCommentPrefix, blockComment: ["/*", "*/"]}});
     // Store
     setCustomCommentPrefix(Config.globalToggleCommentPrefix);
 }
