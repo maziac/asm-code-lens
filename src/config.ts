@@ -4,7 +4,7 @@ import {PackageInfo} from "./whatsnew/packageinfo";
 
  /**
   * Used to pass user preferences settings between functions.
-  * All configurations all all workspace folder are stored in 'configs'.
+  * All configurations and all workspace folder are stored in 'configs'.
   * Each workspace folder can have own settings.
   *
   * However, there is only one provider registered at vscode for all workspaces.
@@ -46,6 +46,9 @@ export class Config {
 	// The custom prefix to use for toggle line comment. Depends on language
 	// id and can therefore only be set globally.
 	public static globalToggleCommentPrefix: string;
+
+	// Highlighting of matching push/pops
+	public static globalEnablePushPopMatching: boolean;
 
 	// A map with the configs for all workspace folders
 	public static configs = new Map<string, Config>();
@@ -100,12 +103,13 @@ export class Config {
 	public workspaceSymbolsRequiredLength: number;
 
 
-	/** Loops through all workspace folders and gets there configuration.
+	/** Loops through all workspace folders and gets their configuration.
 	 */
 	public static init() {
 		// Set global variables (variables with 'window' scope)
 		const globalSettings = PackageInfo.getConfiguration();
 		Config.globalToggleCommentPrefix = globalSettings.comments.toggleLineCommentPrefix;
+		Config.globalEnablePushPopMatching = globalSettings.enablePushPopMatching;
 
 		// Clear global/local variables (variables with 'resource' scope)
 		Config.globalEnableCodeLenses = false;

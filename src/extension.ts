@@ -193,6 +193,16 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: Config.globalToggleCommentPrefix, blockComment: ["/*", "*/"]}});
     // Store
     setCustomCommentPrefix(Config.globalToggleCommentPrefix);
+
+    // Toggle push/pop highlighting
+    const brackets: vscode.CharacterPair[] = [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"]
+    ];
+    if (Config.globalEnablePushPopMatching)
+        brackets.push(["push", "pop"]);
+    vscode.languages.setLanguageConfiguration("asm-collection", {brackets});
 }
 
 

@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "2.5.0",
+    "version": "2.6.0",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -140,10 +140,17 @@
                 },
                 "asm-code-lens.comments.toggleLineCommentPrefix": {
                     "order": 91,
-                    "scope": "window",
+                    "scope": "application",
                     "markdownDescription": "Configure the prefix used when toggling the line comment.",
                     "type": "string",
                     "default": ";"
+                },
+                "asm-code-lens.enablePushPopMatching": {
+                    "order": 92,
+                    "scope": "application",
+                    "markdownDescription": "Enable highlighting of matching push/pop pairs.",
+                    "type": "boolean",
+                    "default": true
                 },
                 "asm-code-lens.labels.colon": {
                     "order": 101,
