@@ -1,5 +1,10 @@
 # Changelog
 
+# 2.5.0
+- Toggling of block comments (/* ... */) supported
+- Matching brackets highlighting
+- Autoclosing and autosurrounding for brackets, block comments and quotation marks
+
 # 2.4.2
 - Hover: Check added that text range is valid.
 - Fixed: macro (without name according sjasmplus) could result in no symbols in outline view.
