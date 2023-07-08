@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "2.4.2",
+    "version": "2.5.0",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -209,7 +209,7 @@
         "commands": [
             {
                 "command": "asm-code-lens.whatsNew",
-                "title": "Show 'What's New' page of this ASM-Code-Lens release.",
+                "title": "Show \"What's New\" page of this ASM-Code-Lens release.",
                 "category": "asm-code-lens"
             },
             {
@@ -246,7 +246,7 @@
                 "aliases": [
                     "Assembler file"
                 ],
-                "configuration": "./asm-collection.language.configuration.json"
+                "configuration": "./config/asm-collection.language.configuration.json"
             },
             {
                 "id": "asm-list-file",
