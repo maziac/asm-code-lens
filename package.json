@@ -20,6 +20,9 @@
         "type": "git",
         "url": "https://github.com/maziac/asm-code-lens"
     },
+    "sponsor": {
+        "url": "https://github.com/sponsors/maziac"
+    },
     "bugs": {
         "url": "https://github.com/maziac/asm-code-lens/issues"
     },
