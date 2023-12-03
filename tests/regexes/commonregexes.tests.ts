@@ -1,4 +1,4 @@
-import { AllowedLanguageIds } from './../../src/languageId';
+import {AllowedLanguageIds} from './../../src/languageId';
 import * as assert from 'assert';
 import {CommonRegexes} from '../../src/regexes/commonregexes';
 import {CompletionRegexes} from './../../src/regexes/completionregexes';
@@ -207,33 +207,35 @@ suite('CommonRegexes', () => {
     });
 
 
-    suite('RegEx 1 capture', () => {
-
-        function checkResults1Capture(regex: RegExp, insOuts: string[]) {
-            try {
-                // Check the test
-                const count = insOuts.length;
-                const div = 3;  // Line divider
-                assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
-                for (let i = 0; i < count; i += div) {
-                    const input = insOuts[i];
-                    const prefix = insOuts[i + 1];
-                    const label = insOuts[i + 2];
-                    const result = regex.exec(input);
-                    if (result) {
-                        const foundPrefix = result[1];
-                        const foundLabel = result[2];
-                        assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i / div) + ": " + input);
-                        assert.equal(label, foundLabel, "Label: '" + label + "' == '" + foundLabel + "', Line " + (i / div));
-                    }
-                    else
-                        assert.equal(label, '', "Label (b):'" + label + "' == '', Line " + (i / div));
+    function checkResults1Capture(regex: RegExp, insOuts: string[]) {
+        let i;
+        const div = 3;  // Line divider
+        try {
+            // Check the test
+            const count = insOuts.length;
+            assert.equal(count % div, 0, "Testcase error: Number of lines in input and output should be equal, otherwise the test is wrong!");
+            for (i = 0; i < count; i += div) {
+                const input = insOuts[i];
+                const prefix = insOuts[i + 1];
+                const label = insOuts[i + 2];
+                const result = regex.exec(input);
+                if (result) {
+                    const foundPrefix = result[1];
+                    const foundLabel = result[2];
+                    assert.equal(prefix, foundPrefix, "Prefix: '" + prefix + "' == '" + foundPrefix + "', Line " + (i / div) + ": " + input);
+                    assert.equal(label, foundLabel, "Label: '" + label + "' == '" + foundLabel + "', Line " + (i / div));
                 }
-            }
-            catch (e) {
-                assert.fail("Testcase assertion: " + e);
+                else
+                    assert.equal(label, '', "Label (b):'" + label + "' == '', Line " + (i / div));
             }
         }
+        catch (e) {
+            assert.fail("Testcase assertion: " + e + "\nin " + (i / div) + ": '" + insOuts[i] + "'");
+        }
+    }
+
+
+    suite('RegEx 1 capture', () => {
 
         test('regexLabelColon asm', (done) => {
             const regex = CommonRegexes.regexLabelWithColon("asm-collection");
@@ -292,6 +294,7 @@ suite('CommonRegexes', () => {
         test('regexLabelWithoutColon', (done) => {
             const regex = CommonRegexes.regexLabelWithoutColon();
             const insOuts = [
+                // input-line, found-prefix, found-label
                 "label1", "", "label1",
                 "LABEL1", "", "LABEL1",
                 "label1  defb 0 ; comment", "", "label1",
@@ -303,7 +306,6 @@ suite('CommonRegexes', () => {
                 "label.init ", "", "label.init",
                 "_LABEL.INIT_ ", "", "_LABEL.INIT_",
                 "label._init", "", "label._init",
-                "label ", "", "label",
 
                 "label", "", "label",
                 "  label2", "", "",
@@ -313,7 +315,61 @@ suite('CommonRegexes', () => {
                 ".label", "", "",
                 " .label", "", "",
                 " .label ", "", "",
+
                 "label:", "", "",
+            ];
+
+            checkResults1Capture(regex, insOuts);
+            done();
+        });
+
+        test('regexLabelWithAndWithoutColon', (done) => {
+            const regex = CommonRegexes.regexLabelWithAndWithoutColon();
+            const insOuts = [
+                // input-line, found-prefix, found-label
+                // Without :
+                "label1", "", "label1",
+                "LABEL1", "", "LABEL1",
+                "label1  defb 0 ; comment", "", "label1",
+                "Label1", "", "Label1",
+                "label_0123456789 ", "", "label_0123456789",
+                "l", "", "l",
+                "0l", "", "",
+                "_l ", "", "_l",
+                "label.init ", "", "label.init",
+                "_LABEL.INIT_ ", "", "_LABEL.INIT_",
+                "label._init", "", "label._init",
+
+                "label", "", "label",
+                "  label2", "", "",
+                "  label2 ", "", "",
+                "   label2 defw 898; comm", "", "",
+                "   label2.loop", "", "",
+                ".label", "", "",
+                " .label", "", "",
+                " .label ", "", "",
+
+                // input-line, found-prefix, found-label
+                // With :
+                "label1:", "", "label1",
+                "LABEL1:", "", "LABEL1",
+                "label1:  defb 0 ; comment", "", "label1",
+                "Label1:", "", "Label1",
+                "label_0123456789: ", "", "label_0123456789",
+                "l:", "", "l",
+                "0l:", "", "",
+                "_l: ", "", "_l",
+                "label.init: ", "", "label.init",
+                "_LABEL.INIT_: ", "", "_LABEL.INIT_",
+                "label._init:", "", "label._init",
+
+                "@label2:", "@", "label2",
+                "label2: ", "", "label2",
+                " label2: ", "", "",
+                "label2:defw 898; comm", "", "label2",
+                "label2.loop:", "", "label2.loop",
+                ".label:", "", "",
+                " .label:", "", "",
             ];
 
             checkResults1Capture(regex, insOuts);
@@ -321,6 +377,117 @@ suite('CommonRegexes', () => {
         });
     });
 
+
+    // For special compilers (M80) that allow special characters ($) in labels.
+    // See https://github.com/maziac/asm-code-lens/issues/103
+    suite('RegEx labels with special characters', () => {
+
+
+        test('regexLabelColon asm', (done) => {
+            const regex = CommonRegexes.regexLabelWithColon("asm-collection");
+            const insOuts = [
+                // input-line, found-prefix, found-label
+                "lab$el1:", "", "label1",
+                "LAB$EL1:", "", "LABEL1",
+                "lab$el1:  defb 0 ; comment", "", "label1",
+                "Lab$el1:", "", "Label1",
+                "lab$el_0123456789: ", "", "label_0123456789",
+                "l$:", "", "l",
+                "0$l:", "", "",
+                "_$l: ", "", "_$l",
+                "lab$el.i$it: ", "", "lab$el.in$it",
+
+                "lab$el", "", "",
+                "@lab$el2:", "@", "lab$el2",
+                "lab$el2: ", "", "lab$el2",
+                "lab$el2:defw 898; comm", "", "lab$el2",
+                "lab$el2.lo$op:", "", "lab$el2.loo$p",
+            ];
+
+            checkResults1Capture(regex, insOuts);
+            done();
+        });
+
+
+        test('regexLabelColon list', (done) => {
+            const regex = CommonRegexes.regexLabelWithColon("asm-list-file");
+            const insOuts = [
+                // For list file
+                "6017.R11 00 AF     lab$el:", "6017.R11 00 AF     ", "lab$el",
+                "6017.R11 00 AF     LAB$EL:", "6017.R11 00 AF     ", "LAB$EL",
+                "39+ 6017           lab$el:", "39+ 6017           ", "lab$el",
+                "29    0012  D3 FE  lab$el:", "29    0012  D3 FE  ", "lab$el",
+                "625++C4D1          lab$el:", "625++C4D1          ", "lab$el",
+                "626++C4D1 FE 10    lab$el:", "626++C4D1 FE 10    ", "lab$el",
+                "626++C4D1 FE 10    @lab$el:", "626++C4D1 FE 10    @", "lab$el",
+                "626++C4D1 FE 10    lab$el.l$a:", "626++C4D1 FE 10    ", "lab$el.l$a",
+                "626++C4D1 FE 10    _LAB$EL.L$A_:", "626++C4D1 FE 10    ", "_LAB$EL.L$A_",
+            ];
+
+            checkResults1Capture(regex, insOuts);
+            done();
+        });
+
+
+        test('regexLabelWithoutColon', (done) => {
+            const regex = CommonRegexes.regexLabelWithoutColon();
+            const insOuts = [
+                // input-line, found-prefix, found-label
+                "lab$el1", "", "lab$el1",
+                "LAB$EL1", "", "LAB$EL1",
+                "lab$el1  defb 0 ; comment", "", "lab$el1",
+                "Lab$el1", "", "Lab$el1",
+                "lab$el_0123456789 ", "", "lab$el_0123456789",
+                "l", "", "l",
+                "0l", "", "",
+                "_l ", "", "_l",
+                "lab$el.in$it ", "", "lab$el.in$it",
+                "_LAB$EL.IN$IT_ ", "", "_LAB$EL.IN$IT_",
+                "lab$el._in$it", "", "lab$el._in$it",
+            ];
+
+            checkResults1Capture(regex, insOuts);
+            done();
+        });
+
+        test('regexLabelWithAndWithoutColon', (done) => {
+            const regex = CommonRegexes.regexLabelWithAndWithoutColon();
+            const insOuts = [
+                // input-line, found-prefix, found-label
+                // Without:
+                "lab$el1", "", "lab$el1",
+                "LAB$EL1", "", "LAB$EL1",
+                "lab$el1  defb 0 ; comment", "", "lab$el1",
+                "Lab$el1", "", "Lab$el1",
+                "lab$el_0123456789 ", "", "lab$el_0123456789",
+                "l", "", "l",
+                "0l", "", "",
+                "_l ", "", "_l",
+                "lab$el.in$it ", "", "lab$el.in$it",
+                "_LAB$EL.IN$IT_ ", "", "_LAB$EL.IN$IT_",
+                "lab$el._in$it", "", "lab$el._in$it",
+
+                // With:
+                "lab$el1:", "", "label1",
+                "LAB$EL1:", "", "LABEL1",
+                "lab$el1:  defb 0 ; comment", "", "label1",
+                "Lab$el1:", "", "Label1",
+                "lab$el_0123456789: ", "", "label_0123456789",
+                "l$:", "", "l",
+                "0$l:", "", "",
+                "_$l: ", "", "_$l",
+                "lab$el.i$it: ", "", "lab$el.in$it",
+
+                "@lab$el2:", "@", "lab$el2",
+                "lab$el2: ", "", "lab$el2",
+                "lab$el2:defw 898; comm", "", "lab$el2",
+                "lab$el2.lo$op:", "", "lab$el2.loo$p",
+            ];
+
+            checkResults1Capture(regex, insOuts);
+            done();
+        });
+    });
 
 
     // insOuts: search-word, input-line, should-match, found-prefix
@@ -389,7 +556,7 @@ suite('CommonRegexes', () => {
 
         test('regexLabelColonForWord list', (done) => {
             const insOuts = [
-                 // For list file
+                // For list file
                 "label", "6017.R11 00 AF     label:", true, "6017.R11 00 AF     ",
                 "label", "39+ 6017           label:", true, "39+ 6017           ",
                 "label", "29    0012  D3 FE  label:", true, "29    0012  D3 FE  ",
