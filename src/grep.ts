@@ -390,8 +390,8 @@ export async function reduceLocations(regexLbls: RegExp, locations: GrepLocation
 
         // Check if same location as searchLabel.
         if (removeOwnLocation
-            && pos.line == position.line
-            && fileName == fileName) {
+            && pos.line === position.line
+            && fileName === docFileName) {
             // Remove also this location
             redLocs.splice(i, 1);
             // Remember
@@ -405,10 +405,10 @@ export async function reduceLocations(regexLbls: RegExp, locations: GrepLocation
         loc.moduleLabel = mLabel.moduleLabel;
         // 3. 'searchLabel' is compared with all labels.
         if (checkFullName) {
-            if (mLabel.label == searchLabel.label
-                || mLabel.moduleLabel == searchLabel.moduleLabel
-                || mLabel.moduleLabel == searchLabel.label
-                || mLabel.label == searchLabel.moduleLabel)
+            if (mLabel.label === searchLabel.label
+                || mLabel.moduleLabel === searchLabel.moduleLabel
+                || mLabel.moduleLabel === searchLabel.label
+                || mLabel.label === searchLabel.moduleLabel)
                 continue; // Please note: the test is ambiguous. There might be situations were this is wrong.
         }
         else {
