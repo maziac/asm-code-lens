@@ -84,10 +84,7 @@ export class Commands {
                 if (count == 0) {
                     // No reference
                     unrefLabels++;
-                    if(osName === "win32")
-                        output.appendLine(label + ", " + fileName + ":" + (pos.line + 1));
-                    else
-                        output.appendLine(label + ", file://" + fileName + ":" + (pos.line + 1));
+                    output.appendLine(label + ", " + fileName + ":" + (pos.line + 1));
                 }
                 // Check for last search
                 labelsCount--;
