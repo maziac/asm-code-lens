@@ -6,10 +6,10 @@ import * as assert from 'assert';
 suite('FoldingRegexes', () => {
 
     test('regexSingleLineComments', () => {
-        assert.equal(FoldingRegexes.regexCommentSingleLine(undefined).source, "^(;|\\/\\/)");
+        assert.equal(FoldingRegexes.regexCommentSingleLine().source, "^(;|\\/\\/)");
         assert.equal(FoldingRegexes.regexCommentSingleLine('#').source, "^(;|\\/\\/|#)");
 
-        let r = FoldingRegexes.regexCommentSingleLine(undefined);
+        let r = FoldingRegexes.regexCommentSingleLine();
         let m = r.exec(';=======');
         assert.notEqual(m, undefined);
 

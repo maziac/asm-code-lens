@@ -184,10 +184,8 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
     }
 
     // Register (always, even if disabled)
-    {
-        regFoldingProvider = vscode.languages.registerFoldingRangeProvider({scheme: "file", language: 'asm-collection'}, new FoldingProvider());
+    regFoldingProvider = vscode.languages.registerFoldingRangeProvider({scheme: "file", language: 'asm-collection'}, new FoldingProvider());
         context.subscriptions.push(regFoldingProvider);
-    }
 
     // Toggle line Comment configuration
     vscode.languages.setLanguageConfiguration("asm-collection", {comments: {lineComment: Config.globalToggleCommentPrefix, blockComment: ["/*", "*/"]}});

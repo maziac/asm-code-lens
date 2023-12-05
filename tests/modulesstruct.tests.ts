@@ -59,7 +59,7 @@ label7:
         };
 
         const regexLbls = CommonRegexes.regexLabel({labelsWithColons: true, labelsWithoutColons: false}, "asm-collection");
-        const regexEnd = /[\w\.]/;
+        const regexEnd = /[\w.]/;
 
         let mLabel = getLabelAndModuleLabelFromFileInfo(regexLbls, fileInfo, 1, 0, regexEnd);
         assert.deepEqual(mLabel, {label: 'label1', moduleLabel: 'label1'});

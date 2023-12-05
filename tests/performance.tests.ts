@@ -39,19 +39,19 @@ regexEveryMacroForWord:  7.5% speed
  */
 class RefRegexes {
     public static regexLabelColon(): RegExp {
-        return /(^\s*@?)\b([a-z_][\w\.]*):/i;
+        return /(^\s*@?)\b([a-z_][\w.]*):/i;
     }
     public static regexLabelWithoutColon(): RegExp {
-        return /^(@?)([a-z_][\w\.]*)(?:\s|$)/i;
+        return /^(@?)([a-z_][\w.]*)(?:\s|$)/i;
     }
     public static regexLabelEquOrMacro(): RegExp {
-        return /^[\w\.]+:?\s*\b(equ|macro)/i;
+        return /^[\w.]+:?\s*\b(equ|macro)/i;
     }
     public static regexInclude(): RegExp {
         return /\s*INCLUDE\s+"(.*)"/i;
     }
     public static regexModuleStruct(): RegExp {
-        return /^\s+(MODULE|STRUCT)\s+([\w\.]+)/i;
+        return /^\s+(MODULE|STRUCT)\s+([\w.]+)/i;
     }
     public static regexEndModuleStruct(): RegExp {
         return /^\s+(ENDMODULE|ENDS)\b/i;
@@ -118,45 +118,43 @@ suite('Performance', () => {
      * @returns The duration in ms.
      */
     function measure(regex: RegExp, compareAsm: boolean, compareList: boolean, count = BASE_COUNT): number {
-        {
-            //console.time();
-            //const prevTime = Date.now();
-            const prevTime: bigint = process.hrtime.bigint();
+        //console.time();
+        //const prevTime = Date.now();
+        const prevTime: bigint = process.hrtime.bigint();
 
-            if (compareAsm && compareList) {
-                for (let i = count; i > 0; i--) {
-                    // asm file
-                    for (const line of asmLines)
-                        regex.exec(line);
-                    // list file
-                    for (const line of listLines)
-                        regex.exec(line);
-                }
+        if (compareAsm && compareList) {
+            for (let i = count; i > 0; i--) {
+                // asm file
+                for (const line of asmLines)
+                    regex.exec(line);
+                // list file
+                for (const line of listLines)
+                    regex.exec(line);
             }
-            else if (compareAsm) {
-                for (let i = count; i > 0; i--) {
-                    // asm file
-                    for (const line of asmLines)
-                        regex.exec(line);
-                }
-            }
-            else if (compareList) {
-                for (let i = count; i > 0; i--) {
-                    // list file
-                    for (const line of listLines)
-                        regex.exec(line);
-                }
-            }
-
-            //const afterTime = Date.now();
-            const afterTime: bigint = process.hrtime.bigint();
-            //console.timeEnd();
-            //return afterTime - prevTime;
-            const diff = afterTime - prevTime;
-            const ms = Number(diff).valueOf() / 1000000;
-            //console.log(ms);
-            return ms;
         }
+        else if (compareAsm) {
+            for (let i = count; i > 0; i--) {
+                // asm file
+                for (const line of asmLines)
+                    regex.exec(line);
+            }
+        }
+        else if (compareList) {
+            for (let i = count; i > 0; i--) {
+                // list file
+                for (const line of listLines)
+                    regex.exec(line);
+            }
+        }
+
+        //const afterTime = Date.now();
+        const afterTime: bigint = process.hrtime.bigint();
+        //console.timeEnd();
+        //return afterTime - prevTime;
+        const diff = afterTime - prevTime;
+        const ms = Number(diff).valueOf() / 1000000;
+        //console.log(ms);
+        return ms;
     }
 
 

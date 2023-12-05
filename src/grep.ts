@@ -413,7 +413,7 @@ export async function reduceLocations(regexLbls: RegExp, locations: GrepLocation
         }
         else {
             // Compare regular expressions to catch also scrambled input.
-            if (regexLabel.exec(mLabel.label)
+            if (regexLabel.exec(mLabel.label)   // NOSONAR
                 || regexModuleLabel.exec(mLabel.moduleLabel)
                 || regexLabel.exec(mLabel.moduleLabel)
                 || regexModuleLabel.exec(mLabel.label))

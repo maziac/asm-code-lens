@@ -64,7 +64,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 					break;
 
 				case 'label':
-				default:
+				default: {
 					// Find label, comment etc.
 					let nextState: string | undefined;
 					if (regexLabel.exec(line))
@@ -83,6 +83,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
 						state = nextState;
 					}
 					break;
+				}
 			}
 		}
 
