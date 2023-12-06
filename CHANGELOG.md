@@ -1,12 +1,11 @@
 # Changelog
-# 2.6.1
-- Fixed "CTRL+click" to follow link on macos for "Find labels with no Reference"
-- Fixed an old bug in reduceLocations method.
-- Cleanup
 
 # 2.6.0
 - Line comment prefix scope changed to 'application'. I.e. it is global to asm-code-lens and can be changed only in user settings.
 - Added setting for push/pop pair matching.
+- Fixed "CTRL+click" to follow link on macos for "Find labels with no Reference"
+- Fixed an old bug in reduceLocations method.
+- Cleanup
 
 # 2.5.0
 - Toggling of block comments (/* ... */) supported
