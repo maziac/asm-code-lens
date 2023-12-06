@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import {Config} from './config';
 import {FileMatch, grep, grepMultiple, reduceLocations} from './grep';
 import {CommandsRegexes} from './regexes/commandsregexes';
-import * as os from 'node:os';
 
 
 /// Output to the vscode "OUTPUT" tab.
@@ -50,7 +49,6 @@ export class Commands {
         output.show(true);
 
         try {
-            const osName = os.platform();   // e.g. "win32", "darwin", "linux"
             let labelsCount = locLabels.length;
             let unrefLabels = 0;
             const regexEqu = CommandsRegexes.regexLabelEquOrMacro();
@@ -91,8 +89,6 @@ export class Commands {
                 // output.appendLine("labelCount="+labelsCount);
                 if (labelsCount == 0) {
                     let unrefText = unrefLabels + ' unreferenced label';
-                    if (unrefLabels != 1)
-                        unrefText += 's';
                     output.appendLine("Done. " + unrefText + ((unrefLabels > 1) ? 's' : '') + ".");
                 }
             }
