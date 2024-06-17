@@ -1,5 +1,8 @@
 # Changelog
 
+# 2.6.1
+- Package update.
+
 # 2.6.0
 - Line comment prefix scope changed to 'application'. I.e. it is global to asm-code-lens and can be changed only in user settings.
 - Added setting for push/pop pair matching.
