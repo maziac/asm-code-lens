@@ -33,9 +33,7 @@
     "categories": [
         "Programming Languages"
     ],
-    "activationEvents": [
-        "onStartupFinished"
-    ],
+    "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
         "views": {
