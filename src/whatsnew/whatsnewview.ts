@@ -14,6 +14,7 @@ export class WhatsNewView {
 	/**
 	 * Updates the version number.
 	 * @return true if version was updated. false if version major/minor are equal.
+	 * Also false if this is the first install, i.e. if there is no previous version.
 	 */
 	public static updateVersion(): boolean {
 		// Load data from extension storage
@@ -22,8 +23,12 @@ export class WhatsNewView {
 		const currentVersion = PackageInfo.extension.packageJSON.version;
 
 		// Update version: "major", "minor" and "patch"
-		if (currentVersion != previousVersion)
+		if (currentVersion !== previousVersion)
 			GlobalStorage.Set(versionId, currentVersion);
+
+		// Is there any previous version?
+		if (!previousVersion)
+			return false;
 
 		// Compare
 		const isNewer = Version.isNewVersion(currentVersion, previousVersion);

@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.6.2
+- Startup delayed.
+- What's new not shown on first installation.
+
 # 2.6.1
 - Package update.
 
