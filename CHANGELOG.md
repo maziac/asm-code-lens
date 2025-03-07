@@ -1,5 +1,8 @@
 # Changelog
 
+# 2.6.3
+- Fix for #110: sjasmplus @ labels in modules are not recognised correctly
+
 # 2.6.2
 - Startup delayed.
 - What's new not shown on first installation.

@@ -83,10 +83,11 @@ export function getModuleFileInfo(lines: string[]): FileModuleStructInfo[] {
  * @param startIndex The index into the label.
  * @param regexEnd Defaults to /[\w\.]/ . I.e. the label is returned with all subparts.
  * Note: The HoverProvider might use /\w/ so that the sub parts are not returned.
- * @returns {label, preString} The found label and the part of the string that
+ * @returns {label, preString, atLabel} The found label and the part of the string that
  * is found before 'label'.
+ * Additionally 'atLabel' is true for all labels that start with @.
  */
-export function getCompleteLabel(lineContents: string, startIndex: number, regexEnd = /[\w.]/): {label: string, preString: string} {
+export function getCompleteLabel(lineContents: string, startIndex: number, regexEnd = /[\w.]/): {label: string, preString: string, atLabel: boolean} {
 	// Find end of label.
 	const len = lineContents.length;    // REMARK: This can lead to error: "length of undefined"
 	let k: number;
@@ -115,7 +116,14 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
 	const label = lineContents.substring(i, k);
 	const preString = lineContents.substring(0, i);
 
-	return {label, preString};
+	// Check for @-label
+	let atLabel = false;
+	if (i > 0) {
+		const s = lineContents.charAt(i - 1);
+		atLabel = (s == '@');
+	}
+
+	return {label, preString, atLabel};
 }
 
 
@@ -180,7 +188,13 @@ export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: 
 	// 1. Get original label
 	const lines = fileInfo.lines;
 	const line = lines[row];
-	let {label, preString} = getCompleteLabel(line, clmn, regexEnd);
+	let {label, preString, atLabel} = getCompleteLabel(line, clmn, regexEnd);
+
+	if (label.includes('exi')) {
+		console.log('getLabelAndModuleLabelFromFileInfo: ' + label);
+		let r = getCompleteLabel(line, clmn, regexEnd);
+		console.log(r);
+	}
 
 	// If local label: The document is parsed from position to begin for a non-local label.
 	if (label.startsWith('.')) {
@@ -190,12 +204,15 @@ export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: 
 			label = nonLocalLabel + label;
 	}
 
-	// Now parse file info for the module/struct part of a label
+	// @Labels will not get a module suffix.
 	let moduleStructParentLabel;
-	for (const item of fileInfo.modStructInfos) {
-		if (item.row > row)
-			break;
-		moduleStructParentLabel = item.label;
+	if (!atLabel) {
+		// Now parse file info for the module/struct part of a label
+		for (const item of fileInfo.modStructInfos) {
+			if (item.row >= row)
+				break;
+			moduleStructParentLabel = item.label;
+		}
 	}
 
 	// The MODULE info is added to the original label
