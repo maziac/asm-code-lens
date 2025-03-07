@@ -72,7 +72,7 @@ const completions = [
  */
 export class CompletionProposalsProvider implements vscode.CompletionItemProvider {
     /**
-     * Called from vscode if the user selects "Find all references".
+     * Called from vscode when the user types characters.
      * @param document The current document.
      * @param position The position of the word for which the references should be found.
      * @param token

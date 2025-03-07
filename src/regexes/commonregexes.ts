@@ -113,7 +113,7 @@ export class CommonRegexes {
 
 
     /**
-     * Calculates the start index by adding the length of each matches.
+     * Calculates the start index by adding the length of each match.
      * (Exported for unit tests)
      */
     public static calcStartIndex(match: RegExpExecArray): number {
