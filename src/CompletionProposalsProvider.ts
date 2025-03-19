@@ -116,7 +116,8 @@ export class CompletionProposalsProvider implements vscode.CompletionItemProvide
         const regexLbls = CommonRegexes.regexLabel(config, languageId);
         let nonLocalLabel;  // Only used for local labels
         if (rowLabel.label.startsWith('.')) {
-            nonLocalLabel = getNonLocalLabel(regexLbls, lines, row);
+            const result = getNonLocalLabel(regexLbls, lines, row, -1);
+            nonLocalLabel = result.label;
         }
 
         // Search

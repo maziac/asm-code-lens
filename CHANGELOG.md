@@ -2,6 +2,7 @@
 
 # 2.6.3
 - Fix for #110: sjasmplus @ labels in modules are not recognised correctly
+- Adjusted @label behavior to sjasmplus 1.21.0
 
 # 2.6.2
 - Startup delayed.

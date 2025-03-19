@@ -120,7 +120,7 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
 	let atLabel = false;
 	if (i > 0) {
 		const s = lineContents.charAt(i - 1);
-		atLabel = (s == '@');
+		atLabel = (s === '@');
 	}
 
 	return {label, preString, atLabel};
@@ -132,23 +132,27 @@ export function getCompleteLabel(lineContents: string, startIndex: number, regex
  * first non local label.
  * @param regexLbls Regexes to find labels. A different regex depending on asm or list file and colons used or not.
  * @param lines An array of strings containing the complete text.
- * @param index The starting line (the line where the label was found.
+ * @param index The starting line (the line where the label was found).
+ * @param minIndex The minimum index to search for labels (exclusive).
  * @returns A string like 'check_collision'. undefined if nothing found.
  */
-export function getNonLocalLabel(regexLbls: RegExp, lines: Array<string>, index: number): string {
+export function getNonLocalLabel(regexLbls: RegExp, lines: Array<string>, index: number, minIndex: number): {label: string, atLabel: boolean} {
 	// Loop
 	let match;
-	for (; index >= 0; index--) {
+	for (; index > minIndex; index--) {
 		const line = lines[index];
 		match = regexLbls.exec(line);
 		if (match) {
 			const label = match[2];
-			return label;
+			const atLabel = (match[1] === '@');
+			return {
+				label, atLabel
+			};
 		}
 	}
 
 	// Out of bounds check
-	return undefined as any;
+	return {label: '_', atLabel: false};
 }
 
 
@@ -190,28 +194,33 @@ export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: 
 	const line = lines[row];
 	let {label, preString, atLabel} = getCompleteLabel(line, clmn, regexEnd);
 
+	// TODO: Remove this debug code
 	if (label.includes('exi')) {
 		console.log('getLabelAndModuleLabelFromFileInfo: ' + label);
 		let r = getCompleteLabel(line, clmn, regexEnd);
 		console.log(r);
 	}
 
-	// If local label: The document is parsed from position to begin for a non-local label.
-	if (label.startsWith('.')) {
-		// Local label, e.g. ".loop"
-		const nonLocalLabel = getNonLocalLabel(regexLbls, lines, row);
-		if (nonLocalLabel)
-			label = nonLocalLabel + label;
-	}
-
 	// @Labels will not get a module suffix.
 	let moduleStructParentLabel;
+	let moduleLabelRow = -1;
 	if (!atLabel) {
 		// Now parse file info for the module/struct part of a label
 		for (const item of fileInfo.modStructInfos) {
 			if (item.row >= row)
 				break;
 			moduleStructParentLabel = item.label;
+			moduleLabelRow = item.row;
+		}
+	}
+
+	// If local label: The document is parsed from position to begin for a non-local label.
+	if (label.startsWith('.')) {
+		// Local label, e.g. ".loop"
+		const result = getNonLocalLabel(regexLbls, lines, row, moduleLabelRow);
+		label = result.label + label;
+		if (result.atLabel) {
+			moduleStructParentLabel = undefined;
 		}
 	}
 
@@ -220,7 +229,7 @@ export function getLabelAndModuleLabelFromFileInfo(regexLbls: RegExp, fileInfo: 
 
 	// Check that no character is preceding the label or label ends with ':' (for list files)
 	const k = preString.length + label.length;
-	if (preString.length == 0 || line[k] == ':') {
+	if (preString.length === 0 || line[k] === ':') {
 		// It's the definition of a label, so moduleLabel is the only possible label.
 		label = moduleLabel;
 	}
