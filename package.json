@@ -1,7 +1,7 @@
 {
     "name": "asm-code-lens",
     "displayName": "ASM Code Lens",
-    "version": "2.6.2",
+    "version": "2.6.3-rc1",
     "publisher": "maziac",
     "description": "A language server that enables code lens, references, hover information, symbol renaming and the outline view for assembler files.",
     "author": {
@@ -337,8 +337,8 @@
         "@types/node": "^18.8.2",
         "@types/vscode": "^1.71.0",
         "@types/vscode-webview": "^1.57.0",
+        "esbuild": "^0.25.0",
         "mocha": "^10.4.0",
-        "esbuild": "^0.16.9",
         "source-map-support": "^0.5.21",
         "typescript": "^4.8.4"
     }
